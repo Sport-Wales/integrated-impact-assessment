@@ -1,0 +1,304 @@
+/* src/styles/index.css */
+/* Sport Wales Global Styles Sheet (SWGS) */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Font Face Declarations */
+@font-face {
+  font-family: 'Objektiv MK1';
+  src: url('/fonts/ObjektivMk1-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Objektiv MK1';
+  src: url('/fonts/ObjektivMk1-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Objektiv MK1';
+  src: url('/fonts/ObjektivMk1-XBold.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Primary Brand Colors */
+  --color-sw-red: #E32434;
+  --color-sw-yellow: #F6B207;
+  --color-sw-blue: #164B64;
+  --color-sw-green: #299D91;
+
+  /* Primary Brand Colors Accent */
+  --color-sw-red-light: #F7BDC2;
+  --color-sw-yellow-light: #FFFFB7;
+  --color-sw-blue-light: #6CD0FF;
+  --color-sw-green-light: #97E9E1;
+  --color-sw-red-dark: #8E0A0A;
+  --color-sw-yellow-dark: #A77B00;
+  --color-sw-blue-dark: #001830;
+  --color-sw-green-dark: #005D53;
+
+  /* Neutral Colors */
+  --color-black: #000000;
+  --color-grey: #BFBEC5;
+  --color-light-grey: #F4F5F7;
+  --color-white: #FFFFFF;
+
+  /* Typography - Font Families */
+  --font-primary: 'Objektiv MK1', 'Montserrat', Arial, sans-serif;
+  --font-fallback: 'Montserrat', sans-serif;
+  --font-system: 'Arial', sans-serif;
+
+  /* Font Weights */
+  --font-weight-regular: 400;
+  --font-weight-bold: 700;
+  --font-weight-xbold: 800;
+
+  /* Font Sizes */
+  --font-size-body: 16px;
+  --font-size-label: 20px;
+  --font-size-head: 24px;
+  --font-size-subhead: 20px;
+  --font-size-hero: 95px;
+
+  /* Line Heights */
+  --line-height-tight: 100%;
+  --line-height-normal: 110%;
+  --line-height-relaxed: 130%;
+
+  /* Spacing & Layout */
+  --margin-small: 5%;
+  --margin-large: 10%;
+  --gutter-width: calc(var(--margin-small) / 2);
+
+  /* Border Radius */
+  --border-radius-button: 8px;
+
+  /* Component Specific */
+  --button-height: 46px;
+  --button-padding: 1rem 2rem;
+
+  /* Layout */
+  --logo-min-width: 160px;
+  --clear-space-logo: 1em;
+
+  /* Transitions */
+  --transition-default: 0.3s ease-in-out;
+
+  /* Opacity */
+  --overlay-light: 75%;
+  --overlay-dark: 90%;
+}
+
+/* Base Styles */
+@layer base {
+  body {
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-normal);
+    color: var(--color-black);
+    background-color: var(--color-white);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: var(--font-weight-xbold);
+    line-height: var(--line-height-tight);
+  }
+}
+
+/* Custom Utility Classes */
+@layer utilities {
+  .sw-text-red {
+    color: var(--color-sw-red);
+  }
+
+  .sw-bg-red {
+    background-color: var(--color-sw-red);
+  }
+
+  .sw-text-blue {
+    color: var(--color-sw-blue);
+  }
+
+  .sw-bg-blue {
+    background-color: var(--color-sw-blue);
+  }
+
+  .sw-text-yellow {
+    color: var(--color-sw-yellow);
+  }
+
+  .sw-bg-yellow {
+    background-color: var(--color-sw-yellow);
+  }
+
+  .sw-text-green {
+    color: var(--color-sw-green);
+  }
+
+  .sw-bg-green {
+    background-color: var(--color-sw-green);
+  }
+}
+
+@layer components {
+  /* Button System */
+  .sw-button {
+    height: var(--button-height);
+    padding: var(--button-padding);
+    border-radius: var(--border-radius-button);
+    font-weight: var(--font-weight-bold);
+    transition: var(--transition-default);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sw-button-primary {
+    @apply sw-bg-red text-white hover:opacity-90;
+  }
+
+  .sw-button-secondary {
+    @apply sw-bg-blue text-white hover:opacity-90;
+  }
+  
+  .sw-button-neutral {
+    @apply bg-gray-500 text-white hover:bg-gray-600;
+  }
+
+  /* Form Components */
+  .sw-input {
+    height: var(--button-height);
+    border-radius: var(--border-radius-button);
+    padding: 0 1rem;
+    border: 1px solid var(--color-grey);
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
+    width: 100%;
+  }
+
+  .sw-textarea {
+    border-radius: var(--border-radius-button);
+    padding: 1rem;
+    border: 1px solid var(--color-grey);
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
+    min-height: 150px;
+    width: 100%;
+  }
+
+  .sw-label {
+    @apply text-lg font-semibold;
+    color: var(--color-sw-blue);
+    font-family: var(--font-primary);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .sw-checkbox {
+    @apply w-5 h-5 rounded border-2 focus:ring-2;
+    border-color: var(--color-sw-blue);
+    color: var(--color-sw-red);
+  }
+
+  /* Layout Components */
+  .sw-container {
+    @apply max-w-5xl mx-auto;
+    padding: 0 var(--margin-small);
+  }
+
+  .sw-card {
+    border-radius: var(--border-radius-button);
+    background-color: var(--color-white);
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Header Components */
+  .sw-header {
+    @apply sw-bg-red text-white p-6;
+  }
+
+  .sw-heading-primary {
+    @apply text-3xl font-extrabold leading-tight mb-4;
+    font-family: var(--font-primary);
+    font-weight: var(--font-weight-xbold);
+  }
+
+  .sw-heading-secondary {
+    @apply text-2xl font-bold mb-3;
+    font-family: var(--font-primary);
+    font-weight: var(--font-weight-bold);
+  }
+
+  /* Content Display */
+  .sw-notice {
+    @apply p-4 rounded-lg;
+    background-color: rgba(246, 178, 7, 0.1);
+    border-left: 4px solid var(--color-sw-yellow);
+  }
+
+  .sw-results {
+    @apply p-6 rounded-lg;
+    background-color: var(--color-sw-blue);
+    color: var(--color-white);
+  }
+
+  .sw-highlight {
+    @apply p-4 rounded-lg;
+    background-color: var(--color-sw-green);
+    color: var(--color-white);
+  }
+
+  .sw-sidebar-card {
+    @apply p-6 rounded-lg;
+    background-color: var(--color-light-grey);
+  }
+
+  /* Progress Bar */
+  .sw-progress-container {
+    @apply w-full bg-gray-200 rounded-full h-3 mb-8;
+  }
+
+  .sw-progress-bar {
+    @apply bg-sw-red h-3 rounded-full;
+  }
+
+  /* Step Indicator */
+  .sw-step-indicator {
+    @apply flex justify-between items-center mt-4 mb-8;
+  }
+
+  .sw-step {
+    @apply flex flex-col items-center;
+  }
+
+  .sw-step-circle {
+    @apply w-8 h-8 rounded-full flex items-center justify-center text-white text-sm mb-1;
+  }
+
+  .sw-step-title {
+    @apply text-xs text-center;
+  }
+
+  .sw-step-active {
+    @apply bg-sw-red;
+  }
+
+  .sw-step-completed {
+    @apply bg-sw-green;
+  }
+
+  .sw-step-incomplete {
+    @apply bg-gray-300;
+  }
+}
