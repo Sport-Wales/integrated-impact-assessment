@@ -10,6 +10,13 @@ const LandingPage = () => {
 		resetFormData();
 	}, [resetFormData]);
 
+	// bug fix: FormSelection not loading. Quick and dirty solution:
+	const handleStart = () => {
+		window.location.href = '/form-selection';
+	};
+
+	  
+
 	return (
 		<div className="max-w-4xl mx-auto px-4 py-12">
 			<h2 className="sw-heading-primary text-3xl font-bold mb-8">
@@ -71,14 +78,13 @@ const LandingPage = () => {
 						approach to Making an Impact.
 					</p>
 				</div>
-
 				<div className="mt-8 flex justify-center">
-					<Link
-						to="/form-selection"
-						className="sw-button sw-button-primary"
+					<button
+						onClick={handleStart}
+						className="px-4 py-2 bg-red-600 text-white rounded font-bold hover:bg-red-700"
 					>
 						Start
-					</Link>
+					</button>
 				</div>
 			</div>
 		</div>
