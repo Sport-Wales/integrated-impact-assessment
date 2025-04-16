@@ -1,70 +1,287 @@
+/* SW Global Styles Sheet (SWGS) */
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Language Toggle */
+.language-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 50;
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Font Face Declarations */
+@font-face {
+  font-family: "Objektiv MK1";
+  src: url("/fonts/ObjektivMk1-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Objektiv MK1";
+  src: url("/fonts/ObjektivMk1-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Objektiv MK1";
+  src: url("/fonts/ObjektivMk1-XBold.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* Primary Brand Colors */
+  --color-sw-red: #e32434;
+  --color-sw-yellow: #f6b207;
+  --color-sw-blue: #164b64;
+  --color-sw-green: #299d91;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* Primary Brand Colors Accent */
+  --color-sw-red-light: #f7bdc2;
+  --color-sw-yellow-light: #ffffb7;
+  --color-sw-blue-light: #6cd0ff;
+  --color-sw-green-light: #97e9e1;
+  --color-sw-red-dark: #8e0a0a;
+  --color-sw-yellow-dark: #a77b00;
+  --color-sw-blue-dark: #001830;
+  --color-sw-green-dark: #005d53;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Neutral Colors */
+  --color-black: #000000;
+  --color-grey: #bfbec5;
+  --color-light-grey: #f4f5f7;
+  --color-white: #ffffff;
+
+  /* Typography - Font Families */
+  --font-primary: "Objektiv MK1", "Montserrat", Arial, sans-serif;
+  --font-fallback: "Montserrat", sans-serif;
+  --font-system: "Arial", sans-serif;
+
+  /* Font Weights */
+  --font-weight-regular: 400;
+  --font-weight-bold: 700;
+  --font-weight-xbold: 800;
+
+  /* Font Sizes */
+  --font-size-body: 16px;
+  --font-size-label: 20px;
+  --font-size-head: 24px;
+  --font-size-subhead: 20px;
+  --font-size-hero: 95px;
+
+  /* Line Heights */
+  --line-height-tight: 100%;
+  --line-height-normal: 110%;
+  --line-height-relaxed: 130%;
+
+  /* Spacing & Layout */
+  --margin-small: 5%;
+  --margin-large: 10%;
+  --gutter-width: calc(var(--margin-small) / 2);
+
+  /* Border Radius */
+  --border-radius-button: 8px;
+
+  /* Component Specific */
+  --button-height: 46px;
+  --button-padding: 1rem 2rem;
+
+  /* Layout */
+  --logo-min-width: 160px;
+  --clear-space-logo: 1em;
+
+  /* Transitions */
+  --transition-default: 0.3s ease-in-out;
+
+  /* Opacity */
+  --overlay-light: 75%;
+  --overlay-dark: 90%;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+/* Base Styles */
+@layer base {
+  body {
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-normal);
   }
-  a:hover {
-    color: #747bff;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: var(--font-weight-xbold);
+    line-height: var(--line-height-tight);
   }
-  button {
-    background-color: #f9f9f9;
+}
+
+/* Custom Utility Classes */
+@layer utilities {
+  .sw-text-red {
+    color: var(--color-sw-red);
+  }
+
+  .sw-bg-red {
+    background-color: var(--color-sw-red);
+  }
+
+  .sw-text-blue {
+    color: var(--color-sw-blue);
+  }
+
+  .sw-bg-blue {
+    background-color: var(--color-sw-blue);
+  }
+
+  .sw-text-yellow {
+    color: var(--color-sw-yellow);
+  }
+
+  .sw-bg-yellow {
+    background-color: var(--color-sw-yellow);
+  }
+
+  .sw-text-green {
+    color: var(--color-sw-green);
+  }
+
+  .sw-bg-green {
+    background-color: var(--color-sw-green);
+  }
+
+  .sw-bg-white {
+    background-color: var(--color-white);
+  }
+}
+
+@layer components {
+  /* Button System */
+  .sw-button {
+    height: var(--button-height);
+    padding: var(--button-padding);
+    border-radius: var(--border-radius-button);
+    font-weight: var(--font-weight-bold);
+    transition: var(--transition-default);
+  }
+
+  .sw-button-primary {
+    @apply sw-bg-red text-white hover:opacity-90;
+  }
+
+  .sw-button-secondary {
+    @apply sw-bg-blue text-white hover:opacity-90;
+  }
+
+  /* Form Components */
+  .sw-input {
+    height: var(--button-height);
+    border-radius: var(--border-radius-button);
+    padding: 0 1rem;
+    border: 1px solid var(--color-grey);
+    font-family: var(--font-primary);
+    font-size: var(--font-size-body);
+  }
+
+  .sw-label {
+    @apply text-lg font-semibold;
+    color: black;
+    font-family: var(--font-primary);
+  }
+
+  .sw-sub-label {
+    @apply font-normal;
+  }
+
+  .sw-checkbox {
+    @apply w-5 h-5 rounded border-2 focus:ring-2;
+    border-color: var(--color-sw-blue);
+    color: var(--color-sw-red);
+  }
+
+  /* Layout Components */
+  .sw-container {
+    @apply mx-auto;
+    padding: 0 var(--margin-small);
+  }
+
+  .sw-card {
+    border-radius: var(--border-radius-button);
+    background-color: var(--color-white);
+    padding: 1.5rem;
+  }
+
+  /* Header Components */
+  .sw-header {
+    @apply sw-bg-red text-white p-6;
+  }
+
+  .sw-heading-primary {
+    @apply text-3xl font-extrabold leading-tight;
+    font-family: var(--font-primary);
+    font-weight: var(--font-weight-xbold);
+  }
+
+  .sw-heading-secondary {
+    @apply text-xl font-bold mb-3;
+    font-family: var(--font-primary);
+    font-weight: var(--font-weight-bold);
+  }
+
+  /* Content Display */
+  .sw-notice {
+    @apply p-4 rounded-lg;
+    background-color: rgba(246, 178, 7, 0.1);
+    border-left: 4px solid var(--color-sw-yellow);
+  }
+
+  .sw-results {
+    @apply p-6 rounded-lg;
+    background-color: var(--color-sw-blue);
+    color: var(--color-white);
+  }
+
+  .sw-highlight {
+    @apply p-4 rounded-lg;
+    background-color: var(--color-sw-green);
+    color: var(--color-white);
+  }
+
+  .sw-sidebar-card {
+    @apply p-6 rounded-lg;
+    background-color: var(--color-light-grey);
+  }
+
+  /* Mode Toggle Button */
+  .mode-toggle-button {
+    @apply sw-button flex-1 min-h-[56px] px-8 text-xs font-semibold tracking-wide;
+    transition: var(--transition-default);
+
+    &.active {
+      @apply sw-button-primary shadow-lg scale-105;
+    }
+
+    &.inactive {
+      @apply bg-white border-2 border-[--color-sw-red] text-[--color-sw-red] hover:sw-bg-red hover:text-white hover:scale-102;
+    }
   }
 }
