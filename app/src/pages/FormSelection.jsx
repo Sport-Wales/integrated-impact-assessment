@@ -122,16 +122,17 @@ const FormSelection = () => {
 				</div>
 
 				<div className="mt-12 flex justify-between">
-					<Link to="/" className="sw-button sw-button-neutral">
+					<Link to="/" className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">
 						Prev
 					</Link>
 					<button
-						className={`sw-button ${selectedForm ? 'sw-button-primary' : 'bg-gray-300 cursor-not-allowed'}`}
+						className={`inline-flex items-center px-6 py-2 rounded-md text-sm font-medium transition-colors duration-200 hover:bg-red-700 ${selectedForm ? ' bg-sw-red text-white' : 'bg-gray-300 text-black'}`}
 						onClick={handleContinue}
 						disabled={!selectedForm}
 					>
-						Start
+						Next
 					</button>
+					
 				</div>
 			</div>
 		</div>

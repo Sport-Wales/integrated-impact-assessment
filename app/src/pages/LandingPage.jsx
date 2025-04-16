@@ -81,7 +81,7 @@ const LandingPage = () => {
 				<div className="mt-8 flex justify-center">
 					<button
 						onClick={handleStart}
-						className="px-4 py-2 bg-red-600 text-white rounded font-bold hover:bg-red-700"
+						className="inline-flex items-center px-6 py-1 rounded-md text-lg bg-sw-red text-white font-medium transition-colors duration-200 hover:bg-red-700"
 					>
 						Start
 					</button>
