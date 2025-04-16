@@ -18,7 +18,7 @@ const LandingPage = () => {
 	  
 
 	return (
-		<div className="max-w-4xl mx-auto px-4 py-12">
+		<div className="mt-4">
 			<h2 className="sw-heading-primary text-3xl font-bold mb-8">
 				Why measuring impact matters
 			</h2>
@@ -38,15 +38,15 @@ const LandingPage = () => {
 				<ul className="space-y-2 ml-6">
 					<li className="flex items-start">
 						<span className="text-green-500 mr-2 text-xl">✅</span>
-						<span className="font-bold">Make better decisions</span> that benefit more people
+						<span className="font-bold">Make better decisions </span> that benefit more people
 					</li>
 					<li className="flex items-start">
 						<span className="text-green-500 mr-2 text-xl">✅</span>
-						<span className="font-bold">Support fairness and equality</span> for all communities
+						<span className="font-bold">Support fairness and equality </span> for all communities
 					</li>
 					<li className="flex items-start">
 						<span className="text-green-500 mr-2 text-xl">✅</span>
-						<span className="font-bold">Protect the environment</span> for future generations
+						<span className="font-bold">Protect the environment </span> for future generations
 					</li>
 					<li className="flex items-start">
 						<span className="text-green-500 mr-2 text-xl">✅</span>

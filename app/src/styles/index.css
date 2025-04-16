@@ -1,9 +1,25 @@
-/* src/styles/index.css */
-/* Sport Wales Global Styles Sheet (SWGS) */
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom classes to match SW styles */
+@layer components {
+  .sw-button {
+    @apply h-12 px-8 py-2 rounded-button font-bold transition duration-300;
+  }
+  .sw-button-primary {
+    @apply bg-sw-red text-white hover:opacity-90;
+  }
+  .sw-button-secondary {
+    @apply bg-sw-blue text-white hover:opacity-90;
+  }
+  .sw-button-neutral {
+    @apply bg-gray-500 text-white hover:bg-gray-600;
+  }
+  .sw-checkbox {
+    @apply w-5 h-5 rounded border-2 border-sw-blue focus:ring-2;
+  }
+}
 
 /* Font Face Declarations */
 @font-face {
