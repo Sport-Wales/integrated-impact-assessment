@@ -18,7 +18,7 @@ const LandingPage = () => {
 	  
 
 	return (
-		<div className="mt-4">
+		<div className="max-w-4xl mx-auto px-4 py-12">
 			<h2 className="sw-heading-primary text-3xl font-bold mb-8">
 				Why measuring impact matters
 			</h2>

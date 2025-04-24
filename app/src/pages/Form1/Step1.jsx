@@ -80,7 +80,7 @@ const Form1Step1 = () => {
 						name="title"
 						value={formState.title}
 						onChange={handleChange}
-						className="sw-input"
+						className="input-field w-full my-4"
 						required
 					/>
 				</div>
@@ -96,7 +96,7 @@ const Form1Step1 = () => {
 						name="leadName"
 						value={formState.leadName}
 						onChange={handleChange}
-						className="sw-input"
+						className="input-field w-full my-4"
 						required
 						placeholder="Name"
 					/>
@@ -109,7 +109,7 @@ const Form1Step1 = () => {
 						name="leadRole"
 						value={formState.leadRole}
 						onChange={handleChange}
-						className="sw-input"
+						className="input-field w-full my-4"
 						required
 						placeholder="Role"
 					/>
@@ -128,7 +128,7 @@ const Form1Step1 = () => {
 						name="otherPeople"
 						value={formState.otherPeople}
 						onChange={handleChange}
-						className="sw-input"
+						className="input-field w-full my-4"
 					/>
 				</div>
 
@@ -144,7 +144,7 @@ const Form1Step1 = () => {
 						name="workDetails"
 						value={formState.workDetails}
 						onChange={handleChange}
-						className="sw-textarea"
+						className="input-field w-full my-4"
 						rows={4}
 					/>
 				</div>
@@ -161,7 +161,7 @@ const Form1Step1 = () => {
 						name="affectedGroups"
 						value={formState.affectedGroups}
 						onChange={handleChange}
-						className="sw-textarea"
+						className="input-field w-full my-4"
 						rows={4}
 					/>
 				</div>

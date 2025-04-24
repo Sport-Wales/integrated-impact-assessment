@@ -4,6 +4,13 @@
 @tailwind components;
 @tailwind utilities;
 
+.input-field {
+	border: 1px solid #bfbec5;
+	padding: 0.1rem;
+	border-radius: 8px;
+	height: 46px;
+}  
+
 /* Language Toggle */
 .language-toggle {
   position: fixed;
@@ -197,10 +204,13 @@
     height: var(--button-height);
     border-radius: var(--border-radius-button);
     padding: 0 1rem;
-    border: 1px solid var(--color-grey);
+    border: 1px solid grey;
     font-family: var(--font-primary);
     font-size: var(--font-size-body);
   }
+
+
+
 
   .sw-label {
     @apply text-lg font-semibold;
