@@ -23,6 +23,7 @@ import Form2Step1 from './pages/Form2/Step1';
 // Form 3 Components
 import Form3Step1 from './pages/Form3/Step1';
 import Form3Step2 from './pages/Form3/Step2';
+import Form3Step3 from './pages/Form3/Step3';
 
 // Context Provider
 import { FormProvider } from './context/FormContext';
@@ -56,6 +57,8 @@ function App() {
               {/* Form 3 Routes */}
               <Route path="/form3/step1" element={<Form3Step1 />} />
               <Route path="/form3/step2" element={<Form3Step2 />} />
+              <Route path="/form3/step3" element={<Form3Step3 />} />
+
             </Routes>
           </main>
         </div>
