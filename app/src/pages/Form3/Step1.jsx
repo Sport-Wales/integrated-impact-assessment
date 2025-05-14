@@ -46,7 +46,7 @@ const Form3Step1 = () => {
 
 	return (
 		<div className="max-w-4xl mx-auto px-4 py-12">
-			<div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+			{/* <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
 				<div className="sw-progress-container">
 					<div className="sw-progress-bar" style={{ width: '33%' }}></div>
 				</div>
@@ -65,7 +65,7 @@ const Form3Step1 = () => {
 						<div className="sw-step-title">Final review</div>
 					</div>
 				</div>
-			</div>
+			</div> */}
 
 			<h2 className="sw-heading-primary text-3xl font-bold mb-8">
 				Step 1: About your project
@@ -82,7 +82,7 @@ const Form3Step1 = () => {
 						name="title"
 						value={formState.title}
 						onChange={handleChange}
-						className="sw-input"
+						className="input-field w-full my-4"
 						required
 					/>
 				</div>
@@ -98,7 +98,7 @@ const Form3Step1 = () => {
 						name="leadName"
 						value={formState.leadName}
 						onChange={handleChange}
-						className="sw-input"
+						className="input-field w-full my-4"
 						required
 						placeholder="Name"
 					/>
@@ -111,7 +111,7 @@ const Form3Step1 = () => {
 						name="leadRole"
 						value={formState.leadRole}
 						onChange={handleChange}
-						className="sw-input"
+						className="input-field w-full my-4"
 						required
 						placeholder="Role"
 					/>
@@ -130,7 +130,7 @@ const Form3Step1 = () => {
 						name="otherPeople"
 						value={formState.otherPeople}
 						onChange={handleChange}
-						className="sw-input"
+						className="input-field w-full my-4"
 					/>
 				</div>
 
@@ -146,7 +146,7 @@ const Form3Step1 = () => {
 						name="workDetails"
 						value={formState.workDetails}
 						onChange={handleChange}
-						className="sw-textarea"
+						className="input-field w-full my-4"
 						rows={6}
 					/>
 				</div>
