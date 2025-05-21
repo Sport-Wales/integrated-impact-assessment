@@ -70,8 +70,6 @@ export const FormProvider = ({ children }) => {
       
       // Form 2 specific fields
       form2: {
-        impactOnPeople: '',
-        impactOnPeopleNotApplicable: false,
         socioEconomicImpact: '',
         socioEconomicImpactNotApplicable: false,
         environmentAndBiodiversity: '',
