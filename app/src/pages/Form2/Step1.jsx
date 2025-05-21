@@ -46,31 +46,6 @@ const Form2Step1 = () => {
 
 	return (
 		<div className="max-w-4xl mx-auto px-4 py-12">
-			<div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-				<div className="sw-progress-container">
-					<div className="sw-progress-bar" style={{ width: '25%' }}></div>
-				</div>
-
-				<div className="sw-step-indicator">
-					<div className="sw-step">
-						<div className="sw-step-circle sw-step-active">1</div>
-						<div className="sw-step-title">About your project</div>
-					</div>
-					<div className="sw-step">
-						<div className="sw-step-circle sw-step-incomplete">2</div>
-						<div className="sw-step-title">Your impact</div>
-					</div>
-					<div className="sw-step">
-						<div className="sw-step-circle sw-step-incomplete">3</div>
-						<div className="sw-step-title">Actions and Next Steps</div>
-					</div>
-					<div className="sw-step">
-						<div className="sw-step-circle sw-step-incomplete">4</div>
-						<div className="sw-step-title">Review</div>
-					</div>
-				</div>
-			</div>
-
 			<h2 className="sw-heading-primary text-3xl font-bold mb-8">
 				Step 1: About Your Project
 			</h2>
@@ -86,7 +61,7 @@ const Form2Step1 = () => {
 						name="title"
 						value={formState.title}
 						onChange={handleChange}
-						className="sw-input"
+						className="input-field w-full my-4"
 						required
 					/>
 				</div>
@@ -102,7 +77,7 @@ const Form2Step1 = () => {
 						name="leadName"
 						value={formState.leadName}
 						onChange={handleChange}
-						className="sw-input"
+						className="input-field w-full my-4"
 						required
 						placeholder="Name"
 					/>
@@ -115,7 +90,7 @@ const Form2Step1 = () => {
 						name="leadRole"
 						value={formState.leadRole}
 						onChange={handleChange}
-						className="sw-input"
+						className="input-field w-full my-4"
 						required
 						placeholder="Role"
 					/>
@@ -134,7 +109,7 @@ const Form2Step1 = () => {
 						name="otherPeople"
 						value={formState.otherPeople}
 						onChange={handleChange}
-						className="sw-input"
+						className="input-field w-full my-4"
 					/>
 				</div>
 
@@ -150,7 +125,7 @@ const Form2Step1 = () => {
 						name="workDetails"
 						value={formState.workDetails}
 						onChange={handleChange}
-						className="sw-textarea"
+						className="input-field w-full my-4"
 						rows={6}
 					/>
 				</div>
