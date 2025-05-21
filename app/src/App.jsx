@@ -19,6 +19,8 @@ import Form1Step9 from './pages/Form1/Step9';
 
 // Form 2 Components
 import Form2Step1 from './pages/Form2/Step1';
+import Form2Step2 from './pages/Form2/Step2';
+import Form2Step3 from './pages/Form2/Step3';
 
 // Form 3 Components
 import Form3Step1 from './pages/Form3/Step1';
@@ -53,6 +55,10 @@ function App() {
 			  
               {/* Form 2 Routes */}
               <Route path="/form2/step1" element={<Form2Step1 />} />
+              <Route path="/form2/step2" element={<Form2Step2 />} />
+              <Route path="/form2/step3" element={<Form2Step3 />} />
+
+
               
               {/* Form 3 Routes */}
               <Route path="/form3/step1" element={<Form3Step1 />} />
