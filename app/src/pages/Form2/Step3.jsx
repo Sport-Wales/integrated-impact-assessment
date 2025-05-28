@@ -72,7 +72,7 @@ const Form2Step3 = () => {
           id="environmentAndBiodiversityNotApplicable"
           name="environmentAndBiodiversity"
           value="false"
-          checked={formState.socioEconomicImpact === "false"}
+          checked={formState.environmentAndBiodiversity === "false"}
           onChange={handleChange}
           className='w-4 h-4 mr-2'
            />
