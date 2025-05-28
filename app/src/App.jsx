@@ -21,6 +21,8 @@ import Form1Step9 from './pages/Form1/Step9';
 import Form2Step1 from './pages/Form2/Step1';
 import Form2Step2 from './pages/Form2/Step2';
 import Form2Step3 from './pages/Form2/Step3';
+import Form2Step4 from './pages/Form2/Step4';
+import Form2Step5 from './pages/Form2/Step5';
 
 // Form 3 Components
 import Form3Step1 from './pages/Form3/Step1';
@@ -57,6 +59,8 @@ function App() {
               <Route path="/form2/step1" element={<Form2Step1 />} />
               <Route path="/form2/step2" element={<Form2Step2 />} />
               <Route path="/form2/step3" element={<Form2Step3 />} />
+              <Route path="/form2/step4" element={<Form2Step4 />} />
+              <Route path="/form2/step5" element={<Form2Step5 />} />
 
 
               
