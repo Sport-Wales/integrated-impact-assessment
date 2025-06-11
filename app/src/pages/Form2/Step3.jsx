@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
+import ProgressBar from '../../components/ProgressBar';
+import { form2Steps } from './constants';
 
 const Form2Step3 = () => {
   const navigate = useNavigate();
-  const {formData, updateFormData} = useFormContext();
+  const {formData, updateFormData, completeStep } = useFormContext();
 
   const [formState, setFormState] = useState({
     environmentAndBiodiversity: formData.form2?.environmentAndBiodiversity || '',
@@ -34,11 +36,39 @@ const Form2Step3 = () => {
         }
     });
 
+	completeStep(1);
+
     navigate('/form2/step4')
+  };
+
+  const handleStepClick = (stepIndex) => {
+    // Navigate to the appropriate step
+    switch(stepIndex) {
+      case 0:
+        // Current step - do nothing
+        break;
+      case 1:
+        navigate('/form2/step2');
+        break;
+      case 2:
+        navigate('/form2/step3');
+        break;
+      case 3:
+        navigate('/form2/step4');
+        break;
+      default:
+        break;
+    }
   };
 
   return(
     <div className='max-w-4xl mx-auto px-4 py-12'>
+		<ProgressBar 
+        steps={form2Steps} 
+        currentStep={1} 
+        completedSteps={formData.completedSteps?.form2 || []} 
+        onStepClick={handleStepClick} 
+      />
       <h2 className='text-3xl font-bold mb-8'>
         Step 2: Your Impact
       </h2>
