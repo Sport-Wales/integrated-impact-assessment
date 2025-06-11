@@ -11,6 +11,11 @@ export const FormProvider = ({ children }) => {
     const savedFormData = localStorage.getItem('formData');
     return savedFormData ? JSON.parse(savedFormData) : {
       formType: null, // 'form1', 'form2', or 'form3'
+      completedSteps: {
+        form1: [],
+        form2: [],
+        form3: []
+      },
       
       // Common fields for all forms
       title: '',
@@ -70,6 +75,8 @@ export const FormProvider = ({ children }) => {
       
       // Form 2 specific fields
       form2: {
+        impactOnPeople: '',
+        impactOnPeopleNotApplicable: false,
         socioEconomicImpact: '',
         socioEconomicImpactNotApplicable: false,
         environmentAndBiodiversity: '',
@@ -123,6 +130,30 @@ export const FormProvider = ({ children }) => {
       }
     }));
   };
+  
+  // Track completed steps
+  const completeStep = (stepIndex) => {
+    if (!formData.formType) return;
+    
+    setFormData(prevData => {
+      // Get current completed steps for the form type
+      const currentCompleted = prevData.completedSteps?.[prevData.formType] || [];
+      
+      // Only update if this step isn't already completed
+      if (!currentCompleted.includes(stepIndex)) {
+        const newCompleted = [...currentCompleted, stepIndex].sort((a, b) => a - b);
+        
+        return {
+          ...prevData,
+          completedSteps: {
+            ...prevData.completedSteps,
+            [prevData.formType]: newCompleted
+          }
+        };
+      }
+      return prevData;
+    });
+  };
 
   // Reset form data
   const resetFormData = () => {
@@ -135,6 +166,7 @@ export const FormProvider = ({ children }) => {
       formData,
       updateFormData,
       updateFormSection,
+      completeStep,
       resetFormData
     }}>
       {children}

@@ -13,6 +13,7 @@ npm install
 ```
 3. Start dev server
 ```bash
+cd app
 npm run dev
 ```
 
