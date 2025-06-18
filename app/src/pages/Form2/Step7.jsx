@@ -5,8 +5,8 @@ import ProgressBar from '../../components/ProgressBar';
 import { form2Steps } from './constants';
 
 const Form2Step7 = () => {
-    const navigate = useNavigate();
-    const {formData, updateFormData, completeStep} = useFormContext();
+  const navigate = useNavigate();
+  const {formData, updateFormData, completeStep} = useFormContext();
 
   const [formState, setFormState] = useState({
     reviewDate: formData.form2?.reviewDate || '',
@@ -33,15 +33,15 @@ const [submitError, setSubmitError] = useState(null);
   const handleSubmit = async () => {
     // Update the global form data first
     updateFormData({
-      form3: {
-        ...formData.form3,
+      form2: {
+        ...formData.form2,
       }
 	  
     });
 
 	completeStep(3);
 	setIsSubmitting(true);
-    setSubmitError(null);
+  setSubmitError(null);
 
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -128,7 +128,7 @@ return (
           className="input-field w-full my-4"
           rows={4}
         />
-
+        
         <p className='font-sm text-gray-600 mb-2'>You will be automatically issued with a review notice after 12 months. </p>
       </div>
       {submitError && (
