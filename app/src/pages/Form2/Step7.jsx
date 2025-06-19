@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom';
+import { data, Link, useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
 import ProgressBar from '../../components/ProgressBar';
 import { form2Steps } from './constants';
@@ -120,7 +120,8 @@ return (
         <label htmlFor="reviewDate" className="block text-lg mb-2">
         When do you want to review this assessment?
         </label>
-        <textarea
+        <input
+          type="date"
           id="reviewDate"
           name="reviewDate"
           value={formState.reviewDate}
@@ -128,8 +129,7 @@ return (
           className="input-field w-full my-4"
           rows={4}
         />
-        
-        <p className='font-sm text-gray-600 mb-2'>You will be automatically issued with a review notice after 12 months. </p>
+        <p className='font-sm text-gray-600 mb-2'> You will be automatically issued with a review notice after 12 months.</p>
       </div>
       {submitError && (
         <div className="mb-6 p-4  bg-red-50 border-l-4 border-red-500 text-red-700">
