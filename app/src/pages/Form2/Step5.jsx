@@ -50,7 +50,8 @@ const Form2Step5 = () => {
         ...prev.wellbeingOfFutureGenerations,
         [goals]: {
           ...prev.wellbeingOfFutureGenerations[goals],
-          [field]: value
+          [field]: value,
+          applicable: 'true'
         }
       }
     }));
