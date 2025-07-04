@@ -19,11 +19,21 @@ const Form2Step3 = () => {
   }
   }, [formData.formType, navigate]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+
+  const handleTextChange = (e) => {
+    const {value} = e.target;
     setFormState(prev => ({
       ...prev,
-      [name]: value
+      environmentAndBiodiversity: value,
+      environmentAndBiodiversityNotApplicable: 'false',
+    }));
+  };
+
+  const handleRadioChange = () => {
+    setFormState(prev => ({
+      ...prev,
+      environmentAndBiodiversity: '',
+      environmentAndBiodiversityNotApplicable: 'true'
     }));
   };
 
@@ -89,7 +99,7 @@ const Form2Step3 = () => {
         id="environmentAndBiodiversity"
         name="environmentAndBiodiversity" 
         value={formState.environmentAndBiodiversity}
-        onChange={handleChange}
+        onChange={handleTextChange}
         className='input-field w-full my-4'
         rows={4}
         />
@@ -100,10 +110,10 @@ const Form2Step3 = () => {
           <input
           type="radio" 
           id="environmentAndBiodiversityNotApplicable"
-          name="environmentAndBiodiversity"
-          value="false"
-          checked={formState.environmentAndBiodiversity === "false"}
-          onChange={handleChange}
+          name="environmentAndBiodiversityNotApplicable"
+          value="true"
+          checked={formState.environmentAndBiodiversityNotApplicable === "true"}
+          onChange={handleRadioChange}
           className='w-4 h-4 mr-2'
            />
            <label htmlFor="environmentAndBiodiversityNotApplicable"> Not applicable</label>

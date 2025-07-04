@@ -19,11 +19,20 @@ const Form2Step4 = () => {
   }
   }, [formData.formType, navigate])
 
-    const handleChange = (e) => {
-    const { name, value } = e.target;
+  const handleTextChange = (e) => {
+    const {value} = e.target;
     setFormState(prev => ({
       ...prev,
-      [name]: value
+      welshLanguage: value,
+      welshLanguageNotApplicable: 'false',
+    }));
+  };
+
+  const handleRadioChange = () => {
+    setFormState(prev => ({
+      ...prev,
+      welshLanguage: '',
+      welshLanguageNotApplicable: 'true'
     }));
   };
 
@@ -87,7 +96,7 @@ const Form2Step4 = () => {
       id="welshLanguage" 
       name="welshLanguage"
       value={formState.welshLanguage}
-      onChange={handleChange}
+      onChange={handleTextChange}
       className='input-field w-full my-4'
       rows={4}
       />
@@ -98,10 +107,10 @@ const Form2Step4 = () => {
         <input 
         type="radio" 
         id="welshLanguageNotApplicable"
-        name="welshLanguage"
-        value="false"
-        checked={formState.welshLanguage === "false"}
-        onChange={handleChange}
+        name="welshLanguageNotApplicable"
+        value="true"
+        checked={formState.welshLanguageNotApplicable === "true"}
+        onChange={handleRadioChange}
         className='w-4 h-4 mr-2'
         />
         <label htmlFor="welshLanguageNotApplicable"> Not applicable</label>

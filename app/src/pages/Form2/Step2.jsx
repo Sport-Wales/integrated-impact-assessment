@@ -28,7 +28,7 @@ const Form2Step2 = () => {
     }));
   };
 
-  const handleRadioChange = (e) => {
+  const handleRadioChange = () => {
     setFormState(prev => ({
       ...prev,
       socioEconomicImpact: '',
