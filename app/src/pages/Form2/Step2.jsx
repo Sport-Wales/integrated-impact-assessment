@@ -19,11 +19,20 @@ const Form2Step2 = () => {
     }
   }, [formData.formType, navigate]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target; 
+  const handleTextChange = (e) => {
+    const {value} = e.target;
     setFormState(prev => ({
-        ...prev,
-        [name]: value
+      ...prev,
+      socioEconomicImpact: value,
+      socioEconomicImpactNotApplicable: 'false',
+    }));
+  };
+
+  const handleRadioChange = (e) => {
+    setFormState(prev => ({
+      ...prev,
+      socioEconomicImpact: '',
+      socioEconomicImpactNotApplicable: 'true'
     }));
   };
 
@@ -87,7 +96,7 @@ const Form2Step2 = () => {
         id="socioEconomicImpact"
         name="socioEconomicImpact" 
         value={formState.socioEconomicImpact}
-        onChange={handleChange}
+        onChange={handleTextChange}
         className='input-field w-full my-4'
         rows={4}
         />
@@ -98,10 +107,10 @@ const Form2Step2 = () => {
           <input
           type="radio" 
           id="socioEconomicImpactNotApplicable"
-          name="socioEconomicImpact"
-          value="false"
-          checked={formState.socioEconomicImpact === "false"}
-          onChange={handleChange}
+          name="socioEconomicImpactNotApplicable"
+          value="true"
+          checked={formState.socioEconomicImpactNotApplicable === "true"}
+          onChange={handleRadioChange}
           className='w-4 h-4 mr-2'
            />
            <label htmlFor="socioEconomicImpactNotApplicable"> Not applicable</label>
