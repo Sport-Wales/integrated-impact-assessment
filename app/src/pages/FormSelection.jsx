@@ -41,7 +41,7 @@ const FormSelection = () => {
 							id="form1"
 							checked={selectedForm === 'form1'}
 							onChange={() => handleFormSelect('form1')}
-							className="sw-checkbox mt-1"
+							className="w-5 h-5 rounded border-2 focus:ring-2 mt-1"
 						/>
 						<label htmlFor="form1" className="text-lg cursor-pointer">
 							I'm producing a paper for the Board or Executive
@@ -50,13 +50,15 @@ const FormSelection = () => {
 
 					{/* Option 2 */}
 					<div className="flex items-start space-x-3">
+						<div className='flex items-center'>
 						<input
 							type="checkbox"
 							id="form2"
 							checked={selectedForm === 'form2'}
 							onChange={() => handleFormSelect('form2')}
-							className="sw-checkbox mt-1"
+							className="w-5 h-5 rounded border-2 focus:ring-2 mt-3"
 						/>
+						</div>
 						<label htmlFor="form2" className="text-lg cursor-pointer">
 							My work will have a{' '}
 							<button
@@ -113,7 +115,7 @@ const FormSelection = () => {
 							id="form3"
 							checked={selectedForm === 'form3'}
 							onChange={() => handleFormSelect('form3')}
-							className="sw-checkbox mt-1"
+							className="w-5 h-5 rounded border-2 focus:ring-2 mt-1"
 						/>
 						<label htmlFor="form3" className="text-lg cursor-pointer">
 							My work will have a positive impact on communities, but not impact public duties
