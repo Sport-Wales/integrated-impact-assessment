@@ -49,7 +49,7 @@ const Form1Step2 = () => {
     // Navigate to the appropriate step
     switch(stepIndex) {
       case 0:
-        // Current step - do nothing
+        navigate('/form1/step1');
         break;
       case 1:
         navigate('/form1/step2');
