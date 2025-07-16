@@ -204,9 +204,10 @@ const Form1Step7 = () => {
                         <span>No</span>
                       </label>
                     </div>
-                  </div>
-
-                  <div className="mb-4">
+                  </div>                    
+                  {formState.wellBeingGoals[goal.id].helps === 'yes' &&(
+                    <div>
+                    <div className="mb-4">
                     <label htmlFor={`how-${goal.id}`} className="block text-lg font-semibold mb-2">
                       How?
                     </label>
@@ -233,6 +234,8 @@ const Form1Step7 = () => {
                       placeholder="Suggest improvements to maximize positive impact"
                     />
                   </div>
+                  </div>
+                  )}
                 </div>
               )}
             </div>
