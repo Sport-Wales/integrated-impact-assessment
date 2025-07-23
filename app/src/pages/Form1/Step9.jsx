@@ -155,8 +155,8 @@ const Form1Step9 = () => {
               name="unexpectedHappened"
               value={formState.unexpectedHappened}
               onChange={handleChange}
-              className="input-field w-full"
-              rows={4}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+              rows={1}
               placeholder="Describe any unexpected outcomes or impacts that emerged during the assessment process"
             />
           </div>
@@ -170,8 +170,8 @@ const Form1Step9 = () => {
               name="needToChangeAnything"
               value={formState.needToChangeAnything}
               onChange={handleChange}
-              className="input-field w-full"
-              rows={4}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+              rows={1}
               placeholder="Describe any adjustments or changes needed based on the findings"
             />
           </div>

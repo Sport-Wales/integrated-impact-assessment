@@ -215,8 +215,8 @@ const Form1Step7 = () => {
                       id={`how-${goal.id}`}
                       value={formState.wellBeingGoals[goal.id].how}
                       onChange={(e) => handleTextChange(goal.id, 'how', e.target.value)}
-                      className="input-field w-full"
-                      rows={3}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                      rows={1}
                       placeholder={`Explain how your work will help with ${goal.label}`}
                     />
                   </div>
@@ -229,8 +229,8 @@ const Form1Step7 = () => {
                       id={`improvements-${goal.id}`}
                       value={formState.wellBeingGoals[goal.id].improvements}
                       onChange={(e) => handleTextChange(goal.id, 'improvements', e.target.value)}
-                      className="input-field w-full"
-                      rows={3}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                      rows={1}
                       placeholder="Suggest improvements to maximize positive impact"
                     />
                   </div>

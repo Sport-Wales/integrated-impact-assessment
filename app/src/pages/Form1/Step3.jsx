@@ -231,8 +231,8 @@ const Form1Step3 = () => {
                       id={`reason-${char.id}`}
                       value={formState.impactOnProtectedCharacteristics[char.id].reason}
                       onChange={(e) => handleTextChange(char.id, 'reason', e.target.value)}
-                      className="input-field w-full"
-                      rows={3}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                      rows={1}
                     />
                   </div>
 
@@ -244,8 +244,8 @@ const Form1Step3 = () => {
                       id={`improvement-${char.id}`}
                       value={formState.impactOnProtectedCharacteristics[char.id].improvement}
                       onChange={(e) => handleTextChange(char.id, 'improvement', e.target.value)}
-                      className="input-field w-full"
-                      rows={3}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                      rows={1}
                     />
                   </div>
                 </div>

@@ -180,8 +180,8 @@ const Form1Step5 = () => {
             name="improvements"
             value={formState.environmentalImpact.improvements}
             onChange={handleTextChange}
-            className="input-field w-full"
-            rows={4}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            rows={1}
             placeholder="Describe how your work could minimize environmental impact or enhance biodiversity"
           />
         </div>

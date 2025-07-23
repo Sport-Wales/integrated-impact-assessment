@@ -181,8 +181,8 @@ const Form1Step6 = () => {
             name="improvements"
             value={formState.welshLanguage.improvements}
             onChange={handleTextChange}
-            className="input-field w-full"
-            rows={4}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            rows={1}
             placeholder="Describe how your work could better support or promote the Welsh language"
           />
         </div>

@@ -105,8 +105,8 @@ const Form1Step8 = () => {
             name="actionsAndNextSteps"
             value={formState.actionsAndNextSteps}
             onChange={handleChange}
-            className="input-field w-full"
-            rows={6}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            rows={2}
             placeholder="List specific actions, improvements, and any additional information needed"
           />
         </div>
@@ -123,7 +123,7 @@ const Form1Step8 = () => {
             min="2025-01-01"
             value={formState.reviewDate}
             onChange={handleChange}
-            className="input-field w-full"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg"
           />
         </div>
 
@@ -137,7 +137,7 @@ const Form1Step8 = () => {
             name="responsiblePerson"
             value={formState.responsiblePerson}
             onChange={handleChange}
-            className="input-field w-full"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg"
             placeholder="Name and role of the person responsible"
           />
         </div>

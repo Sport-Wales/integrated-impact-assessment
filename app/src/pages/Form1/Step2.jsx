@@ -106,8 +106,8 @@ const Form1Step2 = () => {
             name="existingKnowledge"
             value={formState.existingKnowledge}
             onChange={handleChange}
-            className="input-field w-full my-4"
-            rows={4}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            rows={3}
           />
         </div>
 
@@ -153,7 +153,7 @@ const Form1Step2 = () => {
               name="missingInfoDetails"
               value={formState.missingInfoDetails}
               onChange={handleChange}
-              className="input-field w-full my-4"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
               rows={3}
             />
           </div>
