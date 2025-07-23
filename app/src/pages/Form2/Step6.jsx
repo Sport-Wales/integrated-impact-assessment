@@ -81,8 +81,8 @@ const Form2Step6 = () => {
       name="actionsAndNextSteps"
       value={formState.actionsAndNextSteps}
       onChange={handleChange}
-      className='input-field w-full my-4'
-      rows={4}
+      className='w-full px-4 py-2 border border-gray-300 rounded-lg'
+      rows={1}
       />
     </div>
   </div>

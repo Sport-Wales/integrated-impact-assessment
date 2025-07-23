@@ -172,8 +172,8 @@ const Form2Step5 = () => {
                       id={`reason-${char.id}`}
                       value={formState.wellbeingOfFutureGenerations[char.id].reason}
                       onChange={(e) => handleTextChange(char.id, 'reason', e.target.value)}
-                      className="mt-2 input-field w-full"
-                      rows={3}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                      rows={1}
                     />
                       </div>                      
                     </div>

@@ -97,8 +97,8 @@ const Form2Step2 = () => {
         name="socioEconomicImpact" 
         value={formState.socioEconomicImpact}
         onChange={handleTextChange}
-        className='input-field w-full my-4'
-        rows={4}
+        className='w-full px-4 py-2 border border-gray-300 rounded-lg'
+        rows={1}
         />
       </div>
       

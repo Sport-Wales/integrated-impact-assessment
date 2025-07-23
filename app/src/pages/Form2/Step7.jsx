@@ -127,8 +127,8 @@ return (
           min="2025-01-01"
           value={formState.reviewDate}
           onChange={handleChange}
-          className="input-field w-full my-4"
-          rows={4}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-3"
+          rows={1}
         />
         <p className='font-sm text-gray-600 mb-2'> You will be automatically issued with a review notice after 12 months.</p>
       </div>
