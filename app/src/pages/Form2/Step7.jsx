@@ -124,6 +124,7 @@ return (
           type="date"
           id="reviewDate"
           name="reviewDate"
+          min="2025-01-01"
           value={formState.reviewDate}
           onChange={handleChange}
           className="input-field w-full my-4"
