@@ -162,7 +162,9 @@ const Form1Step7 = () => {
                 </div>
                 <div className="flex items-center">
                   <span className="mr-4 px-2 py-1 text-xs rounded-full bg-gray-200">
-                    {formState.wellBeingGoals[goal.id].helps === 'yes' ? 'Yes' : 'No'}
+                    {formState.wellBeingGoals[goal.id].helps === 'yes' && 'Yes'}
+                    {formState.wellBeingGoals[goal.id].helps === 'no' && 'No'}
+                    {formState.wellBeingGoals[goal.id].helps === 'neutral' && 'Neutral'}
                   </span>
                   <svg 
                     className={`w-5 h-5 transition-transform ${visibleGoal === goal.id ? 'transform rotate-180' : ''}`} 
@@ -203,6 +205,17 @@ const Form1Step7 = () => {
                         />
                         <span>No</span>
                       </label>
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          name={`helps-${goal.id}`}
+                          value="neutral"
+                          checked={formState.wellBeingGoals[goal.id].helps === 'neutral'}
+                          onChange={() => handleHelpsChange(goal.id, 'neutral')}
+                          className="w-4 h-4 mr-2"
+                        />
+                        <span>Neutral</span>
+                      </label>                      
                     </div>
                   </div>                    
                   {formState.wellBeingGoals[goal.id].helps === 'yes' &&(
