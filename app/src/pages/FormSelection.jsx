@@ -61,6 +61,7 @@ const FormSelection = () => {
 						</div>
 						<label htmlFor="form2" className="text-lg cursor-pointer">
 							My work will have a{' '}
+							<span>
 							<button
 								className="text-sw-blue underline font-semibold"
 								onClick={(e) => {
@@ -69,8 +70,16 @@ const FormSelection = () => {
 								}}
 							>
 								significant impact
+								<div className='pl-1 inline-flex relative'>
+									<svg xmlns="http://www.w3.org/2000/svg"fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+  									<path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+									</svg>
+								</div>
 							</button>{' '}
+							</span>
+						
 							and is likely to affect one or more{' '}
+							<span>
 							<button
 								className="text-sw-blue underline font-semibold"
 								onClick={(e) => {
@@ -79,7 +88,13 @@ const FormSelection = () => {
 								}}
 							>
 								public duties
+								<div className='pl-1 inline-flex relative'>
+									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+  									<path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+									</svg>
+								</div>
 							</button>{' '}
+							</span>
 							(but I'm not producing a paper for the Board or Executive)
 						</label>
 					</div>
