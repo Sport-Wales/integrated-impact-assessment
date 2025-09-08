@@ -147,9 +147,10 @@ const Form1Step3 = () => {
 
       <div className="mb-6">
         <p className="text-lg">
-          Think about how your project affects different groups. For each protected characteristic, 
-          consider whether your work will have a positive, negative, or neutral impact, explain why, 
-          and suggest improvements.
+          Think about how your project affects different groups. For each relevant protected characteristic, consider whether your work will have a positive or negative impact. Please explain why and suggest any improvements. 
+          </p>
+          <p className='mt-3 text-lg'>
+          For characteristics that are not relevant to your project, feel free to leave them as neutral. Explanations for neutral impacts are optional.
         </p>
       </div>
 
