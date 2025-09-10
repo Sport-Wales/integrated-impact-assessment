@@ -11,12 +11,19 @@ const Form1Step4 = () => {
 
   // Initialize form state with data from context or defaults
   const [formState, setFormState] = useState({
-    socioEconomicImpact: formData.form1?.socioEconomicImpact || {
-      helpPeopleWithFewerOpportunities: 'no',
-      createProblems: 'no',
-      improvements: '',
+    wellBeingGoals: formData.form1?.wellBeingGoals || {
+      prosperity: { helps: 'no', how: '', improvements: '' },
+      resilience: { helps: 'no', how: '', improvements: '' },
+      health: { helps: 'no', how: '', improvements: '' },
+      cohesiveCommunities: { helps: 'no', how: '', improvements: '' },
+      globalResponsibility: { helps: 'no', how: '', improvements: '' },
+      cultureAndWelshLanguage: { helps: 'no', how: '', improvements: '' },
+      equality: { helps: 'no', how: '', improvements: '' },
     }
   });
+
+  // Currently visible goal (collapsed view)
+  const [visibleGoal, setVisibleGoal] = useState(null);
 
   // Redirect if form type is not set
   useEffect(() => {
@@ -25,25 +32,41 @@ const Form1Step4 = () => {
     }
   }, [formData.formType, navigate]);
 
-  const handleRadioChange = (field, value) => {
+  // Handle change for 'helps' radio buttons
+  const handleHelpsChange = (goal, value) => {
     setFormState(prev => ({
       ...prev,
-      socioEconomicImpact: {
-        ...prev.socioEconomicImpact,
-        [field]: value
+      wellBeingGoals: {
+        ...prev.wellBeingGoals,
+        [goal]: {
+          ...prev.wellBeingGoals[goal],
+          helps: value
+        }
       }
     }));
   };
 
-  const handleTextChange = (e) => {
-    const { name, value } = e.target;
+  // Handle change for text inputs
+  const handleTextChange = (goal, field, value) => {
     setFormState(prev => ({
       ...prev,
-      socioEconomicImpact: {
-        ...prev.socioEconomicImpact,
-        [name]: value
+      wellBeingGoals: {
+        ...prev.wellBeingGoals,
+        [goal]: {
+          ...prev.wellBeingGoals[goal],
+          [field]: value
+        }
       }
     }));
+  };
+
+  // Toggle visibility of a goal's details
+  const toggleGoal = (goal) => {
+    if (visibleGoal === goal) {
+      setVisibleGoal(null);
+    } else {
+      setVisibleGoal(goal);
+    }
   };
 
   const handleNext = () => {
@@ -51,13 +74,23 @@ const Form1Step4 = () => {
     updateFormData({
       form1: {
         ...formData.form1,
-        socioEconomicImpact: formState.socioEconomicImpact
+        wellBeingGoals: formState.wellBeingGoals
       }
     });
-
-    completeStep(3);
+	completeStep(3);
     navigate('/form1/step5');
   };
+
+  // Define the goals
+  const goals = [
+    { id: 'prosperity', label: 'Prosperity', description: 'Good jobs, fair pay, low carbon impact' },
+    { id: 'resilience', label: 'Resilience', description: 'Strong environment and nature' },
+    { id: 'health', label: 'Health', description: 'Better physical and mental well-being' },
+    { id: 'cohesiveCommunities', label: 'Cohesive Communities', description: 'Safe, connected places to live' },
+    { id: 'globalResponsibility', label: 'Global Responsibility', description: 'Helping beyond Wales' },
+    { id: 'cultureAndWelshLanguage', label: 'Culture & Welsh Language', description: 'Encouraging culture, arts, and Welsh language' },
+    { id: 'equality', label: 'Equality', description: 'Everyone getting fair chances' },
+  ];
 
   const handleStepClick = (stepIndex) => {
     // Navigate to the appropriate step
@@ -96,94 +129,130 @@ const Form1Step4 = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
-	<ProgressBar 
+      <ProgressBar 
         steps={form1Steps} 
         currentStep={3} 
         completedSteps={formData.completedSteps?.form1 || []} 
         onStepClick={handleStepClick} 
       />
+
       <h2 className="text-3xl font-bold mb-8">
-        Step 4: Socio-Economic Impact
+        Step 4: Well-being & Future Generations
       </h2>
 
+      <div className="mb-6">
+        <p className="text-lg">
+          For each goal, answer whether your work will help achieve it, how it will help, and what can be done to improve its contribution.
+        </p>
+      </div>
+
       <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <div className="mb-6">
-          <label className="block text-lg font-semibold mb-4">
-            Will this help people who have fewer opportunities?
-          </label>
-          <div className="space-y-2">
-            <div className="flex items-center">
-              <input
-                type="radio"
-                id="helpYes"
-                name="helpPeopleWithFewerOpportunities"
-                value="yes"
-                checked={formState.socioEconomicImpact.helpPeopleWithFewerOpportunities === 'yes'}
-                onChange={() => handleRadioChange('helpPeopleWithFewerOpportunities', 'yes')}
-                className="w-4 h-4 mr-2"
-              />
-              <label htmlFor="helpYes" className="ml-2">Yes</label>
-            </div>
-            <div className="flex items-center">
-              <input
-                type="radio"
-                id="helpNo"
-                name="helpPeopleWithFewerOpportunities"
-                value="no"
-                checked={formState.socioEconomicImpact.helpPeopleWithFewerOpportunities === 'no'}
-                onChange={() => handleRadioChange('helpPeopleWithFewerOpportunities', 'no')}
-                className="w-4 h-4 mr-2"
-              />
-              <label htmlFor="helpNo" className="ml-2">No</label>
-            </div>
-          </div>
-        </div>
+        <h3 className="text-xl font-bold mb-4">Well-being Goals</h3>
 
-        <div className="mb-6">
-          <label className="block text-lg font-semibold mb-4">
-            Could this create problems for them?
-          </label>
-          <div className="space-y-2">
-            <div className="flex items-center">
-              <input
-                type="radio"
-                id="problemsYes"
-                name="createProblems"
-                value="yes"
-                checked={formState.socioEconomicImpact.createProblems === 'yes'}
-                onChange={() => handleRadioChange('createProblems', 'yes')}
-                className="w-4 h-4 mr-2"
-              />
-              <label htmlFor="problemsYes" className="ml-2">Yes</label>
-            </div>
-            <div className="flex items-center">
-              <input
-                type="radio"
-                id="problemsNo"
-                name="createProblems"
-                value="no"
-                checked={formState.socioEconomicImpact.createProblems === 'no'}
-                onChange={() => handleRadioChange('createProblems', 'no')}
-                className="w-4 h-4 mr-2"
-              />
-              <label htmlFor="problemsNo" className="ml-2">No</label>
-            </div>
-          </div>
-        </div>
+        <div className="space-y-4">
+          {goals.map((goal) => (
+            <div key={goal.id} className="border rounded-lg overflow-hidden">
+              <button 
+                className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 text-left"
+                onClick={() => toggleGoal(goal.id)}
+              >
+                <div className="flex flex-col">
+                  <span className="font-semibold text-lg">{goal.label}</span>
+                  <span className="text-sm text-gray-600">{goal.description}</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="mr-4 px-2 py-1 text-xs rounded-full bg-gray-200">
+                    {formState.wellBeingGoals[goal.id].helps === 'yes' && 'Yes'}
+                    {formState.wellBeingGoals[goal.id].helps === 'no' && 'No'}
+                    {formState.wellBeingGoals[goal.id].helps === 'neutral' && 'Neutral'}
+                  </span>
+                  <svg 
+                    className={`w-5 h-5 transition-transform ${visibleGoal === goal.id ? 'transform rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24" 
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </div>
+              </button>
 
-        <div className="mb-6">
-          <label htmlFor="improvements" className="block text-lg font-semibold mb-2">
-            What can we do to improve things?
-          </label>
-          <textarea
-            id="improvements"
-            name="improvements"
-            value={formState.socioEconomicImpact.improvements}
-            onChange={handleTextChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-            rows={1}
-            placeholder="Describe how your work could improve socio-economic opportunities or address inequalities"
-          />
+              {visibleGoal === goal.id && (
+                <div className="p-4 border-t">
+                  <div className="mb-4">
+                    <label className="block text-lg font-semibold mb-2">Will this help?</label>
+                    <div className="flex space-x-4">
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          name={`helps-${goal.id}`}
+                          value="yes"
+                          checked={formState.wellBeingGoals[goal.id].helps === 'yes'}
+                          onChange={() => handleHelpsChange(goal.id, 'yes')}
+                          className="w-4 h-4 mr-2"
+                        />
+                        <span>Yes</span>
+                      </label>
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          name={`helps-${goal.id}`}
+                          value="no"
+                          checked={formState.wellBeingGoals[goal.id].helps === 'no'}
+                          onChange={() => handleHelpsChange(goal.id, 'no')}
+                          className="w-4 h-4 mr-2"
+                        />
+                        <span>No</span>
+                      </label>
+                      <label className="inline-flex items-center">
+                        <input
+                          type="radio"
+                          name={`helps-${goal.id}`}
+                          value="neutral"
+                          checked={formState.wellBeingGoals[goal.id].helps === 'neutral'}
+                          onChange={() => handleHelpsChange(goal.id, 'neutral')}
+                          className="w-4 h-4 mr-2"
+                        />
+                        <span>Neutral</span>
+                      </label>                      
+                    </div>
+                  </div>                    
+                  {formState.wellBeingGoals[goal.id].helps === 'yes' &&(
+                    <div>
+                    <div className="mb-4">
+                    <label htmlFor={`how-${goal.id}`} className="block text-lg font-semibold mb-2">
+                      How?
+                    </label>
+                    <textarea
+                      id={`how-${goal.id}`}
+                      value={formState.wellBeingGoals[goal.id].how}
+                      onChange={(e) => handleTextChange(goal.id, 'how', e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                      rows={1}
+                      placeholder={`Explain how your work will help with ${goal.label}`}
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor={`improvements-${goal.id}`} className="block text-lg font-semibold mb-2">
+                      What can we do to improve things?
+                    </label>
+                    <textarea
+                      id={`improvements-${goal.id}`}
+                      value={formState.wellBeingGoals[goal.id].improvements}
+                      onChange={(e) => handleTextChange(goal.id, 'improvements', e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                      rows={1}
+                      placeholder="Suggest improvements to maximize positive impact"
+                    />
+                  </div>
+                  </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </div>
 
