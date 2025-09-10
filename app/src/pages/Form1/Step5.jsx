@@ -11,9 +11,9 @@ const Form1Step5 = () => {
 
   // Initialize form state with data from context or defaults
   const [formState, setFormState] = useState({
-    environmentalImpact: formData.form1?.environmentalImpact || {
-      helpNatureAndEnvironment: 'no',
-      harmNature: 'no',
+    welshLanguage: formData.form1?.welshLanguage || {
+      supportWelshLanguage: 'no',
+      hardForWelshSpeakers: 'no',
       improvements: '',
     }
   });
@@ -28,8 +28,8 @@ const Form1Step5 = () => {
   const handleRadioChange = (field, value) => {
     setFormState(prev => ({
       ...prev,
-      environmentalImpact: {
-        ...prev.environmentalImpact,
+      welshLanguage: {
+        ...prev.welshLanguage,
         [field]: value
       }
     }));
@@ -39,8 +39,8 @@ const Form1Step5 = () => {
     const { name, value } = e.target;
     setFormState(prev => ({
       ...prev,
-      environmentalImpact: {
-        ...prev.environmentalImpact,
+      welshLanguage: {
+        ...prev.welshLanguage,
         [name]: value
       }
     }));
@@ -51,7 +51,7 @@ const Form1Step5 = () => {
     updateFormData({
       form1: {
         ...formData.form1,
-        environmentalImpact: formState.environmentalImpact
+        welshLanguage: formState.welshLanguage
       }
     });
 
@@ -96,93 +96,94 @@ const Form1Step5 = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
-	<ProgressBar 
+      <ProgressBar 
         steps={form1Steps} 
         currentStep={4} 
         completedSteps={formData.completedSteps?.form1 || []} 
         onStepClick={handleStepClick} 
       />
+
       <h2 className="text-3xl font-bold mb-8">
-        Step 5: Environment & Biodiversity
+        Step 5: Welsh Language
       </h2>
 
       <div className="bg-white rounded-lg shadow p-6 mb-8">
         <div className="mb-6">
           <label className="block text-lg font-semibold mb-4">
-            Will this help nature and the environment?
+            Will this support the Welsh language?
           </label>
           <div className="space-y-2">
             <div className="flex items-center">
               <input
                 type="radio"
-                id="helpNatureYes"
-                name="helpNatureAndEnvironment"
+                id="supportWelshYes"
+                name="supportWelshLanguage"
                 value="yes"
-                checked={formState.environmentalImpact.helpNatureAndEnvironment === 'yes'}
-                onChange={() => handleRadioChange('helpNatureAndEnvironment', 'yes')}
+                checked={formState.welshLanguage.supportWelshLanguage === 'yes'}
+                onChange={() => handleRadioChange('supportWelshLanguage', 'yes')}
                 className="w-4 h-4 mr-2"
               />
-              <label htmlFor="helpNatureYes" className="ml-2">Yes</label>
+              <label htmlFor="supportWelshYes" className="ml-2">Yes</label>
             </div>
             <div className="flex items-center">
               <input
                 type="radio"
-                id="helpNatureNo"
-                name="helpNatureAndEnvironment"
+                id="supportWelshNo"
+                name="supportWelshLanguage"
                 value="no"
-                checked={formState.environmentalImpact.helpNatureAndEnvironment === 'no'}
-                onChange={() => handleRadioChange('helpNatureAndEnvironment', 'no')}
+                checked={formState.welshLanguage.supportWelshLanguage === 'no'}
+                onChange={() => handleRadioChange('supportWelshLanguage', 'no')}
                 className="w-4 h-4 mr-2"
               />
-              <label htmlFor="helpNatureNo" className="ml-2">No</label>
+              <label htmlFor="supportWelshNo" className="ml-2">No</label>
             </div>
           </div>
         </div>
 
         <div className="mb-6">
           <label className="block text-lg font-semibold mb-4">
-            Could it harm nature?
+            Could it make things harder for Welsh speakers?
           </label>
           <div className="space-y-2">
             <div className="flex items-center">
               <input
                 type="radio"
-                id="harmNatureYes"
-                name="harmNature"
+                id="hardForWelshYes"
+                name="hardForWelshSpeakers"
                 value="yes"
-                checked={formState.environmentalImpact.harmNature === 'yes'}
-                onChange={() => handleRadioChange('harmNature', 'yes')}
+                checked={formState.welshLanguage.hardForWelshSpeakers === 'yes'}
+                onChange={() => handleRadioChange('hardForWelshSpeakers', 'yes')}
                 className="w-4 h-4 mr-2"
               />
-              <label htmlFor="harmNatureYes" className="ml-2">Yes</label>
+              <label htmlFor="hardForWelshYes" className="ml-2">Yes</label>
             </div>
             <div className="flex items-center">
               <input
                 type="radio"
-                id="harmNatureNo"
-                name="harmNature"
+                id="hardForWelshNo"
+                name="hardForWelshSpeakers"
                 value="no"
-                checked={formState.environmentalImpact.harmNature === 'no'}
-                onChange={() => handleRadioChange('harmNature', 'no')}
+                checked={formState.welshLanguage.hardForWelshSpeakers === 'no'}
+                onChange={() => handleRadioChange('hardForWelshSpeakers', 'no')}
                 className="w-4 h-4 mr-2"
               />
-              <label htmlFor="harmNatureNo" className="ml-2">No</label>
+              <label htmlFor="hardForWelshNo" className="ml-2">No</label>
             </div>
           </div>
         </div>
 
         <div className="mb-6">
           <label htmlFor="improvements" className="block text-lg font-semibold mb-2">
-            How can we reduce harm and increase benefits?
+            How can we improve support for Welsh Language?
           </label>
           <textarea
             id="improvements"
             name="improvements"
-            value={formState.environmentalImpact.improvements}
+            value={formState.welshLanguage.improvements}
             onChange={handleTextChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg"
             rows={1}
-            placeholder="Describe how your work could minimize environmental impact or enhance biodiversity"
+            placeholder="Describe how your work could better support or promote the Welsh language"
           />
         </div>
       </div>
