@@ -1,4 +1,3 @@
-// src/pages/Form1/Step6.jsx
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
@@ -11,9 +10,9 @@ const Form1Step6 = () => {
 
   // Initialize form state with data from context or defaults
   const [formState, setFormState] = useState({
-    welshLanguage: formData.form1?.welshLanguage || {
-      supportWelshLanguage: 'no',
-      hardForWelshSpeakers: 'no',
+    socioEconomicImpact: formData.form1?.socioEconomicImpact || {
+      helpPeopleWithFewerOpportunities: 'no',
+      createProblems: 'no',
       improvements: '',
     }
   });
@@ -28,8 +27,8 @@ const Form1Step6 = () => {
   const handleRadioChange = (field, value) => {
     setFormState(prev => ({
       ...prev,
-      welshLanguage: {
-        ...prev.welshLanguage,
+      socioEconomicImpact: {
+        ...prev.socioEconomicImpact,
         [field]: value
       }
     }));
@@ -39,8 +38,8 @@ const Form1Step6 = () => {
     const { name, value } = e.target;
     setFormState(prev => ({
       ...prev,
-      welshLanguage: {
-        ...prev.welshLanguage,
+      socioEconomicImpact: {
+        ...prev.socioEconomicImpact,
         [name]: value
       }
     }));
@@ -51,7 +50,7 @@ const Form1Step6 = () => {
     updateFormData({
       form1: {
         ...formData.form1,
-        welshLanguage: formState.welshLanguage
+        socioEconomicImpact: formState.socioEconomicImpact
       }
     });
 
@@ -96,94 +95,93 @@ const Form1Step6 = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
-      <ProgressBar 
+	<ProgressBar 
         steps={form1Steps} 
         currentStep={5} 
         completedSteps={formData.completedSteps?.form1 || []} 
         onStepClick={handleStepClick} 
       />
-
       <h2 className="text-3xl font-bold mb-8">
-        Step 6: Welsh Language
+        Step 6: Socio-Economic Impact
       </h2>
 
       <div className="bg-white rounded-lg shadow p-6 mb-8">
         <div className="mb-6">
           <label className="block text-lg font-semibold mb-4">
-            Will this support the Welsh language?
+            Will this help people who have fewer opportunities?
           </label>
           <div className="space-y-2">
             <div className="flex items-center">
               <input
                 type="radio"
-                id="supportWelshYes"
-                name="supportWelshLanguage"
+                id="helpYes"
+                name="helpPeopleWithFewerOpportunities"
                 value="yes"
-                checked={formState.welshLanguage.supportWelshLanguage === 'yes'}
-                onChange={() => handleRadioChange('supportWelshLanguage', 'yes')}
+                checked={formState.socioEconomicImpact.helpPeopleWithFewerOpportunities === 'yes'}
+                onChange={() => handleRadioChange('helpPeopleWithFewerOpportunities', 'yes')}
                 className="w-4 h-4 mr-2"
               />
-              <label htmlFor="supportWelshYes" className="ml-2">Yes</label>
+              <label htmlFor="helpYes" className="ml-2">Yes</label>
             </div>
             <div className="flex items-center">
               <input
                 type="radio"
-                id="supportWelshNo"
-                name="supportWelshLanguage"
+                id="helpNo"
+                name="helpPeopleWithFewerOpportunities"
                 value="no"
-                checked={formState.welshLanguage.supportWelshLanguage === 'no'}
-                onChange={() => handleRadioChange('supportWelshLanguage', 'no')}
+                checked={formState.socioEconomicImpact.helpPeopleWithFewerOpportunities === 'no'}
+                onChange={() => handleRadioChange('helpPeopleWithFewerOpportunities', 'no')}
                 className="w-4 h-4 mr-2"
               />
-              <label htmlFor="supportWelshNo" className="ml-2">No</label>
+              <label htmlFor="helpNo" className="ml-2">No</label>
             </div>
           </div>
         </div>
 
         <div className="mb-6">
           <label className="block text-lg font-semibold mb-4">
-            Could it make things harder for Welsh speakers?
+            Could this create problems for them?
           </label>
           <div className="space-y-2">
             <div className="flex items-center">
               <input
                 type="radio"
-                id="hardForWelshYes"
-                name="hardForWelshSpeakers"
+                id="problemsYes"
+                name="createProblems"
                 value="yes"
-                checked={formState.welshLanguage.hardForWelshSpeakers === 'yes'}
-                onChange={() => handleRadioChange('hardForWelshSpeakers', 'yes')}
+                checked={formState.socioEconomicImpact.createProblems === 'yes'}
+                onChange={() => handleRadioChange('createProblems', 'yes')}
                 className="w-4 h-4 mr-2"
               />
-              <label htmlFor="hardForWelshYes" className="ml-2">Yes</label>
+              <label htmlFor="problemsYes" className="ml-2">Yes</label>
             </div>
             <div className="flex items-center">
               <input
                 type="radio"
-                id="hardForWelshNo"
-                name="hardForWelshSpeakers"
+                id="problemsNo"
+                name="createProblems"
                 value="no"
-                checked={formState.welshLanguage.hardForWelshSpeakers === 'no'}
-                onChange={() => handleRadioChange('hardForWelshSpeakers', 'no')}
+                checked={formState.socioEconomicImpact.createProblems === 'no'}
+                onChange={() => handleRadioChange('createProblems', 'no')}
                 className="w-4 h-4 mr-2"
               />
-              <label htmlFor="hardForWelshNo" className="ml-2">No</label>
+              <label htmlFor="problemsNo" className="ml-2">No</label>
             </div>
           </div>
         </div>
 
         <div className="mb-6">
           <label htmlFor="improvements" className="block text-lg font-semibold mb-2">
-            How can we improve support for Welsh Language?
+            What can we do to improve things?
           </label>
           <textarea
             id="improvements"
             name="improvements"
-            value={formState.welshLanguage.improvements}
+            value={formState.socioEconomicImpact.improvements}
             onChange={handleTextChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg"
             rows={1}
-            placeholder="Describe how your work could better support or promote the Welsh language"
+            placeholder="Describe how your work could improve socio-economic opportunities or address inequalities"
           />
         </div>
       </div>
