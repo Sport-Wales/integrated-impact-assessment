@@ -49,7 +49,7 @@ const FormSelection = () => {
 					</div>
 
 					{/* Option 2 */}
-					<div className="flex items-start space-x-3">
+					<div className="flex items-start space-x-3 display hidden">
 						<div className='flex items-center'>
 						<input
 							type="checkbox"
