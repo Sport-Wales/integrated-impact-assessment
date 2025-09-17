@@ -12,15 +12,15 @@ const Form1Step3 = () => {
   // Initialize form state with data from context or defaults
   const [formState, setFormState] = useState({
     impactOnProtectedCharacteristics: formData.form1?.impactOnProtectedCharacteristics || {
-      age: { impact: 'neutral', reason: '', improvement: '' },
-      disability: { impact: 'neutral', reason: '', improvement: '' },
-      genderReassignment: { impact: 'neutral', reason: '', improvement: '' },
-      marriageCivilPartnership: { impact: 'neutral', reason: '', improvement: '' },
-      pregnancyMaternity: { impact: 'neutral', reason: '', improvement: '' },
-      race: { impact: 'neutral', reason: '', improvement: '' },
-      religionBelief: { impact: 'neutral', reason: '', improvement: '' },
-      sex: { impact: 'neutral', reason: '', improvement: '' },
-      sexualOrientation: { impact: 'neutral', reason: '', improvement: '' },
+      age: { impact: ['neutral'], reason: '', improvement: '' },
+      disability: { impact: ['neutral'], reason: '', improvement: '' },
+      genderReassignment: { impact: ['neutral'], reason: '', improvement: '' },
+      marriageCivilPartnership: { impact: ['neutral'], reason: '', improvement: '' },
+      pregnancyMaternity: { impact: ['neutral'], reason: '', improvement: '' },
+      race: { impact: ['neutral'], reason: '', improvement: '' },
+      religionBelief: { impact: ['neutral'], reason: '', improvement: '' },
+      sex: { impact: ['neutral'], reason: '', improvement: '' },
+      sexualOrientation: { impact: ['neutral'], reason: '', improvement: '' },
     }
   });
 
@@ -36,13 +36,21 @@ const Form1Step3 = () => {
 
   // Handle change for impact radio buttons
   const handleImpactChange = (characteristic, value) => {
+    const currentImpact = formState.impactOnProtectedCharacteristics[characteristic].impact;
+    let updatedImpact = [...currentImpact];  
+    if(updatedImpact.includes(value)){
+       updatedImpact = updatedImpact.filter(impact => impact !== value);
+    } else {
+      updatedImpact.push(value);
+    }
+
     setFormState(prev => ({
       ...prev,
       impactOnProtectedCharacteristics: {
         ...prev.impactOnProtectedCharacteristics,
         [characteristic]: {
           ...prev.impactOnProtectedCharacteristics[characteristic],
-          impact: value
+          impact: updatedImpact,
         }
       }
     }));
@@ -166,11 +174,21 @@ const Form1Step3 = () => {
               >
                 <div className="flex items-center">
                   <span className="font-semibold text-lg">{char.label}</span>
-                  <span className="ml-4 px-2 py-1 text-xs rounded-full bg-gray-200">
-                    {formState.impactOnProtectedCharacteristics[char.id].impact === 'positive' && 'Positive'}
-                    {formState.impactOnProtectedCharacteristics[char.id].impact === 'negative' && 'Negative'}
-                    {formState.impactOnProtectedCharacteristics[char.id].impact === 'neutral' && 'Neutral'}
-                  </span>
+                    {formState.impactOnProtectedCharacteristics[char.id].impact.includes('positive') && (
+                      <span className="ml-4 px-2 py-1 text-xs rounded-full bg-gray-200">
+                      Positive
+                      </span>
+                      )}
+                    {formState.impactOnProtectedCharacteristics[char.id].impact.includes('negative') && (
+                      <span className="ml-4 px-2 py-1 text-xs rounded-full bg-gray-200">
+                      Negative
+                      </span>
+                      )}
+                    {formState.impactOnProtectedCharacteristics[char.id].impact.includes('neutral') && (
+                      <span className="ml-4 px-2 py-1 text-xs rounded-full bg-gray-200">
+                      Neutral
+                      </span>
+                      )}
                 </div>
                 <svg 
                   className={`w-5 h-5 transition-transform ${visibleCharacteristic === char.id ? 'transform rotate-180' : ''}`} 
@@ -190,10 +208,10 @@ const Form1Step3 = () => {
                     <div className="flex space-x-4">
                       <label className="inline-flex items-center">
                         <input
-                          type="radio"
+                          type="checkbox"
                           name={`impact-${char.id}`}
                           value="positive"
-                          checked={formState.impactOnProtectedCharacteristics[char.id].impact === 'positive'}
+                          checked={formState.impactOnProtectedCharacteristics[char.id].impact.includes('positive')}
                           onChange={() => handleImpactChange(char.id, 'positive')}
                           className="w-4 h-4 mr-2"
                         />
@@ -201,10 +219,10 @@ const Form1Step3 = () => {
                       </label>
                       <label className="inline-flex items-center">
                         <input
-                          type="radio"
+                          type="checkbox"
                           name={`impact-${char.id}`}
                           value="negative"
-                          checked={formState.impactOnProtectedCharacteristics[char.id].impact === 'negative'}
+                          checked={formState.impactOnProtectedCharacteristics[char.id].impact.includes('negative')}
                           onChange={() => handleImpactChange(char.id, 'negative')}
                           className="w-4 h-4 mr-2"
                         />
@@ -212,10 +230,10 @@ const Form1Step3 = () => {
                       </label>
                       <label className="inline-flex items-center">
                         <input
-                          type="radio"
+                          type="checkbox"
                           name={`impact-${char.id}`}
                           value="neutral"
-                          checked={formState.impactOnProtectedCharacteristics[char.id].impact === 'neutral'}
+                          checked={formState.impactOnProtectedCharacteristics[char.id].impact.includes('neutral')}
                           onChange={() => handleImpactChange(char.id, 'neutral')}
                           className="w-4 h-4 mr-2"
                         />
