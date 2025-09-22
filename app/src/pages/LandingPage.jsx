@@ -61,7 +61,7 @@ const LandingPage = () => {
 				<p className="text-lg">
 					In addition, as a public body we have a legal responsibility to ensure
 					we are working to assess, monitor and take action when our work or
-					decisions make a significant impact our communities.
+					decisions make a significant impact on our communities.
 				</p>
 
 				<p className="text-lg">
