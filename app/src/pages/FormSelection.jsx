@@ -30,7 +30,7 @@ const FormSelection = () => {
 
 			<div>
 				<p className="text-lg mb-6">
-					There are two different IIA forms you can chose to complete, please select the option that best fits your circumstance:
+					There are two different IIA forms you can choose to complete, please select the option that best fits your circumstance:
 				</p>
 
 				<div className="space-y-6 mt-8">
