@@ -19,6 +19,7 @@ const Form1Step9 = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+  const [allStepsError, setAllStepsError] = useState(null);
 
   // Redirect if form type is not set
   useEffect(() => {
@@ -35,7 +36,19 @@ const Form1Step9 = () => {
     }));
   };
 
-  const handleSubmit = async () => {
+   const handleSubmit = async () => {
+      const completedStepsLength = formData.completedSteps?.form1.length;
+      const totalSteps = form1Steps.length-1;
+
+      if(completedStepsLength !== totalSteps){
+        setAllStepsError("All steps must be completed before submitting.");
+        return;
+      } else {
+        setAllStepsError(null);
+      }
+
+    setIsSubmitting(true);
+
     // Update the global form data first
     updateFormData({
       form1: {
@@ -45,8 +58,6 @@ const Form1Step9 = () => {
       }
     });
 
-	completeStep(8);
-    setIsSubmitting(true);
     setSubmitError(null);
 
     try {
@@ -114,6 +125,13 @@ const Form1Step9 = () => {
         completedSteps={formData.completedSteps?.form1 || []} 
         onStepClick={handleStepClick} 
       />
+
+      {allStepsError && (
+        <div className="mb-6 p-8 bg-red-50 border-l-4 border-red-500 text-red-700">
+          <p className="font-large font-bold">Please Complete All Steps</p>
+          <p>{allStepsError}</p>
+        </div>
+      )}
 
       <h2 className="text-3xl font-bold mb-8">
         Step 9: Final Review
