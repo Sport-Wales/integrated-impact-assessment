@@ -29,7 +29,8 @@ const ProgressBar = ({ steps, currentStep, completedSteps, onStepClick }) => {
               return (
                 <div
                   key={step.id}
-                  className={`flex flex-col items-center text-[--color-sw-blue]`}
+                  title={step.description}
+                  className={`flex flex-col items-center text-[--color-sw-blue] overflow-hidden`}
                 >
                   <button
                      onClick={() => onStepClick(index)}
@@ -39,10 +40,10 @@ const ProgressBar = ({ steps, currentStep, completedSteps, onStepClick }) => {
 
                       ${
                         isCurrent
-                          ? 'bg-[--color-sw-red] text-white ring-4 ring-[--color-sw-red-light]'
+                          ? 'bg-[--color-sw-red] mt-1 text-white ring-4 ring-[--color-sw-red-light]'
                           : isCompleted
-                            ? 'bg-[--color-sw-green] text-white'
-                            : 'bg-[--color-sw-blue] text-[--color-white]'
+                            ? 'bg-[--color-sw-green] mt-1 text-white'
+                            : 'bg-[--color-sw-blue] mt-1 text-[--color-white]'
                       }
                     `}
                   >
