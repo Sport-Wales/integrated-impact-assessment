@@ -295,3 +295,7 @@
     }
   }
 }
+
+li {
+	display: list-item !important;
+}
