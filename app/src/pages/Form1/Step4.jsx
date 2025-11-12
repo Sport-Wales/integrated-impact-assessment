@@ -9,21 +9,14 @@ const Form1Step4 = () => {
   const navigate = useNavigate();
   const { formData, updateFormData, completeStep } = useFormContext();
 
-  // Initialize form state with data from context or defaults
-  const [formState, setFormState] = useState({
-    wellBeingGoals: formData.form1?.wellBeingGoals || {
-      prosperity: { helps: 'no', how: '', improvements: '' },
-      resilience: { helps: 'no', how: '', improvements: '' },
-      health: { helps: 'no', how: '', improvements: '' },
-      cohesiveCommunities: { helps: 'no', how: '', improvements: '' },
-      globalResponsibility: { helps: 'no', how: '', improvements: '' },
-      cultureAndWelshLanguage: { helps: 'no', how: '', improvements: '' },
-      equality: { helps: 'no', how: '', improvements: '' },
-    }
-  });
+  // Single text field for well-being response
+  const [wellBeingResponse, setWellBeingResponse] = useState(
+    formData.form1?.wellBeingResponse || ''
+  );
 
-  // Currently visible goal (collapsed view)
-  const [visibleGoal, setVisibleGoal] = useState(null);
+  // Collapsible sections state
+  const [showGoals, setShowGoals] = useState(true);
+  const [showWaysOfWorking, setShowWaysOfWorking] = useState(false);
 
   // Redirect if form type is not set
   useEffect(() => {
@@ -32,68 +25,19 @@ const Form1Step4 = () => {
     }
   }, [formData.formType, navigate]);
 
-  // Handle change for 'helps' radio buttons
-  const handleHelpsChange = (goal, value) => {
-    setFormState(prev => ({
-      ...prev,
-      wellBeingGoals: {
-        ...prev.wellBeingGoals,
-        [goal]: {
-          ...prev.wellBeingGoals[goal],
-          helps: value
-        }
-      }
-    }));
-  };
-
-  // Handle change for text inputs
-  const handleTextChange = (goal, field, value) => {
-    setFormState(prev => ({
-      ...prev,
-      wellBeingGoals: {
-        ...prev.wellBeingGoals,
-        [goal]: {
-          ...prev.wellBeingGoals[goal],
-          [field]: value
-        }
-      }
-    }));
-  };
-
-  // Toggle visibility of a goal's details
-  const toggleGoal = (goal) => {
-    if (visibleGoal === goal) {
-      setVisibleGoal(null);
-    } else {
-      setVisibleGoal(goal);
-    }
-  };
-
   const handleNext = () => {
     // Update the global form data
     updateFormData({
       form1: {
         ...formData.form1,
-        wellBeingGoals: formState.wellBeingGoals
+        wellBeingResponse: wellBeingResponse
       }
     });
-	completeStep(3);
+    completeStep(6); // This is step 7 in the sequence (index 6)
     navigate('/form1/step5');
   };
 
-  // Define the goals
-  const goals = [
-    { id: 'prosperity', label: 'Prosperity', description: 'Good jobs, fair pay, low carbon impact' },
-    { id: 'resilience', label: 'Resilience', description: 'Strong environment and nature' },
-    { id: 'health', label: 'Health', description: 'Better physical and mental well-being' },
-    { id: 'cohesiveCommunities', label: 'Cohesive Communities', description: 'Safe, connected places to live' },
-    { id: 'globalResponsibility', label: 'Global Responsibility', description: 'Helping beyond Wales' },
-    { id: 'cultureAndWelshLanguage', label: 'Culture & Welsh Language', description: 'Encouraging culture, arts, and Welsh language' },
-    { id: 'equality', label: 'Equality', description: 'Everyone getting fair chances' },
-  ];
-
   const handleStepClick = (stepIndex) => {
-    // Navigate to the appropriate step
     switch(stepIndex) {
       case 0:
         navigate('/form1/step1');
@@ -127,6 +71,35 @@ const Form1Step4 = () => {
     }
   };
 
+  const wellBeingGoals = [
+    { label: 'Prosperity', description: 'Good jobs, fair pay, low carbon impact.' },
+    { label: 'Resilience', description: 'Strong environment and nature.' },
+    { label: 'Health', description: 'Better physical and mental well-being.' },
+    { label: 'Cohesive Communities', description: 'Safe, connected places to live.' },
+    { label: 'Global Responsibility', description: 'Helping beyond Wales.' },
+    { label: 'Culture & Welsh Language*', description: 'Encouraging culture, arts, and Welsh language.' },
+    { label: 'Equality', description: 'Everyone getting fair chances.' },
+  ];
+
+  const waysOfWorking = [
+    { 
+      title: 'Long Term', 
+      description: 'The importance of balancing short-term needs with the need to safeguard the long-term needs.' 
+    },
+    { 
+      title: 'Collaboration', 
+      description: 'Acting in collaboration with any other organisation (or different parts of the body itself) that could help the body to meet its well-being objectives.' 
+    },
+    { 
+      title: 'Involvement', 
+      description: 'The importance of involving people with an interest in achieving the well-being goals and ensuring that those people reflect the diversity of the area which the body serves.' 
+    },
+    { 
+      title: 'Prevention', 
+      description: 'How acting to prevent problems occurring or getting worse may help public bodies meet their objectives.' 
+    },
+  ];
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
       <ProgressBar 
@@ -137,134 +110,138 @@ const Form1Step4 = () => {
       />
 
       <h2 className="text-3xl font-bold mb-8">
-        Step 4: Well-being & Future Generations
+        Well-being for future generations
       </h2>
 
-      <div className="mb-6">
-        <p className="text-lg">
-          For each goal, answer whether your work will help achieve it, how it will help, and what can be done to improve its contribution.
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <p className="text-lg mb-4">
+          This section covers impacts of your work on Well-being for future generations.
         </p>
-      </div>
+        <p className="text-lg mb-4">
+          Look through the lists below of well-being goals and our (Sport Wales') ways of working.
+        </p>
+        <p className="text-lg mb-4">
+          Then think about how your piece of work relates to those goals, and the ways of working you'll use.
+        </p>
+        <p className="text-lg font-semibold">
+          In the text box say:
+        </p>
+        <ul className="list-disc ml-6 mb-4">
+          <li>if your work will help achieve it,</li>
+          <li>how it will help,</li>
+          <li>what can be done to improve its contribution.</li>
+        </ul>
 
-      <div className="bg-white rounded-lg shadow p-6 mb-8">
-        <h3 className="text-xl font-bold mb-4">Well-being Goals</h3>
+        {/* Resources */}
+        <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <h3 className="font-bold mb-2">Resources</h3>
+          <a href="#" className="text-blue-600 underline hover:text-blue-800">
+            Well-being goals fact sheet
+          </a>
+        </div>
 
-        <div className="space-y-4">
-          {goals.map((goal) => (
-            <div key={goal.id} className="border rounded-lg overflow-hidden">
-              <button 
-                className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 text-left"
-                onClick={() => toggleGoal(goal.id)}
-              >
-                <div className="flex flex-col">
-                  <span className="font-semibold text-lg">{goal.label}</span>
-                  <span className="text-sm text-gray-600">{goal.description}</span>
-                </div>
-                <div className="flex items-center">
-                  <span className="mr-4 px-2 py-1 text-xs rounded-full bg-gray-200">
-                    {formState.wellBeingGoals[goal.id].helps === 'yes' && 'Yes'}
-                    {formState.wellBeingGoals[goal.id].helps === 'no' && 'No'}
-                    {formState.wellBeingGoals[goal.id].helps === 'neutral' && 'Neutral'}
-                  </span>
-                  <svg 
-                    className={`w-5 h-5 transition-transform ${visibleGoal === goal.id ? 'transform rotate-180' : ''}`} 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24" 
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
-              </button>
-
-              {visibleGoal === goal.id && (
-                <div className="p-4 border-t">
-                  <div className="mb-4">
-                    <label className="block text-lg font-semibold mb-2">Will this help?</label>
-                    <div className="flex space-x-4">
-                      <label className="inline-flex items-center">
-                        <input
-                          type="radio"
-                          name={`helps-${goal.id}`}
-                          value="yes"
-                          checked={formState.wellBeingGoals[goal.id].helps === 'yes'}
-                          onChange={() => handleHelpsChange(goal.id, 'yes')}
-                          className="w-4 h-4 mr-2"
-                        />
-                        <span>Yes</span>
-                      </label>
-                      <label className="inline-flex items-center">
-                        <input
-                          type="radio"
-                          name={`helps-${goal.id}`}
-                          value="no"
-                          checked={formState.wellBeingGoals[goal.id].helps === 'no'}
-                          onChange={() => handleHelpsChange(goal.id, 'no')}
-                          className="w-4 h-4 mr-2"
-                        />
-                        <span>No</span>
-                      </label>
-                      <label className="inline-flex items-center">
-                        <input
-                          type="radio"
-                          name={`helps-${goal.id}`}
-                          value="neutral"
-                          checked={formState.wellBeingGoals[goal.id].helps === 'neutral'}
-                          onChange={() => handleHelpsChange(goal.id, 'neutral')}
-                          className="w-4 h-4 mr-2"
-                        />
-                        <span>Neutral</span>
-                      </label>                      
-                    </div>
-                  </div>                    
-                  {formState.wellBeingGoals[goal.id].helps === 'yes' &&(
-                    <div>
-                    <div className="mb-4">
-                    <label htmlFor={`how-${goal.id}`} className="block text-lg font-semibold mb-2">
-                      How?
-                    </label>
-                    <textarea
-                      id={`how-${goal.id}`}
-                      value={formState.wellBeingGoals[goal.id].how}
-                      onChange={(e) => handleTextChange(goal.id, 'how', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                      rows={1}
-                      placeholder={`Explain how your work will help with ${goal.label}`}
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor={`improvements-${goal.id}`} className="block text-lg font-semibold mb-2">
-                      What can we do to improve things?
-                    </label>
-                    <textarea
-                      id={`improvements-${goal.id}`}
-                      value={formState.wellBeingGoals[goal.id].improvements}
-                      onChange={(e) => handleTextChange(goal.id, 'improvements', e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                      rows={1}
-                      placeholder="Suggest improvements to maximize positive impact"
-                    />
-                  </div>
-                  </div>
-                  )}
-                </div>
-              )}
+        {/* Well-being Goals - Collapsible */}
+        <div className="border rounded-lg overflow-hidden mb-4">
+          <button 
+            className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 text-left"
+            onClick={() => setShowGoals(!showGoals)}
+          >
+            <h3 className="text-xl font-bold">Well-being goals</h3>
+            <svg 
+              className={`w-5 h-5 transition-transform ${showGoals ? 'transform rotate-180' : ''}`} 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          
+          {showGoals && (
+            <div className="p-4 border-t">
+              <ul className="space-y-3">
+                {wellBeingGoals.map((goal, index) => (
+                  <li key={index}>
+                    <strong>{goal.label}</strong> – {goal.description}
+                  </li>
+                ))}
+              </ul>
+              
+              <div className="mt-4 p-3 bg-yellow-50 border-l-4 border-yellow-400">
+                <p className="text-sm">
+                  <strong>*Note:</strong> We have a legal public duty to support Welsh language use. 
+                  This means there is an additional Welsh language section in this form. You can add 
+                  more details about any impacts your work has on Welsh language use there.
+                </p>
+              </div>
             </div>
-          ))}
+          )}
+        </div>
+
+        {/* Ways of Working - Collapsible */}
+        <div className="border rounded-lg overflow-hidden mb-6">
+          <button 
+            className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 text-left"
+            onClick={() => setShowWaysOfWorking(!showWaysOfWorking)}
+          >
+            <h3 className="text-xl font-bold">Ways of working</h3>
+            <svg 
+              className={`w-5 h-5 transition-transform ${showWaysOfWorking ? 'transform rotate-180' : ''}`} 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          
+          {showWaysOfWorking && (
+            <div className="p-4 border-t">
+              <div className="space-y-4">
+                {waysOfWorking.map((way, index) => (
+                  <div key={index}>
+                    <h4 className="font-bold mb-1">{way.title}</h4>
+                    <p className="text-gray-700">{way.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Main Text Box */}
+        <div>
+          <label htmlFor="wellBeingResponse" className="block text-lg font-semibold mb-2">
+            Your response
+          </label>
+          <textarea
+            id="wellBeingResponse"
+            value={wellBeingResponse}
+            onChange={(e) => setWellBeingResponse(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            rows={10}
+            placeholder="Describe how your work relates to the well-being goals and the ways of working you'll use. Include whether it will help achieve the goals, how it will help, and what can be done to improve its contribution."
+          />
         </div>
       </div>
 
       <div className="mt-12 flex justify-between">
-        <Link to="/form1/step3" className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">
+        <Link to="/form1/step6" className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+          </svg>
           Prev
         </Link>
         <button
-          className="inline-flex items-center px-6 py-1 rounded-md text-sm bg-sw-red text-white font-medium transition-colors duration-200 hover:bg-red-700"
+          className="inline-flex items-center px-6 py-2 rounded-md text-sm bg-[--color-sw-red] text-white font-medium transition-colors duration-200 hover:bg-opacity-90"
           onClick={handleNext}
         >
           Next
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+          </svg>
         </button>
       </div>
     </div>
