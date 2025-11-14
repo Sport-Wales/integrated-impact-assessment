@@ -33,7 +33,7 @@ const Form1Step4 = () => {
         wellBeingResponse: wellBeingResponse
       }
     });
-    completeStep(6); // This is step 7 in the sequence (index 6)
+    completeStep(3);
     navigate('/form1/step5');
   };
 
@@ -238,7 +238,7 @@ const Form1Step4 = () => {
           className="inline-flex items-center px-6 py-2 rounded-md text-sm bg-[--color-sw-red] text-white font-medium transition-colors duration-200 hover:bg-opacity-90"
           onClick={handleNext}
         >
-          Next
+          Next: Welsh language
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
           </svg>
