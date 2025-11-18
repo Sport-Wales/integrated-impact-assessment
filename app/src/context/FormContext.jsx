@@ -54,6 +54,11 @@ export const FormProvider = ({ children }) => {
           supportWelshLanguage: 'no',
           hardForWelshSpeakers: 'no',
           improvements: '',
+          positiveImpact: '',
+          negativeImpact: '',
+          neutralImpact: '',
+          increasePositiveEffects: '',
+          decreaseAdverseEffects: '',
         },
         socioEconomicImpact: {
           helpPeopleWithFewerOpportunities: 'no',

@@ -101,14 +101,22 @@ const Form1Step1 = () => {
       />
 
       <h2 className="text-3xl font-bold mb-8">
-        Step 1: Basic Details
+        Enter basic details
       </h2>
+	  <p className="mb-1">On this page you’ll:</p>
+		<ul className="list-disc pl-6 mb-8">
+			<li>identify the work you’re assessing the impacts of,</li>
+			<li>say who is involved,</li>
+			<li>describe the piece of work,</li>
+		</ul>
 
       <div className="bg-white rounded-lg shadow p-6 space-y-6">
         <div>
+			
           <label htmlFor="title" className="block text-lg font-semibold mb-2">
             Give this assessment a title
           </label>
+		  <p className="text-sm text-gray-600 mb-2">This should be something that identifies the work you’re assessing the impacts of</p>
           <input
             type="text"
             id="title"
@@ -155,7 +163,7 @@ const Form1Step1 = () => {
             Who else is involved?
           </label>
           <p className="text-sm text-gray-600 mb-2">
-            Other people helping. These will also be given access to this assessment
+		  These people will be able to access to this assessment. Colleague, participants, or representatives you’re talking to about this work’s impact
           </p>
           <input
             type="text"
@@ -172,7 +180,7 @@ const Form1Step1 = () => {
             What is this piece of work about?
           </label>
           <p className="text-sm text-gray-600 mb-2">
-            Explain your project, plan, or idea in a few sentences
+		  Describe what you’re working on in a few sentences. 
           </p>
           <textarea
             id="workDetails"
@@ -189,7 +197,7 @@ const Form1Step1 = () => {
             Who will be affected?
           </label>
           <p className="text-sm text-gray-600 mb-2">
-            e.g., staff, public, athletes, partners
+		  For example: staff, members of the public, athletes, Sport Wales’ partners, etc. 
           </p>
           <textarea
             id="affectedGroups"
@@ -212,7 +220,7 @@ const Form1Step1 = () => {
             className="inline-flex items-center px-6 py-2 rounded-md text-sm bg-[--color-sw-red] text-white font-medium transition-colors duration-200 hover:bg-opacity-90"
             onClick={handleNext}
           >
-            Next
+            Next: Known impacts
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
             </svg>
