@@ -255,11 +255,13 @@ const Form1Step5 = () => {
               <p className="text-gray-700 mb-4">
                 To meet our public duty you must answer these questions and explain your reasoning:
               </p>
-
+              <div>
+              <p className="block text-lg font-semibold mb-2">Please set out the 3 impacts of the piece of work on the Welsh language in the boxes below:</p>
+              </div>
               {/* Question 1 */}
               <div>
                 <label htmlFor="positiveImpact" className="block text-lg font-semibold mb-2">
-                  1. How does the policy have a positive impact on the Welsh language?
+                  Positive impacts:
                 </label>
                 <textarea
                   id="positiveImpact"
@@ -275,7 +277,7 @@ const Form1Step5 = () => {
               {/* Question 2 */}
               <div>
                 <label htmlFor="negativeImpact" className="block text-lg font-semibold mb-2">
-                  2. How does the policy have a negative impact on the Welsh language?
+                  Negative impacts:
                 </label>
                 <textarea
                   id="negativeImpact"
@@ -291,7 +293,7 @@ const Form1Step5 = () => {
               {/* Question 3 */}
               <div>
                 <label htmlFor="neutralImpact" className="block text-lg font-semibold mb-2">
-                  3. How does the policy have a neutral impact on the Welsh language?
+                  Neutral impacts:
                 </label>
                 <textarea
                   id="neutralImpact"
