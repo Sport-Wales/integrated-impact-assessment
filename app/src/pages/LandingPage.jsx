@@ -38,7 +38,7 @@ const LandingPage = () => {
 					<ul className="space-y-2 ml-6">
 						<li className="flex items-start">
 							<span className="text-green-500 mr-2 text-xl">✅</span>
-							<span>make better decisions so our work benefits more people</span>
+							<span>do better work and make better decisions so our work benefits more people</span>
 						</li>
 						<li className="flex items-start">
 							<span className="text-green-500 mr-2 text-xl">✅</span>
