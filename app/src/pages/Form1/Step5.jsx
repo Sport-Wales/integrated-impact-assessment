@@ -212,7 +212,7 @@ const Form1Step5 = () => {
 
         {/* Important notice for policy work */}
         <div className="mb-6 p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-500">
-          <h3 className="font-bold text-lg mb-2">Important: writing a new policy or changing an existing policy</h3>
+          <h3 className="font-bold text-lg mb-2">Important: writing a new policy, reviewing an existing policy or making significant changes to a policy level or strategy level area of work</h3>
           <p className="text-gray-700 mb-2">
             Contact Sport Wales' Regulatory Compliance Lead as early as possible if your work is on a new or existing policy and involves a consultation process.
           </p>
