@@ -54,7 +54,10 @@ const FormIntroduction = () => {
 					</ul>
 
 					<p className="text-lg mt-3">
-						You'll find links to help with this in guides and resources.
+						You'll find links to help with this in {'   '}
+					  <a href="#guides-and-resources" className="text-sw-blue underline hover:text-sw-blue-dark">
+						  guides and resources.
+					  </a>
 					</p>
 				</div>
 
@@ -113,7 +116,7 @@ const FormIntroduction = () => {
 				</div>
 
 				{/* Guides and resources section */}
-				<div className="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500">
+				<div className="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500" id='guides-and-resources'>
 					<h3 className="text-xl font-bold mb-4">Guides and resources</h3>
 					
 					<ul className="space-y-3">
