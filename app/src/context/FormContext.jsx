@@ -61,12 +61,14 @@ export const FormProvider = ({ children }) => {
           decreaseAdverseEffects: '',
         },
         socioEconomicImpact: {
-          helpPeopleWithFewerOpportunities: 'no',
-          createProblems: 'no',
+          helpPeopleWithFewerOpportunities: 'yes',
+          howItHelps: '',
+          makeThingsHarder: 'no',
           improvements: '',
         },
         environmentalImpact: {
-          helpNatureAndEnvironment: 'no',
+          helpNatureAndEnvironment: 'yes',
+          howItHelps: '',
           harmNature: 'no',
           improvements: '',
         },
