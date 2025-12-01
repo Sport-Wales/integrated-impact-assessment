@@ -103,12 +103,6 @@ const Form1Step1 = () => {
       <h2 className="text-3xl font-bold mb-8">
         Enter basic details
       </h2>
-	  <p className="mb-1">On this page you’ll:</p>
-		<ul className="list-disc pl-6 mb-8">
-			<li>identify the work you’re assessing the impacts of,</li>
-			<li>say who is involved,</li>
-			<li>describe the piece of work,</li>
-		</ul>
 
       <div className="bg-white rounded-lg shadow p-6 space-y-6">
         <div>
