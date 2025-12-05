@@ -67,7 +67,7 @@ const FormIntroduction = () => {
 					<h3 className="text-xl font-bold mb-4">Who to involve</h3>
 					
 					<p className="text-lg mb-3">
-						It is possible to complete an Integrated Impact Assessment on your own. But, it is usually faster and more effective to work on it as a small team.
+						It is possible to complete an Integrated Impact Assessment on your own. But, it is usually faster and leads to better work to involve a small team. Including colleagues won't take a lot of time, for a simple piece of work it may just involve replying with comments to a first draft completion of an IIA form.
 					</p>
 
 					<p className="text-lg mb-3">
@@ -108,11 +108,11 @@ const FormIntroduction = () => {
 					<h3 className="text-xl font-bold mb-4">Setting up a review date</h3>
 					
 					<p className="text-lg mb-3">
-						When you submit the form you'll need to set a review date. This should be when you expect your piece of work to finish.
+						When you submit the form you'll need to set a review date. This should be long enough after your piece of work is finished to be able to tell what the actual impacts have been.
 					</p>
 
 					<p className="text-lg">
-						The review will let you compare the impacts you expected with what you learnt during the piece of work.
+						The review will ask you to compare the impacts you expected when completing the form with the actual impacts you have seen since completing the piece of work. It can also be another good time to consider what you learnt during the piece of work.
 					</p>
 				</div>
 
