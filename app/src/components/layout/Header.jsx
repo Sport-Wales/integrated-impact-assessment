@@ -1,5 +1,7 @@
 // src/components/layout/Header.jsx
 import { Link } from 'react-router-dom';
+import SaveButton from '../ui/SaveButton';
+import ShareButton from '../ui/ShareButton';
 
 const Header = () => {
   return (
@@ -22,12 +24,8 @@ const Header = () => {
           </h1>
         </div>
         <div className="flex items-center space-x-2">
-          <button className="sw-button sw-button-secondary text-sm">
-            Save
-          </button>
-          <button className="sw-button sw-button-secondary text-sm">
-            Share
-          </button>
+          <SaveButton/>
+		  <ShareButton/>
         </div>
       </div>
     </header>

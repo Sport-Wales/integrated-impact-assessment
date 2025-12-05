@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
 import ProgressBar from '../../components/ProgressBar';
 import { form1Steps } from './constants';
+import NextButton from "../../components/ui/NextButton";
 
 const Form1Step5 = () => {
   const navigate = useNavigate();
@@ -346,12 +347,7 @@ const Form1Step5 = () => {
         <Link to="/form1/step4" className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">
           Prev
         </Link>
-        <button
-          className="inline-flex items-center px-6 py-1 rounded-md text-sm bg-sw-red text-white font-medium transition-colors duration-200 hover:bg-red-700"
-          onClick={handleNext}
-        >
-          Next: Socio-economic impact
-        </button>
+		<NextButton label="Next: Socio-economic impact" onClick={handleNext} />
       </div>
     </div>
   );

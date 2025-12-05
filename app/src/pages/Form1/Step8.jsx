@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
 import ProgressBar from '../../components/ProgressBar';
 import { form1Steps } from './constants';
+import NextButton from "../../components/ui/NextButton";
 
 const Form1Step8 = () => {
   const navigate = useNavigate();
@@ -153,6 +154,8 @@ const Form1Step8 = () => {
         >
           Next
         </button>
+		<PrevButton backLink="/form1/step7" />
+		<NextButton label="Next: Review" onClick={handleNext} />
       </div>
     </div>
   );

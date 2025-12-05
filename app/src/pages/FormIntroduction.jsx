@@ -1,6 +1,7 @@
 // page 3
 import { Link, useNavigate } from 'react-router-dom';
 import { useFormContext } from '../context/FormContext';
+import PrevButton from "../components/ui/PrevButton";
 
 const FormIntroduction = () => {
 	const navigate = useNavigate();
@@ -122,7 +123,7 @@ const FormIntroduction = () => {
 					<ul className="space-y-3">
 						<li>
 							<a href="#" className="text-sw-blue underline font-semibold hover:text-sw-blue-dark text-lg">
-								Past Sport Wales Integrated Impact Assessments.
+								Past Sport Wales Integrated Impact Assessments
 							</a>
 						</li>
 						<li>
@@ -132,7 +133,7 @@ const FormIntroduction = () => {
 						</li>
 						<li>
 							<a href="#" className="text-sw-blue underline font-semibold hover:text-sw-blue-dark text-lg">
-								Descriptions of our Public Duties.
+								Descriptions of our Public Duties
 							</a>
 						</li>
 						<li>
@@ -145,19 +146,14 @@ const FormIntroduction = () => {
 
 				{/* Navigation buttons */}
 				<div className="mt-12 flex justify-between">
-					<Link to="/form-selection" className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">
-						<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-						</svg>
-						Prev
-					</Link>
+					<PrevButton backLink="/form-selection" />
 					<button
-						className="inline-flex items-center px-6 py-2 rounded-md text-sm bg-sw-red text-white font-medium transition-colors duration-200 hover:bg-red-700"
+						className="inline-flex items-center px-6 py-2 rounded-md hover:bg-cyan-700 text-sm bg-[--color-sw-blue] text-white font-medium transition-colors duration-200 hover:bg-opacity-90"
 						onClick={handleStart}
 					>
 						Next: Enter basic details
 						<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7" />
 						</svg>
 					</button>
 				</div>

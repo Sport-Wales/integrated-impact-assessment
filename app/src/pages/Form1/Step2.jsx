@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
 import ProgressBar from '../../components/ProgressBar';
 import { form1Steps } from './constants';
+import NextButton from "../../components/ui/NextButton";
+import PrevButton from "../../components/ui/PrevButton";
 
 const Form1Step2 = () => {
 	const navigate = useNavigate();
@@ -175,15 +177,8 @@ const Form1Step2 = () => {
 				)}
 
 				<div className="mt-12 flex justify-between">
-					<Link to="/form1/step1" className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">
-						Prev
-					</Link>
-					<button
-						className="inline-flex items-center px-6 py-1 rounded-md text-sm bg-sw-red text-white font-medium transition-colors duration-200 hover:bg-red-700"
-						onClick={handleNext}
-					>
-						Next: People
-					</button>
+					<PrevButton backLink="/form1/step1" />
+					<NextButton label="Next: People" onClick={handleNext} />
 				</div>
 			</div>
 		</div>

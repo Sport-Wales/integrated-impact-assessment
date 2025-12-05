@@ -34,23 +34,23 @@ const LandingPage = () => {
 					<ul className="space-y-2 ml-6">
 						<li className="flex items-start">
 							<span className="text-green-500 mr-2 text-xl">✅</span>
-							<span>do better work and make better decisions so our work benefits more people</span>
+							<span>do better work and make better decisions so our work benefits more people,</span>
 						</li>
 						<li className="flex items-start">
 							<span className="text-green-500 mr-2 text-xl">✅</span>
-							<span>support fairness and equality for all communities</span>
+							<span>support fairness and equality for all communities,</span>
 						</li>
 						<li className="flex items-start">
 							<span className="text-green-500 mr-2 text-xl">✅</span>
-							<span>protect the environment for future generations</span>
+							<span>protect the environment for future generations,</span>
 						</li>
 						<li className="flex items-start">
 							<span className="text-green-500 mr-2 text-xl">✅</span>
-							<span>strengthen the Welsh language and culture</span>
+							<span>strengthen the Welsh language and culture,</span>
 						</li>
 						<li className="flex items-start">
 							<span className="text-green-500 mr-2 text-xl">✅</span>
-							<span>meet our legal and ethical responsibilities as a public body (Public Duties)</span>
+							<span>meet our legal and ethical responsibilities as a public body (Public Duties).</span>
 						</li>
 					</ul>
 				</div>
@@ -96,7 +96,7 @@ const LandingPage = () => {
 				<div className="mt-8 flex justify-center">
 					<button
 						onClick={handleStart}
-						className="inline-flex items-center px-6 py-2 rounded-md text-lg bg-sw-red text-white font-medium transition-colors duration-200 hover:bg-red-700"
+						className="inline-flex  hover:bg-cyan-700 items-center px-6 py-2 rounded-md text-sm bg-[--color-sw-blue] text-white font-medium transition-colors duration-200 hover:bg-opacity-90"
 					>
 						Next: Select an impact assessment
 						<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -170,13 +170,13 @@ const FormSelection = () => {
 						Prev
 					</Link>
 					<button
-						className={`inline-flex items-center px-6 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${selectedForm ? 'bg-sw-red text-white hover:bg-red-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+						className={`inline-flex items-center px-6 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${selectedForm ? 'bg-sw-blue text-white hover:bg-cyan-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
 						onClick={handleContinue}
 						disabled={!selectedForm}
 					>
 						Next: Preparing for your integrated impact assessment
 						<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7" />
 						</svg>
 					</button>
 				</div>

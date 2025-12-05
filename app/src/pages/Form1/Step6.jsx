@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
 import ProgressBar from '../../components/ProgressBar';
 import { form1Steps } from './constants';
+import NextButton from "../../components/ui/NextButton";
+import PrevButton from "../../components/ui/PrevButton";
 
 const Form1Step6 = () => {
 	const navigate = useNavigate();
@@ -216,21 +218,8 @@ const Form1Step6 = () => {
 			</div>
 
 			<div className="mt-12 flex justify-between">
-				<Link to="/form1/step5" className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">
-					<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-					</svg>
-					Prev
-				</Link>
-				<button
-					className="inline-flex items-center px-6 py-2 rounded-md text-sm bg-sw-red text-white font-medium transition-colors duration-200 hover:bg-red-700"
-					onClick={handleNext}
-				>
-					Next: Environment and biodiversity
-					<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-					</svg>
-				</button>
+				<PrevButton backLink="/form1/step5" />
+				<NextButton label="Next: Environment and biodiversity" onClick={handleNext} />
 			</div>
 		</div>
 	);
