@@ -1,10 +1,11 @@
 // src/pages/Form1/Step8.jsx
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
-import ProgressBar from '../../components/ProgressBar';
+import ProgressBar from '../../components/ui/ProgressBar';
 import { form1Steps } from './constants';
 import NextButton from "../../components/ui/NextButton";
+import PrevButton from "../../components/ui/PrevButton";
 
 const Form1Step8 = () => {
   const navigate = useNavigate();
@@ -82,7 +83,6 @@ const Form1Step8 = () => {
     }
   };
 
-
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
       <ProgressBar 
@@ -93,7 +93,7 @@ const Form1Step8 = () => {
       />
 
       <h2 className="text-3xl font-bold mb-8">
-        Step 8: Actions and Next Steps
+        Actions and next steps
       </h2>
 
       <div className="bg-white rounded-lg shadow p-6 mb-8">
@@ -107,7 +107,7 @@ const Form1Step8 = () => {
             value={formState.actionsAndNextSteps}
             onChange={handleChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-            rows={2}
+            rows={3}
             placeholder="List specific actions, improvements, and any additional information needed"
           />
         </div>
@@ -145,17 +145,8 @@ const Form1Step8 = () => {
       </div>
 
       <div className="mt-12 flex justify-between">
-        <Link to="/form1/step7" className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">
-          Prev
-        </Link>
-        <button
-          className="inline-flex items-center px-6 py-1 rounded-md text-sm bg-sw-red text-white font-medium transition-colors duration-200 hover:bg-red-700"
-          onClick={handleNext}
-        >
-          Next
-        </button>
-		<PrevButton backLink="/form1/step7" />
-		<NextButton label="Next: Review" onClick={handleNext} />
+        <PrevButton backLink="/form1/step7" />
+        <NextButton label="Next: Review" onClick={handleNext} />
       </div>
     </div>
   );

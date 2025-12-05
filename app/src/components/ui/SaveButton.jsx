@@ -10,7 +10,7 @@ const SaveButton = () => {
 
 	return (
 		<button
-			className="inline-flex hover:bg-cyan-700 hover:border-[--color-sw-blue] items-center px-3 py-2 rounded-md text-sm bg-[--color-sw-blue]  text-white font-medium transition-colors duration-200 hover:bg-opacity-90"
+			className="inline-flex hover:bg-cyan-700 items-center px-3 py-2 rounded-md text-sm bg-[--color-sw-blue]  text-white font-medium transition-colors duration-200 hover:bg-opacity-90"
 			onClick={onClick}
 		>
 		<svg

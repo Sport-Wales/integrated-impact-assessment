@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
-import ProgressBar from '../../components/ProgressBar';
+import ProgressBar from '../../components/ui/ProgressBar';
 import { form1Steps } from './constants';
 import NextButton from "../../components/ui/NextButton";
 import PrevButton from "../../components/ui/PrevButton";
@@ -154,22 +154,29 @@ const Form1Step3 = () => {
 			<h2 className="text-3xl font-bold mb-8">
 				People
 			</h2>
+			{/* Resources */}
+			
+			<div className="bg-white rounded-lg shadow p-6 mb-8">
+				<div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+				<h3 className="font-bold mb-2">Resources</h3>
+				<a href="#" className="text-blue-600 underline hover:text-blue-800">
+					TBC
+				</a>
+			</div>
 			<p className="mb-1">This section covers impacts of your work on equality and people’s protected characteristics.</p>
 			<p className="mb-1">Protected characteristics are a way of describing things that can lead to discrimination.</p>
 			<p className="mb-1">Everybody has protected characteristics. So, avoiding harm to them and promoting equality helps everyone that our work affects.</p>
-			<h3 className="text-xl font-bold mb-4">Resources</h3>
+			
 			<h3 className="text-xl font-bold mb-4">How to complete this section</h3>
 			<p className="mb-1">Think about how your piece of work could affect different groups. Select each protected characteristic affected and:</p>
-			<ul className="list-disc pl-6 mb-8">
+			<ul className="list-disc pl-6 mb-4">
 				<li>select whether the impact is positive (will help people), or negative (might discriminate),</li>
 				<li>describe how your piece of work affects people with this characteristic,</li>
 				<li>if the impact is negative, say how you'll try to avoid this.</li>
 			</ul>
 			<p className="mb-1">You only need to fill out the sections for characteristics affected by this piece of work.</p>
 			<p className="mb-1">You can skip characteristics not affected. They will appear as 'Neutral' when you submit this form).</p>
-			<div className="bg-white rounded-lg shadow p-6 mb-8">
-				<h3 className="text-xl font-bold mb-4">Protected Characteristics (Equality Act 2010)</h3>
-
+				<h3 className="text-xl font-bold mb-4 mt-4">Protected Characteristics (Equality Act 2010)</h3>
 				<div className="space-y-4">
 					{characteristics.map((char) => (
 						<div key={char.id} className="border rounded-lg overflow-hidden">

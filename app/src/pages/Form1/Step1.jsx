@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
-import ProgressBar from '../../components/ProgressBar';
+import ProgressBar from '../../components/ui/ProgressBar';
 import { form1Steps } from './constants';
 import NextButton from "../../components/ui/NextButton";
 import PrevButton from "../../components/ui/PrevButton";
@@ -101,14 +101,11 @@ const Form1Step1 = () => {
 				completedSteps={formData.completedSteps?.form1 || []}
 				onStepClick={handleStepClick}
 			/>
-
-      <h2 className="text-3xl font-bold mb-8">
-        Enter basic details
-      </h2>
-
+			<h2 className="text-3xl font-bold mb-8">
+				Enter basic details
+			</h2>
 			<div className="bg-white rounded-lg shadow p-6 space-y-6">
 				<div>
-
 					<label htmlFor="title" className="block text-lg font-semibold mb-2">
 						Give this assessment a title
 					</label>

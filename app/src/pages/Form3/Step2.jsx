@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
-import ProgressBar from '../../components/ProgressBar';
+import ProgressBar from '../../components/ui/ProgressBar';
 import { form3Steps } from './constants';
 
 const Form3Step2 = () => {

@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
-import ProgressBar from '../../components/ProgressBar';
+import ProgressBar from '../../components/ui/ProgressBar';
 import { form1Steps } from './constants';
 import NextButton from "../../components/ui/NextButton";
 import PrevButton from "../../components/ui/PrevButton";
@@ -90,12 +90,10 @@ const Form1Step2 = () => {
 				completedSteps={formData.completedSteps?.form1 || []}
 				onStepClick={handleStepClick}
 			/>
-
 			<h2 className="text-3xl font-bold mb-8">
 				Known impacts and strategies
 			</h2>
-
-			<div className="space-y-6">
+			<div className="bg-white rounded-lg shadow p-6 space-y-6">
 				<div>
 					<label htmlFor="existingKnowledge" className="block text-lg font-semibold mb-2">
 						What do you already know?
