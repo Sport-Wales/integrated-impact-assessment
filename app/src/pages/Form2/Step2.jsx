@@ -1,135 +1,106 @@
-import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
-import ProgressBar from '../../components/ui/ProgressBar';
 import { form2Steps } from './constants';
+import ProgressBar from '../../components/ui/ProgressBar';
+import NextButton from "../../components/ui/NextButton";
+import PrevButton from "../../components/ui/PrevButton";
 
 const Form2Step2 = () => {
   const navigate = useNavigate();
   const { formData, updateFormData, completeStep } = useFormContext();
 
   const [formState, setFormState] = useState({
-    socioEconomicImpact: formData.form2?.socioEconomicImpact || '',
-    socioEconomicImpactNotApplicable: formData.form2?.socioEconomicImpactNotApplicable || 'false',
+    assessment: formData.form2?.assessment || '',
   });
 
   useEffect(() => {
-    if(!formData.formType){
-        navigate('/form-selector');
+    if (!formData.formType) {
+      navigate('/form-selection');
     }
   }, [formData.formType, navigate]);
 
-  const handleTextChange = (e) => {
-    const {value} = e.target;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormState(prev => ({
       ...prev,
-      socioEconomicImpact: value,
-      socioEconomicImpactNotApplicable: 'false',
-    }));
-  };
-
-  const handleRadioChange = () => {
-    setFormState(prev => ({
-      ...prev,
-      socioEconomicImpact: '',
-      socioEconomicImpactNotApplicable: 'true'
+      [name]: value
     }));
   };
 
   const handleNext = () => {
     updateFormData({
-        form2:{
+      form2: {
         ...formData.form2,
-        socioEconomicImpact: formState.socioEconomicImpact,
-        socioEconomicImpactNotApplicable: formState.socioEconomicImpactNotApplicable
-        }
+        assessment: formState.assessment,
+      }
     });
-
-	completeStep(1);
-
+    // Mark this step as completed
+    completeStep(1);
     navigate('/form2/step3');
   };
 
+  // Handle clicking on a step in the progress bar
   const handleStepClick = (stepIndex) => {
     // Navigate to the appropriate step
     switch(stepIndex) {
       case 0:
-        // Current step - do nothing
+        navigate('/form2/step1');
         break;
       case 1:
-        navigate('/form2/step2');
+        // Current step - do nothing
         break;
       case 2:
         navigate('/form2/step3');
-        break;
-      case 3:
-        navigate('/form2/step4');
         break;
       default:
         break;
     }
   };
 
-  return(
-    <div className='max-w-4xl mx-auto px-4 py-12'>
+  return (
+    <div className="max-w-4xl mx-auto px-4 py-12">
+      {/* Progress Bar */}
       <ProgressBar 
         steps={form2Steps} 
         currentStep={1} 
         completedSteps={formData.completedSteps?.form2 || []} 
         onStepClick={handleStepClick} 
       />
-	  <h2 className='text-3xl font-bold mb-8'>
-        Step 2: Your Impact
+
+      <h2 className="text-3xl font-bold mb-8">
+        Your Assessment
       </h2>
-    <div className='space-y-6'>
-        <p className='font-sm text-gray-600 mb-2'>
-          In this section you should read the short background about each area and detail your approach to any positive or negative impacts. If there is no impact you can click the box for ‘not applicable’.
+
+      <div className="mb-4 p-4 bg-blue-50 rounded-lg">
+        <p>
+          You should read the 'Guidance and Research' section and view the 'IIA Bank' to help you. 
+          If you need further guidance contact Ian Blackburn.
         </p>
-      <div>
-        <label htmlFor="socioEconomicImpact" className='block font-lg font-semibold mb-2'>
-          Socio-economic impact
-        </label>
-        <p className='font-sm text-gray-600 mb-2'>
-          Write about how this work will impact on deprived communities.
-        </p>
-        <textarea
-        id="socioEconomicImpact"
-        name="socioEconomicImpact" 
-        value={formState.socioEconomicImpact}
-        onChange={handleTextChange}
-        className='w-full px-4 py-2 border border-gray-300 rounded-lg'
-        rows={1}
-        />
       </div>
-      
-      <div className='space-y-6'>
-        <div className='flex items-center'>
-          <input
-          type="radio" 
-          id="socioEconomicImpactNotApplicable"
-          name="socioEconomicImpactNotApplicable"
-          value="true"
-          checked={formState.socioEconomicImpactNotApplicable === "true"}
-          onChange={handleRadioChange}
-          className='w-4 h-4 mr-2'
-           />
-           <label htmlFor="socioEconomicImpactNotApplicable"> Not applicable</label>
+
+      <div className="bg-white rounded-lg shadow p-6 space-y-6">
+        <div>
+          <label htmlFor="assessment" className="block text-lg font-semibold mb-2">
+            In this section you should explain any positive or negative impact you believe your work will achieve, and any actions you will take.
+          </label>
+          <textarea
+            id="assessment"
+            name="assessment"
+            value={formState.assessment}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            rows={10}
+            placeholder="Describe the positive and negative impacts of your work and any actions you plan to take"
+          />
+        </div>
+
+        <div className="mt-12 flex justify-between">
+          	<PrevButton backLink="/form2/step1" />
+			<NextButton label="Next: People" onClick={handleNext} />
         </div>
       </div>
     </div>
-
-    <div className='mt-12 flex justify-between'>
-      <Link to="/form2/step1" className='inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'>
-      Prev
-      </Link>
-      <button
-        className="inline-flex items-center px-6 py-1 rounded-md text-sm bg-sw-red text-white font-medium transition-colors duration-200 hover:bg-red-700"
-            onClick={handleNext}
-      >
-        Next
-      </button>      
-    </div>
-  </div>
   );
 };
 

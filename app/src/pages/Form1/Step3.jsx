@@ -1,9 +1,9 @@
 // src/pages/Form1/Step3.jsx
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
-import ProgressBar from '../../components/ui/ProgressBar';
 import { form1Steps } from './constants';
+import ProgressBar from '../../components/ui/ProgressBar';
 import NextButton from "../../components/ui/NextButton";
 import PrevButton from "../../components/ui/PrevButton";
 

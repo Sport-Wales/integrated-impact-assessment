@@ -21,15 +21,6 @@ import Form1Step9 from './pages/Form1/Step9';
 import Form2Step1 from './pages/Form2/Step1';
 import Form2Step2 from './pages/Form2/Step2';
 import Form2Step3 from './pages/Form2/Step3';
-import Form2Step4 from './pages/Form2/Step4';
-import Form2Step5 from './pages/Form2/Step5';
-import Form2Step6 from './pages/Form2/Step6';
-import Form2Step7 from './pages/Form2/Step7';
-
-// Form 3 Components
-import Form3Step1 from './pages/Form3/Step1';
-import Form3Step2 from './pages/Form3/Step2';
-import Form3Step3 from './pages/Form3/Step3';
 
 // Context Provider
 import { FormProvider } from './context/FormContext';
@@ -61,17 +52,6 @@ function App() {
               <Route path="/form2/step1" element={<Form2Step1 />} />
               <Route path="/form2/step2" element={<Form2Step2 />} />
               <Route path="/form2/step3" element={<Form2Step3 />} />
-              <Route path="/form2/step4" element={<Form2Step4 />} />
-              <Route path="/form2/step5" element={<Form2Step5 />} />
-              <Route path="/form2/step6" element={<Form2Step6 />} />
-              <Route path="/form2/step7" element={<Form2Step7 />} />
-
-
-              
-              {/* Form 3 Routes */}
-              <Route path="/form3/step1" element={<Form3Step1 />} />
-              <Route path="/form3/step2" element={<Form3Step2 />} />
-              <Route path="/form3/step3" element={<Form3Step3 />} />
 
             </Routes>
           </main>

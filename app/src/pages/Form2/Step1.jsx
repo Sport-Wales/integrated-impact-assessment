@@ -1,14 +1,15 @@
-// src/pages/Form2/Step1.jsx
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
 import ProgressBar from '../../components/ui/ProgressBar';
 import { form2Steps } from './constants';
+import NextButton from '../../components/ui/NextButton';
+import PrevButton from '../../components/ui/PrevButton';
 
 const Form2Step1 = () => {
   const navigate = useNavigate();
   const { formData, updateFormData, completeStep } = useFormContext();
-  
+
   const [formState, setFormState] = useState({
     title: formData.title || '',
     leadName: formData.leadName || '',
@@ -16,7 +17,7 @@ const Form2Step1 = () => {
     otherPeople: formData.otherPeople || '',
     workDetails: formData.workDetails || '',
   });
-  
+
   // Redirect if form type is not set
   useEffect(() => {
     if (!formData.formType) {
@@ -41,10 +42,10 @@ const Form2Step1 = () => {
       otherPeople: formState.otherPeople,
       workDetails: formState.workDetails
     });
-    
+
     // Mark this step as completed
     completeStep(0);
-    
+
     // Navigate to the next step
     navigate('/form2/step2');
   };
@@ -62,9 +63,6 @@ const Form2Step1 = () => {
       case 2:
         navigate('/form2/step3');
         break;
-      case 3:
-        navigate('/form2/step4');
-        break;
       default:
         break;
     }
@@ -79,11 +77,11 @@ const Form2Step1 = () => {
         completedSteps={formData.completedSteps?.form2 || []} 
         onStepClick={handleStepClick} 
       />
-      
+
       <h2 className="text-3xl font-bold mb-8">
-        Step 1: About Your Project
+        About your project
       </h2>
-      
+
       <div className="bg-white rounded-lg shadow p-6 space-y-6">
         <div>
           <label htmlFor="title" className="block text-lg font-semibold mb-2">
@@ -99,7 +97,7 @@ const Form2Step1 = () => {
             required
           />
         </div>
-        
+
         <div>
           <label htmlFor="leadName" className="block text-lg font-semibold mb-2">
             Who is leading this assessment?
@@ -116,7 +114,7 @@ const Form2Step1 = () => {
             placeholder="Name"
           />
         </div>
-        
+
         <div className="mt-4">
           <input
             type="text"
@@ -129,7 +127,7 @@ const Form2Step1 = () => {
             placeholder="Role"
           />
         </div>
-        
+
         <div>
           <label htmlFor="otherPeople" className="block text-lg font-semibold mb-2">
             Who else is involved?
@@ -146,7 +144,7 @@ const Form2Step1 = () => {
             className="w-full px-4 py-2 border border-gray-300 rounded-lg"
           />
         </div>
-        
+
         <div>
           <label htmlFor="workDetails" className="block text-lg font-semibold mb-2">
             Use this section to detail this work
@@ -163,23 +161,10 @@ const Form2Step1 = () => {
             rows={6}
           />
         </div>
-        
+
         <div className="mt-12 flex justify-between">
-          <Link to="/form-introduction" className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-            </svg>
-            Prev
-          </Link>
-          <button 
-            className="inline-flex items-center px-6 py-2 rounded-md text-sm bg-[--color-sw-red] text-white font-medium transition-colors duration-200 hover:bg-opacity-90"
-            onClick={handleNext}
-          >
-            Next
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+          	<PrevButton backLink="/form-introduction" />
+			<NextButton label="Next: Known impacts" onClick={handleNext} />
         </div>
       </div>
     </div>

@@ -1,7 +1,6 @@
-// src/components/ProgressBar.jsx
 import React from 'react';
 
-const ProgressBar = ({ steps, currentStep, completedSteps, onStepClick }) => {
+const ProgressBar = ({ steps, currentStep, onStepClick }) => {
 
   return (
     <div className="w-full bg-white rounded-lg shadow p-6 space-y-6 mb-8">

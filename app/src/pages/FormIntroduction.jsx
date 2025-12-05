@@ -16,8 +16,6 @@ const FormIntroduction = () => {
 			navigate('/form1/step1');
 		} else if (formData.formType === 'form2') {
 			navigate('/form2/step1');
-		} else if (formData.formType === 'form3') {
-			navigate('/form3/step1');
 		} else {
 			// If no form type selected, go back to selection
 			navigate('/form-selection');

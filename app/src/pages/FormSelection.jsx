@@ -52,13 +52,13 @@ const FormSelection = () => {
 					<div className="flex items-start space-x-3">
 						<input
 							type="radio"
-							id="form3"
+							id="form2"
 							name="formSelection"
-							checked={selectedForm === 'form3'}
-							onChange={() => handleFormSelect('form3')}
+							checked={selectedForm === 'form2'}
+							onChange={() => handleFormSelect('form2')}
 							className="w-5 h-5 mt-1"
 						/>
-						<label htmlFor="form3" className="text-lg cursor-pointer">
+						<label htmlFor="form2" className="text-lg cursor-pointer">
 							<span className="font-semibold">Short Integrated Impact Assessment</span>
 						</label>
 					</div>
