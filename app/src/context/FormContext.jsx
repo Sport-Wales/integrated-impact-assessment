@@ -10,11 +10,10 @@ export const FormProvider = ({ children }) => {
   const getInitialState = () => {
     const savedFormData = localStorage.getItem('formData');
     return savedFormData ? JSON.parse(savedFormData) : {
-      formType: null, // 'form1', 'form2', or 'form3'
+      formType: null, // 'form1', 'form2'
       completedSteps: {
         form1: [],
-        form2: [],
-        form3: []
+        form2: []
       },
       
       // Common fields for all forms
@@ -82,30 +81,6 @@ export const FormProvider = ({ children }) => {
       
       // Form 2 specific fields
       form2: {
-        impactOnPeople: '',
-        impactOnPeopleNotApplicable: false,
-        socioEconomicImpact: '',
-        socioEconomicImpactNotApplicable: false,
-        environmentAndBiodiversity: '',
-        environmentAndBiodiversityNotApplicable: false,
-        welshLanguage: '',
-        welshLanguageNotApplicable: false,
-        wellbeingOfFutureGenerations: {
-          prosperity: '',
-          resilience: '',
-          health: '',
-          cohesiveCommunities: '',
-          globalResponsibility: '',
-          cultureAndWelshLanguage: '',
-          equality: '',
-        },
-        wellbeingOfFutureGenerationsNotApplicable: false,
-        actionsAndNextSteps: '',
-        reviewDate: '',
-      },
-      
-      // Form 3 specific fields
-      form3: {
         assessment: '',
         review: '',
       }

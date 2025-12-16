@@ -110,10 +110,6 @@ integrated-impact-assessment/
 │   │   │   ├── Step1.jsx
 │   │   │   ├── Step2.jsx
 │   │   │   └── ...
-│   │   └── Form3/               # Short IIA (3 steps)
-│   │       ├── Step1.jsx
-│   │       ├── Step2.jsx
-│   │       └── Step3.jsx
 │   │
 │   ├── styles/
 │   │   └── index.css            # Global styles & CSS variables
@@ -328,21 +324,14 @@ form1: {
 }
 ```
 
-### Form 2: Medium Integrated Impact Assessment
-**Use case**: Significant work affecting public duties (not for Board)
+### Form 2: Short Integrated Impact Assessment
+**Use case**: Community impact without affecting public duties
 
 **Steps**:
 1. Project details
 2. Impact assessment
 3. Final review
 
-### Form 3: Short Integrated Impact Assessment
-**Use case**: Community impact without affecting public duties
-
-**Steps**:
-1. Project overview
-2. Community impact
-3. Summary
 
 ## State Management
 
@@ -379,11 +368,10 @@ localStorage.getItem('formData')
 
 // Data structure
 {
-  formType: 'form1' | 'form2' | 'form3',
+  formType: 'form1' | 'form2',
   completedSteps: {
     form1: [0, 1, 2],
-    form2: [],
-    form3: []
+    form2: []
   },
   title: string,
   // ... all form fields
