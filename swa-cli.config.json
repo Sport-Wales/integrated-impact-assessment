@@ -1,0 +1,12 @@
+{
+  "$schema": "https://aka.ms/azure/static-web-apps-cli/schema",
+  "configurations": {
+    "iia-app": {
+      "appLocation": "./app",
+      "apiLocation": "./api",
+      "outputLocation": "dist",
+      "devServerUrl": "http://localhost:5173",
+      "run": "npm run dev --prefix ./app"
+    }
+  }
+}
