@@ -1,6 +1,5 @@
 // src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useState } from 'react';
 import Header from './components/layout/Header';
 import LandingPage from './pages/LandingPage';
 import FormSelection from './pages/FormSelection';
@@ -22,42 +21,44 @@ import Form2Step1 from './pages/Form2/Step1';
 import Form2Step2 from './pages/Form2/Step2';
 import Form2Step3 from './pages/Form2/Step3';
 
-// Context Provider
+// Context Providers
 import { FormProvider } from './context/FormContext';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (
-    <FormProvider>
-      <Router>
-        <div className="min-h-screen flex flex-col">
-          <Header />
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/form-selection" element={<FormSelection />} />
-              <Route path="/form-introduction" element={<FormIntroduction />} />
-              
-              {/* Form 1 Routes */}
-              <Route path="/form1/step1" element={<Form1Step1 />} />
-			  <Route path="/form1/step2" element={<Form1Step2 />} />
-			  <Route path="/form1/step3" element={<Form1Step3 />} />
-			  <Route path="/form1/step4" element={<Form1Step4 />} />
-			  <Route path="/form1/step5" element={<Form1Step5 />} />
-			  <Route path="/form1/step6" element={<Form1Step6 />} />
-			  <Route path="/form1/step7" element={<Form1Step7 />} />
-			  <Route path="/form1/step8" element={<Form1Step8 />} />
-			  <Route path="/form1/step9" element={<Form1Step9 />} />
-			  
-              {/* Form 2 Routes */}
-              <Route path="/form2/step1" element={<Form2Step1 />} />
-              <Route path="/form2/step2" element={<Form2Step2 />} />
-              <Route path="/form2/step3" element={<Form2Step3 />} />
-
-            </Routes>
-          </main>
-        </div>
-      </Router>
-    </FormProvider>
+    <AuthProvider>
+      <FormProvider>
+        <Router>
+          <div className="min-h-screen flex flex-col">
+            <Header />
+            <main className="flex-grow">
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/form-selection" element={<FormSelection />} />
+                <Route path="/form-introduction" element={<FormIntroduction />} />
+                
+                {/* Form 1 Routes */}
+                <Route path="/form1/step1" element={<Form1Step1 />} />
+                <Route path="/form1/step2" element={<Form1Step2 />} />
+                <Route path="/form1/step3" element={<Form1Step3 />} />
+                <Route path="/form1/step4" element={<Form1Step4 />} />
+                <Route path="/form1/step5" element={<Form1Step5 />} />
+                <Route path="/form1/step6" element={<Form1Step6 />} />
+                <Route path="/form1/step7" element={<Form1Step7 />} />
+                <Route path="/form1/step8" element={<Form1Step8 />} />
+                <Route path="/form1/step9" element={<Form1Step9 />} />
+                
+                {/* Form 2 Routes */}
+                <Route path="/form2/step1" element={<Form2Step1 />} />
+                <Route path="/form2/step2" element={<Form2Step2 />} />
+                <Route path="/form2/step3" element={<Form2Step3 />} />
+              </Routes>
+            </main>
+          </div>
+        </Router>
+      </FormProvider>
+    </AuthProvider>
   );
 }
 

@@ -12,6 +12,10 @@
   },
   "routes": [
     {
+      "route": "/api/healthCheck",
+      "allowedRoles": ["anonymous"]
+    },
+    {
       "route": "/api/*",
       "allowedRoles": ["authenticated"]
     }

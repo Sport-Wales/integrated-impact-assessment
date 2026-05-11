@@ -1,14 +1,21 @@
 {
-  "name": "integrated-impact-assessment",
+  "name": "iia-backend-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "Azure Functions backend for Sport Wales Integrated Impact Assessment (IIA) Portal",
+  "author": "Sport Wales Development Team",
+  "license": "UNLICENSED",
+  "private": true,
   "scripts": {
     "start": "func start",
     "test": "echo \"No tests yet...\""
   },
   "dependencies": {
     "@azure/functions": "^4.0.0",
-    "mssql": "^12.3.1"
+    "mssql": "^12.3.1",
+    "pg": "^8.11.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "main": "src/{index.js,functions/*.js}"
 }

@@ -1,0 +1,62 @@
+name: Azure Static Web Apps CI/CD
+
+# Trigger this workflow on pushes to develop or main branches
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - main
+      - develop
+
+# Define jobs that run
+jobs:
+  build_and_deploy_job:
+    # Only run if it's a push OR an opened/synchronize/reopened pull request
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    runs-on: ubuntu-latest
+    name: Build and Deploy Job
+    steps:
+      # Step 1: Checkout the code from GitHub
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+          lfs: false
+
+      # Step 2: Deploy to Azure Static Web Apps
+      # This step is automatically configured when you create a Static Web App in Azure Portal
+      # Azure generates the deployment token and stores it as a GitHub secret
+      - name: Build And Deploy
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          # This token is automatically created by Azure when you connect GitHub
+          # For develop branch: AZURE_STATIC_WEB_APPS_API_TOKEN_DEV
+          # For main branch: AZURE_STATIC_WEB_APPS_API_TOKEN_PROD
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for PR comments
+          action: "upload"
+          
+          # CRITICAL: These paths must match your project structure exactly
+          app_location: "/app"          # React frontend location
+          api_location: "/api"          # Azure Functions backend location
+          output_location: "dist"       # Vite build output folder
+          
+          # Skip API build during GitHub Action (Azure handles it)
+          skip_api_build: false
+
+  # Job that runs when a pull request is closed
+  close_pull_request_job:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    name: Close Pull Request Job
+    steps:
+      - name: Close Pull Request
+        id: closepullrequest
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          action: "close"
