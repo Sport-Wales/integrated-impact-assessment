@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
+import { apiService } from '../../services/api';
 import ProgressBar from '../../components/ui/ProgressBar';
 import { form2Steps } from './constants';
 import NextButton from '../../components/ui/NextButton';
@@ -8,7 +9,9 @@ import PrevButton from '../../components/ui/PrevButton';
 
 const Form2Step1 = () => {
   const navigate = useNavigate();
-  const { formData, updateFormData, completeStep } = useFormContext();
+  const { formData, updateFormData, commitStep, confirmDbSave } = useFormContext();
+
+  const isReadOnly = formData.status === 'signed_off' || formData.userRole === 'view';
 
   const [formState, setFormState] = useState({
     title: formData.title || '',
@@ -27,26 +30,36 @@ const Form2Step1 = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormState(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormState(prev => ({ ...prev, [name]: value }));
+    // Sync to FormContext immediately so SaveButton always has current data
+    updateFormData({ [name]: value });
   };
 
-  const handleNext = () => {
-    // Update the global form data
-    updateFormData({
+  const handleNext = async () => {
+    // Build updated data
+    const updatedData = {
       title: formState.title,
       leadName: formState.leadName,
       leadRole: formState.leadRole,
       otherPeople: formState.otherPeople,
       workDetails: formState.workDetails
-    });
+    };
 
-    // Mark this step as completed
-    completeStep(0);
+    const dataToSave = commitStep(0, updatedData);
 
-    // Navigate to the next step
+    try {
+      const result = await apiService.saveAssessment(dataToSave);
+      
+      // Store returned ID on first save
+      if (!formData.assessmentId && result?.id) {
+        confirmDbSave(result.id);
+      }
+    } catch (err) {
+      // Silent fail — data is safe in localStorage
+      console.warn('[AutoSave] Could not save to database:', err.message);
+    }
+
+    // Navigate to next step
     navigate('/form2/step2');
   };
 
@@ -81,6 +94,11 @@ const Form2Step1 = () => {
       <h2 className="text-3xl font-bold mb-8">
         About your project
       </h2>
+      {isReadOnly && (
+        <p className="mb-6 text-sm text-gray-500">
+          {formData.status === 'signed_off' ? 'This assessment has been signed off and cannot be edited.' : 'You have view-only access to this assessment.'}
+        </p>
+      )}
 
       <div className="bg-white rounded-lg shadow p-6 space-y-6">
         <div>
@@ -93,6 +111,7 @@ const Form2Step1 = () => {
             name="title"
             value={formState.title}
             onChange={handleChange}
+            readOnly={isReadOnly}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg"
             required
           />
@@ -109,6 +128,7 @@ const Form2Step1 = () => {
             name="leadName"
             value={formState.leadName}
             onChange={handleChange}
+            readOnly={isReadOnly}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg"
             required
             placeholder="Name"
@@ -122,6 +142,7 @@ const Form2Step1 = () => {
             name="leadRole"
             value={formState.leadRole}
             onChange={handleChange}
+            readOnly={isReadOnly}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg"
             required
             placeholder="Role"
@@ -141,6 +162,7 @@ const Form2Step1 = () => {
             name="otherPeople"
             value={formState.otherPeople}
             onChange={handleChange}
+            readOnly={isReadOnly}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg"
           />
         </div>
@@ -157,6 +179,7 @@ const Form2Step1 = () => {
             name="workDetails"
             value={formState.workDetails}
             onChange={handleChange}
+            readOnly={isReadOnly}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg"
             rows={6}
           />
@@ -164,7 +187,10 @@ const Form2Step1 = () => {
 
         <div className="mt-12 flex justify-between">
           	<PrevButton backLink="/form-introduction" />
-			<NextButton label="Next: Known impacts" onClick={handleNext} />
+			{!isReadOnly
+				? <NextButton label="Next: Known impacts" onClick={handleNext} />
+				: <button onClick={() => navigate('/')} className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-[--color-sw-blue] text-white hover:bg-cyan-700">Back to My Assessments</button>
+			}
         </div>
       </div>
     </div>

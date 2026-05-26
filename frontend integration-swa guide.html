@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frontend Integration Guide — IIA Portal</title>
+<style>
+  :root {
+    --sw-red:   #e32434;
+    --sw-blue:  #164b64;
+    --sw-green: #299d91;
+    --sw-yellow:#f6b207;
+    --sw-light: #f4f5f7;
+    --sw-white: #ffffff;
+    --font: "Montserrat", Arial, sans-serif;
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); font-size: 15px; line-height: 1.65; color: #1a1a1a; background: #f9f9f9; }
+
+  /* Header */
+  .hdr { background: var(--sw-blue); color: white; padding: 2rem 2.5rem; border-bottom: 4px solid var(--sw-red); }
+  .hdr .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 0.4rem; }
+  .hdr h1 { font-size: 1.75rem; font-weight: 800; line-height: 1.15; margin-bottom: 0.4rem; }
+  .hdr .sub { font-size: 0.875rem; color: rgba(255,255,255,0.65); margin-bottom: 1rem; }
+  .badge { display: inline-flex; align-items: center; background: var(--sw-green); color: white; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 0.25rem 0.7rem; border-radius: 20px; }
+
+  /* Wrap */
+  .wrap { max-width: 880px; margin: 0 auto; padding: 2.5rem 2rem 5rem; }
+
+  /* Section block */
+  .block { background: white; border: 1px solid #e2e2e8; border-radius: var(--radius); margin-bottom: 2.5rem; overflow: hidden; }
+  .block-hdr { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; background: var(--sw-blue); color: white; }
+  .block-hdr.grey { background: #4a5568; }
+  .block-tag { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.6; white-space: nowrap; }
+  .block-title { font-size: 0.95rem; font-weight: 800; flex: 1; }
+  .block-badge { font-size: 11px; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 20px; white-space: nowrap; }
+  .block-badge.done { background: var(--sw-green); color: white; }
+  .block-badge.req  { background: var(--sw-yellow); color: #1a1a1a; }
+  .block-body { padding: 1.5rem; }
+
+  /* Steps */
+  .step { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid #eee; }
+  .step:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .step-row { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.8rem; }
+  .dot { flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; background: var(--sw-green); color: white; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+  .dot.req { background: var(--sw-red); }
+  .step-head { font-size: 0.92rem; font-weight: 700; color: var(--sw-blue); line-height: 1.3; }
+  .step-head small { display: block; font-size: 0.75rem; font-weight: 400; color: #666; margin-top: 2px; }
+
+  p { margin-bottom: 0.7rem; color: #333; font-size: 0.9rem; }
+  p:last-child { margin-bottom: 0; }
+
+  ol.list { margin: 0.5rem 0 0.7rem 0; padding-left: 1.4rem; }
+  ol.list li { margin-bottom: 0.35rem; color: #333; font-size: 0.875rem; }
+  ul.list { margin: 0.5rem 0 0.7rem 0; padding-left: 1.4rem; }
+  ul.list li { margin-bottom: 0.35rem; color: #333; font-size: 0.875rem; list-style: disc; }
+
+  /* Code */
+  pre { background: #1e1e2e; color: #cdd6f4; font-family: "Courier New", monospace; font-size: 0.775rem; line-height: 1.6; border-radius: var(--radius); padding: 1rem 1.2rem; overflow-x: auto; margin: 0.7rem 0; border-left: 3px solid var(--sw-blue); white-space: pre; }
+  code { font-family: "Courier New", monospace; font-size: 0.8rem; background: #eef2f7; color: var(--sw-blue); padding: 0.1rem 0.3rem; border-radius: 3px; }
+  pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+
+  /* Callouts */
+  .note { border-radius: var(--radius); padding: 0.8rem 1rem; margin: 0.7rem 0; font-size: 0.875rem; }
+  .note-lbl { font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 0.25rem; }
+  .note.warn  { background: #fff8e1; border-left: 4px solid var(--sw-yellow); }
+  .note.warn .note-lbl  { color: #a77b00; }
+  .note.sec   { background: #fef2f2; border-left: 4px solid var(--sw-red); }
+  .note.sec .note-lbl   { color: var(--sw-red); }
+  .note.info  { background: #e8f4f8; border-left: 4px solid var(--sw-blue); }
+  .note.info .note-lbl  { color: var(--sw-blue); }
+  .note.ok    { background: #f0fdf4; border-left: 4px solid var(--sw-green); }
+  .note.ok .note-lbl    { color: var(--sw-green); }
+
+  /* Tables */
+  table.t { width: 100%; border-collapse: collapse; font-size: 0.875rem; margin: 0.7rem 0; }
+  table.t th { background: var(--sw-light); font-weight: 700; text-align: left; padding: 0.45rem 0.7rem; border-bottom: 2px solid #ddd; font-size: 0.8rem; color: #444; }
+  table.t td { padding: 0.4rem 0.7rem; border-bottom: 1px solid #eee; vertical-align: top; font-size: 0.875rem; }
+  table.t tr:last-child td { border-bottom: none; }
+  table.t td:first-child { font-family: "Courier New", monospace; font-size: 0.8rem; color: var(--sw-blue); font-weight: 700; }
+  table.t td.plain:first-child { font-family: var(--font); font-size: 0.875rem; color: #1a1a1a; font-weight: 600; }
+  table.t td.badge-ok { color: var(--sw-green); font-weight: 700; font-family: var(--font); }
+  table.t td.badge-req { color: #a77b00; font-weight: 700; font-family: var(--font); }
+
+  /* Status table */
+  table.st { width: 100%; border-collapse: collapse; font-size: 0.875rem; margin: 0.7rem 0; }
+  table.st th { background: var(--sw-blue); color: white; padding: 0.45rem 0.8rem; text-align: left; font-size: 0.8rem; }
+  table.st td { padding: 0.4rem 0.8rem; border-bottom: 1px solid #eee; font-size: 0.875rem; }
+  table.st tr:last-child td { border-bottom: none; }
+  table.st tr:nth-child(even) td { background: #fafafa; }
+  .tick { color: var(--sw-green); font-weight: 700; }
+  .pend { color: #a77b00; font-weight: 700; }
+
+  /* Verify row */
+  .vfy { display: flex; align-items: flex-start; gap: 0.5rem; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius); padding: 0.6rem 0.85rem; font-size: 0.875rem; margin: 0.7rem 0; }
+  .vfy-icon { flex-shrink: 0; margin-top: 1px; }
+
+  /* Flow diagram */
+  .flow { background: #1e1e2e; color: #cdd6f4; font-family: "Courier New", monospace; font-size: 0.775rem; line-height: 1.75; border-radius: var(--radius); padding: 1rem 1.2rem; margin: 0.7rem 0; border-left: 3px solid var(--sw-green); overflow-x: auto; white-space: pre; }
+
+  /* Concept cards - simple grey boxes */
+  .concept { background: var(--sw-light); border-radius: var(--radius); padding: 1rem 1.1rem; margin-bottom: 0.75rem; }
+  .concept-title { font-weight: 700; color: var(--sw-blue); font-size: 0.9rem; margin-bottom: 0.3rem; }
+
+  /* Footer */
+  .footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 2px solid var(--sw-red); font-size: 0.8rem; color: #888; text-align: center; }
+  .contents { max-width: 880px; margin: 0 auto; padding: 1.25rem 2rem 0; }
+  .contents-inner { background: white; border: 1px solid #e2e2e8; border-radius: 8px; padding: 0.9rem 1.5rem; }
+  .contents-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #888; display: block; margin-bottom: 0.5rem; }
+  .contents-inner ul { list-style: none; padding: 0; margin: 0; columns: 3; column-gap: 1.5rem; }
+  .contents-inner ul li { margin-bottom: 0.2rem; break-inside: avoid; }
+  .contents-inner ul li a { font-size: 0.72rem; color: #164b64; text-decoration: none; }
+  .contents-inner ul li a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="eyebrow">Sport Wales — Internal Developer Documentation</div>
+  <h1>Frontend Integration Guide</h1>
+  <p class="sub">IIA Portal — React Frontend, Azure SWA, Authentication, localStorage, Auto-save &amp; API Layer</p>
+  <span class="badge">&#10003; Complete</span>
+</header>
+
+<nav class="contents">
+  <div class="contents-inner">
+    <span class="contents-label">Contents</span>
+    <ul>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#three-modes">Three Development Modes</a></li>
+      <li><a href="#section-a">Configuration Files</a></li>
+      <li><a href="#section-b">Authentication</a></li>
+      <li><a href="#section-c">API Service Layer</a></li>
+      <li><a href="#section-d">localStorage &amp; State</a></li>
+      <li><a href="#section-e">Auto-Save &amp; Save Button</a></li>
+      <li><a href="#section-f">Azure Config</a></li>
+      <li><a href="#section-g">How to Develop</a></li>
+      <li><a href="#section-h">Testing Protocol</a></li>
+      <li><a href="#ref-trouble">Troubleshooting</a></li>
+      <li><a href="#ref-files">Quick Reference</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ══════════════════════════ OVERVIEW ══════════════════════════ -->
+<div class="block" id="overview">
+  <div class="block-hdr">
+    <span class="block-tag">Overview</span>
+    <span class="block-title">What This Guide Covers</span>
+  </div>
+  <div class="block-body">
+    <p>This guide documents how the IIA Portal React frontend is structured, how it connects to the Azure Static Web Apps backend, and how data flows through the application. It covers configuration files, authentication, localStorage, the API service layer, auto-save, and how to develop and test locally.</p>
+    <table class="t">
+      <tr><th>Area</th><th>Files</th><th>Status</th></tr>
+      <tr><td class="plain">Development Configuration</td><td>vite.config.js, .env.example, .env.local</td><td class="badge-ok">&#10003; Done</td></tr>
+      <tr><td class="plain">Authentication System</td><td>AuthContext.jsx, App.jsx</td><td class="badge-ok">&#10003; Done</td></tr>
+      <tr><td class="plain">API Service Layer</td><td>services/api.js</td><td class="badge-ok">&#10003; Done</td></tr>
+      <tr><td class="plain">localStorage &amp; State</td><td>context/FormContext.jsx</td><td class="badge-ok">&#10003; Done</td></tr>
+      <tr><td class="plain">Auto-save on Navigation</td><td>All 12 form step files</td><td class="badge-ok">&#10003; Done</td></tr>
+      <tr><td class="plain">Manual Save Button</td><td>components/ui/SaveButton.jsx</td><td class="badge-ok">&#10003; Done</td></tr>
+      <tr><td class="plain">Azure Deployment</td><td>staticwebapp.config.json, GitHub Actions</td><td class="badge-ok">&#10003; Done</td></tr>
+    </table>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════ THREE MODES ══════════════════════════ -->
+<div class="block" id="three-modes">
+  <div class="block-hdr">
+    <span class="block-tag">Critical Concept</span>
+    <span class="block-title">Three Development Modes — Understand These First</span>
+  </div>
+  <div class="block-body">
+    <p>The app behaves differently depending on how you start it. You must understand all three modes before working on the frontend.</p>
+
+    <div class="concept">
+      <div class="concept-title">Mode 1 — Pure Local &nbsp;<code>npm run dev</code></div>
+      <ul class="list">
+        <li>React only, runs on port <code>5173</code></li>
+        <li>Mock authentication via <code>.env.local</code> — no real login needed</li>
+        <li>API calls proxied to port <code>7071</code> via <code>vite.config.js</code></li>
+        <li><strong>When to use:</strong> UI work, styling, layout, component testing</li>
+      </ul>
+    </div>
+
+    <div class="concept">
+      <div class="concept-title">Mode 2 — Full Stack &nbsp;<code>swa start</code></div>
+      <ul class="list">
+        <li>SWA CLI runs on port <code>4280</code> and coordinates React (5173) + API (7071)</li>
+        <li>Simulates Azure environment — mock Azure AD login available</li>
+        <li>Tests real frontend-to-backend communication flow</li>
+        <li><strong>When to use:</strong> Testing complete flows, verifying API calls, demonstrating to stakeholders</li>
+      </ul>
+    </div>
+
+    <div class="concept">
+      <div class="concept-title">Mode 3 — Azure Production</div>
+      <ul class="list">
+        <li>Everything hosted on Azure — real authentication and real database</li>
+        <li><code>sw-iia-dev</code> — staging, safe test data, connected to <code>develop</code> branch</li>
+        <li><code>sw-iia-live</code> — production, real staff data, connected to <code>main</code> branch</li>
+        <li><strong>When to use:</strong> After local testing passes, real deployment</li>
+      </ul>
+    </div>
+
+    <div class="flow">Deployment flow:
+  git push develop &#x2192; auto-deploys to sw-iia-dev &#x2192; test &#x2192;
+  create PR &#x2192; merge to main &#x2192; auto-deploys to sw-iia-live</div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════ SECTION A — CONFIG ══════════════════════════ -->
+<div class="block" id="section-a">
+  <div class="block-hdr">
+    <span class="block-tag">Section A</span>
+    <span class="block-title">Configuration Files</span>
+    <span class="block-badge done">&#10003; Completed</span>
+  </div>
+  <div class="block-body">
+
+    <!-- A.1 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">A1</span><div class="step-head">Vite Proxy Configuration<small>File: <code>/app/vite.config.js</code></small></div></div>
+      <p>When running <code>npm run dev</code>, React is on port <code>5173</code> but the API is on port <code>7071</code>. Without this proxy, any call to <code>/api/hello</code> would look for it at <code>localhost:5173/api/hello</code> — wrong port. The proxy secretly forwards it to port 7071.</p>
+<pre>import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:7071',  // Forward to Azure Functions
+        changeOrigin: true,               // Prevents CORS errors
+        secure: false                     // Allows HTTP locally
+      }
+    }
+  }
+})</pre>
+      <div class="note info"><div class="note-lbl">Note</div>This proxy only applies during <code>npm run dev</code>. When using <code>swa start</code>, the SWA CLI handles routing. In Azure production, SWA handles it automatically. This file does nothing in production.</div>
+    </div>
+
+    <!-- A.2 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">A2</span><div class="step-head">Environment Variable Template<small>File: <code>/.env.example</code> — in project root, committed to Git</small></div></div>
+      <p>A template showing what environment variables are needed. Never contains real values — safe to commit to Git.</p>
+<pre># IIA Application Environment Configuration
+# Copy this file to .env.local and fill in actual values
+# NEVER commit .env.local to Git
+
+NODE_ENV=development
+
+# Use mock authentication for local development
+# true  = npm run dev (no SWA CLI)
+# false = swa start or in Azure
+VITE_USE_MOCK_AUTH=true
+
+# API Base URL — /api works in all environments
+VITE_API_BASE_URL=/api</pre>
+      <div class="note info"><div class="note-lbl">Important</div>The <code>VITE_</code> prefix is required for Vite to expose variables to React. Variables without this prefix are only available in backend code.</div>
+    </div>
+
+    <!-- A.3 -->
+    <div class="step">
+      <div class="step-row"><span class="dot req">A3</span><div class="step-head">Create Your Personal Environment File<small>File: <code>/.env.local</code> — in project root, NEVER committed to Git</small></div></div>
+      <div class="note warn"><div class="note-lbl">Action Required</div>This file must be created manually. It is listed in <code>.gitignore</code> so it is never shared on GitHub.</div>
+<pre># Create by copying the template:
+cp .env.example .env.local</pre>
+      <p>The default values are correct for local development. You do not need to change anything unless working with specific Azure credentials.</p>
+      <div class="note warn"><div class="note-lbl">&#9888; Switching Between npm run dev and swa start</div>The <code>VITE_USE_MOCK_AUTH</code> value must change depending on how you start the app:
+        <ul class="list" style="margin-top:0.4rem;">
+          <li><code>VITE_USE_MOCK_AUTH=true</code> — use with <code>npm run dev</code> (no SWA CLI, instant fake login)</li>
+          <li><code>VITE_USE_MOCK_AUTH=false</code> — use with <code>swa start</code> (SWA CLI provides its own mock login at <code>/.auth/login/aad</code>)</li>
+        </ul>
+        Restart the dev server after changing this value — Vite does not hot-reload <code>.env.local</code>.
+      </div>
+      <p><strong>What happens if you skip creating this file:</strong> The app may not know whether to use mock auth or real auth. You may see "user is undefined" errors.</p>
+    </div>
+
+    <!-- A.4 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">A4</span><div class="step-head">Git Security — <code>/app/.gitignore</code><small>Prevents secrets from being pushed to GitHub</small></div></div>
+      <p>Verified to include all environment file variants:</p>
+<pre># Environment files with secrets — ALL variants blocked
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local</pre>
+      <div class="note sec"><div class="note-lbl">Security</div>Never remove these lines. If a <code>.env.local</code> file ever appeared in a <code>git status</code> output, stop immediately and verify the .gitignore before committing.</div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════ SECTION B — AUTH ══════════════════════════ -->
+<div class="block" id="section-b">
+  <div class="block-hdr">
+    <span class="block-tag">Section B</span>
+    <span class="block-title">Authentication System</span>
+    <span class="block-badge done">&#10003; Completed</span>
+  </div>
+  <div class="block-body">
+
+    <!-- B.1 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">B1</span><div class="step-head">How Azure SWA Authentication Works</div></div>
+      <p>Azure SWA handles the actual login process. React does not manage passwords or tokens directly.</p>
+      <div class="flow">1. User clicks "Login"
+2. App redirects to /.auth/login/aad
+3. Azure intercepts &#x2192; shows Microsoft login page
+4. User enters Sport Wales credentials
+5. Azure validates with Sport Wales Azure AD
+6. Azure redirects back to the app
+7. Azure makes user info available at /.auth/me
+8. AuthContext.jsx reads /.auth/me &#x2192; user is now logged in</div>
+
+      <p>Three authentication scenarios depending on environment:</p>
+      <table class="t">
+        <tr><th>Scenario</th><th>How it works</th><th>When</th></tr>
+        <tr><td class="plain">Mock Auth</td><td>VITE_USE_MOCK_AUTH=true creates a fake user — no login screen needed</td><td>npm run dev</td></tr>
+        <tr><td class="plain">SWA CLI Mock</td><td>swa start provides a fake login form at /.auth/login/aad</td><td>swa start</td></tr>
+        <tr><td class="plain">Real Azure AD</td><td>Actual Sport Wales Microsoft login with real credentials</td><td>Azure production</td></tr>
+      </table>
+    </div>
+
+    <!-- B.2 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">B2</span><div class="step-head">AuthContext.jsx — Authentication State Management<small>File: <code>/app/src/context/AuthContext.jsx</code></small></div></div>
+      <p>Fetches the logged-in user from Azure and makes that information available to every component in the app via the <code>useAuth()</code> hook.</p>
+
+      <p><strong>What it provides:</strong></p>
+      <table class="t">
+        <tr><th>Value</th><th>Type</th><th>Description</th></tr>
+        <tr><td>user</td><td>object | null</td><td>Contains userId, userDetails (email), userRoles</td></tr>
+        <tr><td>loading</td><td>boolean</td><td>True while the auth check is in progress</td></tr>
+        <tr><td>error</td><td>string | null</td><td>Error message if auth check failed</td></tr>
+        <tr><td>isAuthenticated</td><td>boolean</td><td>Shorthand: !!user</td></tr>
+        <tr><td>login()</td><td>function</td><td>Redirects to /.auth/login/aad (or mock in dev)</td></tr>
+        <tr><td>logout()</td><td>function</td><td>Redirects to /.auth/logout (or mock in dev)</td></tr>
+      </table>
+
+      <p><strong>Usage in any component:</strong></p>
+<pre>import { useAuth } from '../context/AuthContext';
+
+function MyComponent() {
+  const { user, loading, isAuthenticated, login, logout } = useAuth();
+
+  if (loading) return &lt;div&gt;Checking login status...&lt;/div&gt;;
+
+  if (!isAuthenticated) {
+    return &lt;button onClick={login}&gt;Log In&lt;/button&gt;;
+  }
+
+  return (
+    &lt;div&gt;
+      &lt;p&gt;Welcome, {user.userDetails}!&lt;/p&gt;
+      &lt;button onClick={logout}&gt;Log Out&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</pre>
+
+      <p><strong>How mock vs real auth is switched:</strong></p>
+<pre>// Inside AuthContext.jsx — reads the environment variable
+const useMockAuth = import.meta.env.VITE_USE_MOCK_AUTH === 'true';
+
+// If mock: sets a fake user immediately, no network call
+// If real: fetches /.auth/me from Azure SWA</pre>
+    </div>
+
+    <!-- B.3 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">B3</span><div class="step-head">App.jsx — Provider Wrapping Order<small>File: <code>/app/src/App.jsx</code></small></div></div>
+      <p>The entire app is wrapped with <code>AuthProvider</code> so every component can access the logged-in user. The order matters.</p>
+<pre>&lt;AuthProvider&gt;        {/* Outermost — authentication state */}
+  &lt;FormProvider&gt;      {/* Can access auth data when saving */}
+    &lt;Router&gt;          {/* Can access both auth and form data */}
+      &lt;Routes&gt;
+        {/* All form steps, pages, routes */}
+      &lt;/Routes&gt;
+    &lt;/Router&gt;
+  &lt;/FormProvider&gt;
+&lt;/AuthProvider&gt;</pre>
+      <div class="note info"><div class="note-lbl">Why order matters</div>AuthProvider must be outermost so FormProvider can access user identity when saving data (e.g. "save this form for user X"). If FormProvider came first, it would have no access to auth data.</div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════ SECTION C — API ══════════════════════════ -->
+<div class="block" id="section-c">
+  <div class="block-hdr">
+    <span class="block-tag">Section C</span>
+    <span class="block-title">API Service Layer</span>
+    <span class="block-badge done">&#10003; Completed</span>
+  </div>
+  <div class="block-body">
+
+    <!-- C.1 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">C1</span><div class="step-head">Why the API Service Layer Exists<small>File: <code>/app/src/services/api.js</code></small></div></div>
+      <p>Without a centralised service, every component writes its own <code>fetch()</code> code. If an endpoint URL changes, you update 20 files. With this layer, all backend communication lives in one place.</p>
+<pre>// Import in any component:
+import { apiService } from '../services/api';</pre>
+    </div>
+
+    <!-- C.2 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">C2</span><div class="step-head">Available Methods &amp; Error Handling Patterns</div></div>
+      <table class="t">
+        <tr><th>Method</th><th>HTTP</th><th>Purpose</th><th>Error pattern</th></tr>
+        <tr><td>pingServer()</td><td>GET</td><td>Test backend connectivity</td><td>throws raw</td></tr>
+        <tr><td>saveAssessment(formData)</td><td>POST</td><td>INSERT if new, UPDATE if existing. Returns { id }</td><td>silent fail &#x2014; see below</td></tr>
+        <tr><td>getAssessment(id)</td><td>GET</td><td>Fetch full assessment including form_data</td><td>user-friendly</td></tr>
+        <tr><td>listAssessments()</td><td>GET</td><td>Lightweight workspace list — no form_data</td><td>user-friendly</td></tr>
+        <tr><td>completeAssessment(id)</td><td>POST</td><td>Set status = complete</td><td>user-friendly</td></tr>
+        <tr><td>deleteAssessment(id)</td><td>POST</td><td>Permanently delete an assessment</td><td>silent fail</td></tr>
+        <tr><td>signOffAssessment(id)</td><td>POST</td><td>Permanently lock — sets signed_off status</td><td>user-friendly</td></tr>
+        <tr><td>getPermissions(id)</td><td>GET</td><td>List who has access to an assessment</td><td>user-friendly</td></tr>
+        <tr><td>shareAssessment(id, email, role)</td><td>POST</td><td>Give colleague view or edit access</td><td>user-friendly</td></tr>
+        <tr><td>removeShare(id, email)</td><td>POST</td><td>Revoke colleague's access</td><td>user-friendly</td></tr>
+      </table>
+
+      <p><strong>Two error-handling patterns are used deliberately:</strong></p>
+      <div class="note info"><div class="note-lbl">Pattern A — User-facing error (most methods)</div>Wraps in try/catch and throws a user-friendly message. Callers surface this to the UI. Used when a failure should be visible to the user.</div>
+      <div class="note ok"><div class="note-lbl">Pattern B — Silent fail (saveAssessment, deleteAssessment)</div>Throws the raw error. Callers swallow it silently. Used because localStorage is always the source of truth — the DB save is a best-effort background sync. The user never sees a failure.</div>
+
+      <p><strong>User-facing error messages by HTTP status:</strong></p>
+<pre>401  →  "You must be logged in to do this"
+403  →  "You do not have permission to do this"
+404  →  "Assessment not found"
+500  →  "Server error. Please try again."
+other → "{context} failed. Check your connection."</pre>
+
+      <p><strong>Using saveAssessment — the most common call:</strong></p>
+<pre>// formData must include assessmentId:
+//   null   = new assessment — backend does INSERT, returns { id: UUID }
+//   UUID   = existing assessment — backend does UPDATE
+
+const result = await apiService.saveAssessment(formData);
+
+// On first save: store the returned UUID
+if (!formData.assessmentId &amp;&amp; result?.id) {
+  confirmDbSave(result.id);  // re-keys localStorage and updates FormContext
+}</pre>
+    </div>
+
+    <!-- C.3 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">C3</span><div class="step-head">Status and Role Constants</div></div>
+      <p>Always use these constants instead of raw strings to prevent typos:</p>
+<pre>import { ASSESSMENT_STATUS, PERMISSION_ROLE } from '../services/api';
+
+ASSESSMENT_STATUS.DRAFT       // 'draft'
+ASSESSMENT_STATUS.COMPLETE    // 'complete'
+ASSESSMENT_STATUS.SIGNED_OFF  // 'signed_off'
+
+PERMISSION_ROLE.VIEW          // 'view'
+PERMISSION_ROLE.EDIT          // 'edit'</pre>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════ SECTION D — LOCALSTORAGE ══════════════════════════ -->
+<div class="block" id="section-d">
+  <div class="block-hdr">
+    <span class="block-tag">Section D</span>
+    <span class="block-title">localStorage &amp; State Management (FormContext)</span>
+    <span class="block-badge done">&#10003; Completed</span>
+  </div>
+  <div class="block-body">
+
+    <!-- D.1 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">D1</span><div class="step-head">The localStorage Architecture<small>File: <code>/app/src/context/FormContext.jsx</code></small></div></div>
+      <p>The app uses a <strong>multi-assessment localStorage store</strong>. Every assessment gets its own slot. Users can have multiple drafts and the correct one is restored on page reload.</p>
+
+      <p><strong>Two localStorage keys — all access goes through constants, never raw strings:</strong></p>
+      <table class="t">
+        <tr><th>Key constant</th><th>Actual key</th><th>What it stores</th></tr>
+        <tr><td>LS_ASSESSMENTS_KEY</td><td>iia_assessments</td><td>Object: <code>{ [localId]: formDataSnapshot }</code> — holds all drafts on this device</td></tr>
+        <tr><td>LS_ACTIVE_KEY</td><td>iia_active</td><td>String: the localId of the assessment currently being edited</td></tr>
+      </table>
+
+      <p><strong>Local IDs vs Database IDs:</strong></p>
+<pre>// Before first DB save:
+localId = "local_1716900000000_ab3f2"  // our generated key
+assessmentId = null                     // no DB record yet
+
+// After first successful DB save:
+localId = "550e8400-e29b-41d4-..."    // re-keyed to the DB UUID
+assessmentId = "550e8400-e29b-41d4-..."  // same value</pre>
+    </div>
+
+    <!-- D.2 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">D2</span><div class="step-head">Auto-Persist — Every Change Saved Automatically</div></div>
+      <p>A <code>useEffect</code> inside FormContext watches <code>formData</code> and writes it to localStorage on every change. Users never lose data even if the browser crashes.</p>
+<pre>// Inside FormContext.jsx — runs on every formData change
+useEffect(() => {
+  if (formData.localId) {
+    writeAssessmentToStore(formData.localId, formData);
+    // Also stamps lastSavedAt: new Date().toISOString()
+  }
+}, [formData]);</pre>
+      <div class="note ok"><div class="note-lbl">Key principle</div>localStorage is always written first. The database is a background sync. If the backend is unavailable, the user never notices — their data is always safe locally.</div>
+    </div>
+
+    <!-- D.3 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">D3</span><div class="step-head">FormContext Methods Reference</div></div>
+      <table class="t">
+        <tr><th>Method</th><th>What it does</th><th>When to use</th></tr>
+        <tr><td>updateFormData(data)</td><td>Shallow-merge into top-level formData</td><td>Updating common fields (title, leadName etc)</td></tr>
+        <tr><td>updateFormSection(type, section, data)</td><td>Update a specific nested section</td><td>Updating form1.welshLanguage etc</td></tr>
+        <tr><td>commitStep(stepIndex, data)</td><td>Merge data + mark step complete in one pass. Returns the exact merged snapshot for DB save.</td><td>Every handleNext — use this instead of updateFormData + completeStep</td></tr>
+        <tr><td>confirmDbSave(assessmentId)</td><td>Re-keys localStorage from localId to real DB UUID. Prevents duplicates on future saves.</td><td>After first successful saveAssessment() call</td></tr>
+        <tr><td>loadAssessment(dbResponse)</td><td>Populates FormContext from a DB row. DB column values always override stale form_data values.</td><td>When user opens an existing assessment from workspace</td></tr>
+        <tr><td>resetFormData()</td><td>Creates a new blank assessment with a fresh localId</td><td>When user clicks "Start New Assessment"</td></tr>
+        <tr><td>startAssessment(formType)</td><td>Sets form type on an active assessment. Creates new slot if none exists.</td><td>FormSelection page when user picks form1 or form2</td></tr>
+        <tr><td>deleteLocalAssessment(localId)</td><td>Removes from localStorage. Clears active pointer if it was the current form.</td><td>User deletes a draft from workspace</td></tr>
+      </table>
+
+      <div class="note warn"><div class="note-lbl">Critical — use commitStep not updateFormData in handleNext</div>
+        <code>commitStep</code> returns the exact snapshot that was stored in one atomic operation. If you call <code>updateFormData()</code> and then pass <code>formData</code> to <code>saveAssessment()</code>, the <code>formData</code> reference is stale — React batches state updates, so <code>completedSteps</code> will always be one step behind in the database. Always use <code>commitStep</code> in step navigation handlers.
+      </div>
+    </div>
+
+    <!-- D.4 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">D4</span><div class="step-head">Deep Merge — How New Fields Are Added Safely</div></div>
+      <p>When loading an older saved assessment that predates a new field, <code>deepMerge</code> ensures the new field gets its default value rather than being undefined.</p>
+<pre>// On initial load: merge saved data over fresh defaults
+// New fields in getInitialState() are always present, even in old sessions
+return deepMerge(getInitialState(), savedData);
+
+// Arrays and primitives from saved data replace defaults (not element-merged)
+// Nested objects are merged recursively</pre>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════ SECTION E — AUTOSAVE ══════════════════════════ -->
+<div class="block" id="section-e">
+  <div class="block-hdr">
+    <span class="block-tag">Section E</span>
+    <span class="block-title">Auto-Save &amp; Save Button</span>
+    <span class="block-badge done">&#10003; Completed</span>
+  </div>
+  <div class="block-body">
+
+    <!-- E.1 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">E1</span><div class="step-head">How Auto-Save Works on Step Navigation</div></div>
+      <p>Every time a user clicks Next or Back in a form step, the current step's data is saved to both localStorage (instantly) and the database (background, non-blocking). The user is never blocked if the database is unavailable.</p>
+
+      <p><strong>The pattern used in every form step's <code>handleNext</code>:</strong></p>
+<pre>const handleNext = async () => {
+
+  // 1. Build this step's data
+  const updatedData = {
+    title: formState.title,
+    form1: { ...formData.form1, affectedGroups: formState.affectedGroups }
+  };
+
+  // 2. commitStep: merges data + marks step complete in ONE pass.
+  //    Returns the exact merged snapshot — no staleness risk.
+  const dataToSave = commitStep(0, updatedData);  // 0 = step index
+
+  // 3. Background DB save (non-blocking — wrapped in try/catch)
+  try {
+    const result = await apiService.saveAssessment(dataToSave);
+
+    // 4. On first successful DB save: re-key localStorage to real UUID
+    if (!formData.assessmentId &amp;&amp; result?.id) {
+      confirmDbSave(result.id);
+    }
+  } catch (err) {
+    // Silent fail — data is safe in localStorage
+    console.warn('[AutoSave] Could not save to database:', err.message);
+  }
+
+  // 5. Navigate regardless of DB save result
+  navigate('/form1/step2');
+};</pre>
+
+      <div class="note info"><div class="note-lbl">Why silent fail is correct here</div>localStorage was written in step 2 before the DB call. The user's data is safe. Blocking navigation on a network failure would be a bad experience. The next step navigation will attempt another DB save.</div>
+    </div>
+
+    <!-- E.2 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">E2</span><div class="step-head">Manual Save Button<small>File: <code>/app/src/components/ui/SaveButton.jsx</code></small></div></div>
+      <p>Appears in the Header during any active form. Allows users to manually trigger a database sync at any time. Always reports success because localStorage always succeeds.</p>
+
+      <p><strong>Save states:</strong> <code>idle</code> → <code>saving</code> → <code>saved</code> (2 seconds) → <code>idle</code></p>
+
+<pre>// SaveButton behaviour:
+onClick = async () => {
+  if (!formData.formType) return;  // Nothing to save
+
+  setSaveState('saving');
+
+  try {
+    const result = await apiService.saveAssessment(formData);
+    if (!formData.assessmentId &amp;&amp; result?.id) {
+      confirmDbSave(result.id);  // First DB save — upgrade localStorage key
+    }
+  } catch (err) {
+    // Silent — localStorage already saved. DB sync will happen next time.
+    console.warn('[SaveButton] DB save failed. Data safe in localStorage.', err.message);
+  }
+
+  // Always show 'Saved &#x2713;' — localStorage always succeeded
+  setSaveState('saved');
+  setTimeout(() =&gt; setSaveState('idle'), 2000);
+};</pre>
+
+      <div class="note ok"><div class="note-lbl">Important design decision</div>The button always shows "Saved &#x2713;" regardless of whether the DB call succeeded. This is intentional — localStorage saved successfully. The DB failure is an implementation detail the user does not need to know about. The data is safe.</div>
+    </div>
+
+    <!-- E.3 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">E3</span><div class="step-head">The Two-Phase Save Model — Summary</div></div>
+      <div class="flow">Phase 1 — Immediate (always succeeds):
+  User types or clicks Next
+  &#x2193;
+  FormContext useEffect fires
+  &#x2193;
+  writeAssessmentToStore(localId, formData)
+  &#x2193;
+  localStorage updated &#x2713;
+
+Phase 2 — Background (best-effort):
+  handleNext or SaveButton calls apiService.saveAssessment()
+  &#x2193;
+  Backend receives POST /api/saveAssessment
+  &#x2193;
+  If assessmentId is null  &#x2192;  INSERT  &#x2192;  returns { id: UUID }
+  If assessmentId is UUID  &#x2192;  UPDATE  &#x2192;  returns { id: UUID }
+  &#x2193;
+  confirmDbSave(id) re-keys localStorage entry to real UUID
+  &#x2193;
+  Future saves will UPDATE not INSERT &#x2713;</div>
+    </div>
+
+    <!-- E.4 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">E4</span><div class="step-head">Read-Only Enforcement (Signed-Off &amp; View-Only)</div></div>
+      <p>Every form step checks two conditions before rendering inputs as editable:</p>
+<pre>// At the top of every step component:
+const isReadOnly = formData.status === 'signed_off'
+                || formData.userRole === 'view';
+
+// Applied to all inputs:
+&lt;input readOnly={isReadOnly} ... /&gt;
+&lt;textarea readOnly={isReadOnly} ... /&gt;
+
+// Navigation buttons hidden when read-only:
+{!isReadOnly
+  ? &lt;NextButton onClick={handleNext} /&gt;
+  : &lt;button onClick={() =&gt; navigate('/')}&gt;Back to My Assessments&lt;/button&gt;
+}</pre>
+      <div class="note info"><div class="note-lbl">When read-only is applied</div><code>signed_off</code> — assessment permanently locked after sign-off. <code>view</code> — user was shared the assessment with view-only permission (userRole set by loadAssessment from the DB response).</div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════ SECTION F — AZURE CONFIG ══════════════════════════ -->
+<div class="block" id="section-f">
+  <div class="block-hdr">
+    <span class="block-tag">Section F</span>
+    <span class="block-title">Azure Static Web App Configuration</span>
+    <span class="block-badge done">&#10003; Completed</span>
+  </div>
+  <div class="block-body">
+
+    <!-- F.1 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">F1</span><div class="step-head">Security Firewall (<code>staticwebapp.config.json</code>)<small>File: <code>/app/staticwebapp.config.json</code> — enforced by Azure in production</small></div></div>
+      <p>This is the most critical config file. Azure reads it on every request. It controls authentication, routing protection, and SPA routing.</p>
+<pre>{
+  "auth": {
+    "identityProviders": {
+      "azureActiveDirectory": {
+        "registration": {
+          "openIdIssuer": "https://login.microsoftonline.com/YOUR_TENANT_ID/v2.0",
+          "clientIdSettingName": "AAD_CLIENT_ID",
+          "clientSecretSettingName": "AAD_CLIENT_SECRET"
+        }
+      }
+    }
+  },
+  "routes": [
+    { "route": "/api/healthCheck", "allowedRoles": ["anonymous"] },
+    { "route": "/api/*",           "allowedRoles": ["authenticated"] }
+  ],
+  "responseOverrides": {
+    "401": { "statusCode": 302, "redirect": "/.auth/login/aad" }
+  },
+  "navigationFallback": {
+    "rewrite": "/index.html"
+  }
+}</pre>
+      <table class="t">
+        <tr><th>Section</th><th>What it does</th></tr>
+        <tr><td class="plain">auth block</td><td>Connects to Sport Wales Azure AD tenant specifically — not consumer Microsoft accounts</td></tr>
+        <tr><td class="plain">/api/healthCheck route</td><td>Anonymous access — Azure monitoring tools need this to check if the app is alive</td></tr>
+        <tr><td class="plain">/api/* route</td><td>All other API calls require an authenticated user. Routes processed top-to-bottom.</td></tr>
+        <tr><td class="plain">responseOverrides 401</td><td>Unauthenticated users are redirected to login rather than seeing a 401 error page</td></tr>
+        <tr><td class="plain">navigationFallback</td><td>Solves SPA routing — refreshing on /form1/step3 returns index.html not a 404</td></tr>
+      </table>
+      <div class="note sec"><div class="note-lbl">Production Impact</div>Once deployed, a typo here could lock all staff out or leave the API unprotected. Test in <code>sw-iia-dev</code> before merging to <code>main</code>.</div>
+    </div>
+
+    <!-- F.2 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">F2</span><div class="step-head">GitHub Actions Deployment<small>File: <code>/.github/workflows/azure-static-web-apps.yml</code></small></div></div>
+      <p>Every push to <code>develop</code> or <code>main</code> automatically builds and deploys to Azure. No manual file uploads needed.</p>
+      <table class="t">
+        <tr><th>Branch</th><th>Deploys to</th><th>Purpose</th></tr>
+        <tr><td class="plain">develop</td><td>sw-iia-dev</td><td>Staging — safe test data, developers and testers only</td></tr>
+        <tr><td class="plain">main</td><td>sw-iia-live</td><td>Production — real staff data, stable only</td></tr>
+      </table>
+      <div class="note warn"><div class="note-lbl">Critical paths in the workflow</div><code>app_location: /app</code> · <code>api_location: /api</code> · <code>output_location: dist</code> — if output_location is wrong, live site shows blank white page.</div>
+    </div>
+
+    <!-- F.3 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">F3</span><div class="step-head">Production Secrets in Azure Portal</div></div>
+      <p><code>local.settings.json</code> is never uploaded to Azure. Matt must manually enter these values in Azure Portal → Static Web App → Configuration:</p>
+      <table class="t">
+        <tr><th>Key</th><th>Value</th></tr>
+        <tr><td>NODE_ENV</td><td>production</td></tr>
+        <tr><td>DB_TYPE</td><td>postgres</td></tr>
+        <tr><td>DB_CONNECTION_STRING</td><td>[From Matt — PostgreSQL connection string]</td></tr>
+        <tr><td>TENANT_ID</td><td>[From Matt — Sport Wales Azure AD tenant ID]</td></tr>
+        <tr><td>AAD_CLIENT_ID</td><td>[From Matt — App registration client ID]</td></tr>
+        <tr><td>AAD_CLIENT_SECRET</td><td>[From Matt — App registration client secret]</td></tr>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════ SECTION G — HOW TO ADD ══════════════════════════ -->
+<div class="block" id="section-g">
+  <div class="block-hdr">
+    <span class="block-tag">Section G</span>
+    <span class="block-title">How to Develop — Adding New API Calls &amp; Form Steps</span>
+  </div>
+  <div class="block-body">
+
+    <!-- G.1 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">G1</span><div class="step-head">Adding a New API Method to api.js</div></div>
+      <p>Follow the existing pattern. Choose Pattern A (user-facing error) for most calls. Use Pattern B (silent fail) only if the caller handles failure without showing the user anything.</p>
+<pre>// Pattern A — user-facing error (use for most new methods)
+myNewEndpoint: async (param) => {
+  try {
+    const response = await fetch(`${API_BASE}/myEndpoint`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ param }),
+    });
+    return await handleResponse(response);
+  } catch (error) {
+    handleError('My endpoint', error);  // throws user-friendly message
+  }
+},
+
+// Pattern B — silent fail (only when caller swallows the error)
+myBackgroundCall: async (data) => {
+  const response = await fetch(`${API_BASE}/myEndpoint`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  return await handleResponse(response);  // raw error propagates to caller
+},</pre>
+    </div>
+
+    <!-- G.2 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">G2</span><div class="step-head">Adding a New Form Step</div></div>
+      <p>Every form step follows the same structure. Copy an existing step and follow this checklist:</p>
+      <ol class="list">
+        <li>Import: <code>useFormContext</code>, <code>apiService</code>, <code>commitStep</code>, <code>confirmDbSave</code></li>
+        <li>Add <code>const isReadOnly = formData.status === 'signed_off' || formData.userRole === 'view'</code></li>
+        <li>Initialise local state from FormContext values (so data survives navigation)</li>
+        <li>In <code>handleChange</code>: call <code>updateFormData()</code> immediately so SaveButton always has current data</li>
+        <li>In <code>handleNext</code>: call <code>commitStep(stepIndex, updatedData)</code> — not <code>updateFormData</code> — to get the snapshot</li>
+        <li>Pass the snapshot to <code>apiService.saveAssessment(dataToSave)</code> — not the stale <code>formData</code></li>
+        <li>Call <code>confirmDbSave(result.id)</code> on first successful save (when <code>formData.assessmentId</code> is null)</li>
+        <li>Wrap DB call in try/catch with <code>console.warn</code> on failure — never block navigation</li>
+        <li>Apply <code>readOnly={isReadOnly}</code> to all inputs and textareas</li>
+        <li>Hide Next button and show "Back to My Assessments" when <code>isReadOnly</code></li>
+      </ol>
+<pre>// Minimal correct handleNext pattern:
+const handleNext = async () => {
+  const updatedData = {
+    form1: { ...formData.form1, myField: formState.myField }
+  };
+  const dataToSave = commitStep(STEP_INDEX, updatedData);
+  try {
+    const result = await apiService.saveAssessment(dataToSave);
+    if (!formData.assessmentId &amp;&amp; result?.id) {
+      confirmDbSave(result.id);
+    }
+  } catch (err) {
+    console.warn('[AutoSave] DB save failed:', err.message);
+  }
+  navigate('/form1/stepN');
+};</pre>
+    </div>
+
+    <!-- G.3 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">G3</span><div class="step-head">Adding a New Field to FormContext</div></div>
+      <ol class="list">
+        <li>Add the field with its default value inside <code>getInitialState()</code></li>
+        <li>Because of <code>deepMerge</code>, old saved sessions will automatically get the default value on next load — no migration needed</li>
+        <li>The field will be included in every <code>saveAssessment</code> call automatically since the whole <code>formData</code> object is sent</li>
+        <li>The backend stores everything in the <code>form_data</code> JSONB column — no schema change needed for new form fields</li>
+      </ol>
+    </div>
+
+  </div>
+</div>
+
+
+    <!-- G.4 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">G4</span><div class="step-head">How the Workspace Page Works — listAssessments, loadAssessment &amp; deleteLocalAssessment</div></div>
+      <p>The workspace (LandingPage.jsx) is the home screen after login. It combines three systems: the API service, FormContext, and localStorage. Understanding how they interact is important for anyone maintaining or extending it.</p>
+
+      <p><strong>On mount — fetch all assessments:</strong></p>
+<pre>useEffect(() => {
+  const fetchAssessments = async () => {
+    try {
+      const data = await apiService.listAssessments();
+      setAssessments(data || []);
+    } catch (err) {
+      if (err.status === 401) {
+        setError('You are not logged in. Please log in to see your assessments.');
+      } else {
+        // Fallback: show local-only drafts from localStorage if DB is unavailable
+        const store = readAssessmentsStore();
+        const localItems = Object.values(store);
+        setAssessments(localItems);
+      }
+    }
+  };
+  fetchAssessments();
+}, []);</pre>
+
+      <p><strong>Opening an existing assessment — two paths depending on source:</strong></p>
+<pre>const handleOpenAssessment = async (assessmentId, formType, status) => {
+
+  // Path A: DB-backed assessment (assessmentId is a real UUID)
+  if (assessmentId &amp;&amp; !assessmentId.startsWith('local_')) {
+    const data = await apiService.getAssessment(assessmentId);
+    loadAssessment(data);  // populates FormContext from DB row
+    navigate(formType === 'form1' ? '/form1/step1' : '/form2/step1');
+    return;
+  }
+
+  // Path B: Local-only draft (assessmentId starts with 'local_')
+  // Load directly from localStorage — no DB call needed
+  const store = readAssessmentsStore();
+  const localData = store[assessmentId];
+  if (localData) {
+    loadAssessment({ id: assessmentId, form_data: localData,
+                     status: localData.status, form_type: localData.formType,
+                     user_role: 'owner' });
+    navigate(formType === 'form1' ? '/form1/step1' : '/form2/step1');
+  }
+};</pre>
+
+      <p><strong>Deleting an assessment — two steps in the correct order:</strong></p>
+<pre>const handleDelete = async (assessmentId) => {
+
+  // Step 1: Remove from localStorage immediately (always succeeds)
+  deleteLocalAssessment(assessmentId);
+  setAssessments(prev => prev.filter(a => a.id !== assessmentId));
+
+  // Step 2: Sync deletion to DB in background (silent fail — Pattern B)
+  if (assessmentId &amp;&amp; !assessmentId.startsWith('local_')) {
+    try {
+      await apiService.deleteAssessment(assessmentId);
+    } catch (err) {
+      // Silent — localStorage already cleaned up. DB will eventually
+      // be cleaned by the backend if the record is orphaned.
+      console.warn('[Delete] DB delete failed:', err.message);
+    }
+  }
+};</pre>
+
+      <div class="note info"><div class="note-lbl">Key pattern to remember</div>localStorage always changes first. The DB call is always a background sync that can silently fail. This pattern is consistent across save, delete, and complete — the user never sees a failure caused by the backend being unavailable.</div>
+
+      <p><strong>Starting a new assessment from the workspace:</strong></p>
+<pre>const handleStartNew = () => {
+  resetFormData();          // Creates fresh localId, stamps createdAt
+  navigate('/form-selection');  // User picks form1 or form2
+  // startAssessment(formType) is called by FormSelection
+  // when the user makes their choice
+};</pre>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════ SECTION H — TESTING ══════════════════════════ -->
+<div class="block" id="section-h">
+  <div class="block-hdr">
+    <span class="block-tag">Section H</span>
+    <span class="block-title">Testing Protocol</span>
+  </div>
+  <div class="block-body">
+
+    <div class="step">
+      <div class="step-row"><span class="dot">H1</span><div class="step-head">Prerequisites Before Testing</div></div>
+      <table class="st">
+        <tr><th>Requirement</th><th>Check</th></tr>
+        <tr><td>Node.js 18 or higher</td><td><span class="tick">Run: node --version → must show v18.x.x or higher. Required by both Azure Functions and Vite. If lower, download from nodejs.org.</span></td></tr>
+        <tr><td>Azure Functions Core Tools</td><td><span class="tick">Run: func --version → should show 4.x.x</span></td></tr>
+        <tr><td>SWA CLI installed</td><td><span class="tick">Run: swa --version → should show 2.0.9+</span></td></tr>
+        <tr><td>.env.local created</td><td><span class="tick">cp .env.example .env.local</span></td></tr>
+        <tr><td>Frontend dependencies</td><td><span class="tick">cd app &amp;&amp; npm install</span></td></tr>
+        <tr><td>Backend dependencies</td><td><span class="tick">cd api &amp;&amp; npm install</span></td></tr>
+      </table>
+    </div>
+
+    <div class="step">
+      <div class="step-row"><span class="dot">H2</span><div class="step-head">Test 1 — Pure React<small>Purpose: Verify UI, routing, mock auth</small></div></div>
+<pre>cd app
+npm run dev</pre>
+      <div class="vfy"><span class="vfy-icon">&#10003;</span><span>App opens at <code>http://localhost:5173</code></span></div>
+      <div class="vfy"><span class="vfy-icon">&#10003;</span><span>Console shows: <code>[Auth] Using mock authentication</code></span></div>
+      <div class="vfy"><span class="vfy-icon">&#10003;</span><span>Navigation between pages works, no console errors</span></div>
+      <p><strong>When to use:</strong> UI development, styling, layout, component testing. No backend needed.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-row"><span class="dot">H3</span><div class="step-head">Test 2 — Backend API Only<small>Purpose: Verify Azure Functions are running</small></div></div>
+<pre>cd api
+npm start</pre>
+      <div class="vfy"><span class="vfy-icon">&#10003;</span><span>Terminal shows: <code>Functions: hello: [GET,POST] http://localhost:7071/api/hello</code></span></div>
+      <div class="vfy"><span class="vfy-icon">&#10003;</span><span>Visit <code>http://localhost:7071/api/hello?name=Test</code> → returns: <code>Hello, Test!</code></span></div>
+      <div class="vfy"><span class="vfy-icon">&#10003;</span><span>Visit <code>http://localhost:7071/api/healthCheck</code> → returns JSON status</span></div>
+    </div>
+
+    <div class="step">
+      <div class="step-row"><span class="dot">H4</span><div class="step-head">Test 3 — Full Stack<small>Purpose: Test complete flow including frontend-to-backend communication</small></div></div>
+<pre># From project root
+swa start</pre>
+      <div class="vfy"><span class="vfy-icon">&#10003;</span><span>SWA CLI runs on <code>http://localhost:4280</code></span></div>
+      <div class="vfy"><span class="vfy-icon">&#10003;</span><span>React on 5173 and API on 7071 started automatically</span></div>
+      <div class="vfy"><span class="vfy-icon">&#10003;</span><span>Mock login at <code>http://localhost:4280/.auth/login/aad</code></span></div>
+      <div class="vfy"><span class="vfy-icon">&#10003;</span><span>Health check at <code>http://localhost:4280/api/healthCheck</code></span></div>
+      <p><strong>Test API connectivity from browser console:</strong></p>
+<pre>fetch('/api/hello?name=SportWales').then(r => r.text()).then(console.log)
+// Expected: Hello, SportWales!</pre>
+      <p><strong>When to use:</strong> Testing complete flows, auth, API calls, demonstrating to stakeholders.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-row"><span class="dot">H5</span><div class="step-head">Test 4 — localStorage Persistence<small>Purpose: Verify data survives page refresh</small></div></div>
+      <ol class="list">
+        <li>Start with <code>swa start</code>, navigate to <code>http://localhost:4280</code></li>
+        <li>Start a new assessment, fill in title and lead name on Step 1</li>
+        <li>Open DevTools (F12) → Application → Local Storage → <code>http://localhost:4280</code></li>
+        <li>Verify <code>iia_assessments</code> key exists and contains your input</li>
+        <li>Verify <code>iia_active</code> key exists and points to a <code>local_</code> ID</li>
+        <li>Refresh the page (F5)</li>
+        <li>Verify your data is still present in the form</li>
+      </ol>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════ TROUBLESHOOTING ══════════════════════════ -->
+<div class="block" id="ref-trouble">
+  <div class="block-hdr">
+    <span class="block-tag">Reference</span>
+    <span class="block-title">Troubleshooting</span>
+  </div>
+  <div class="block-body">
+
+    <div class="step">
+      <div class="step-row"><span class="dot">&#x21</span><div class="step-head">Cannot GET /api/hello or CORS errors</div></div>
+      <ol class="list">
+        <li>Verify <code>/api</code> is running: <code>cd api &amp;&amp; npm start</code></li>
+        <li>Check <code>vite.config.js</code> has the proxy section</li>
+        <li>Use <code>swa start</code> instead of <code>npm run dev</code> for full-stack testing</li>
+      </ol>
+    </div>
+
+    <div class="step">
+      <div class="step-row"><span class="dot">&#x21</span><div class="step-head">Auth endpoint not available / "user is undefined"</div></div>
+      <ol class="list">
+        <li>Create <code>.env.local</code> from the template: <code>cp .env.example .env.local</code></li>
+        <li>Set <code>VITE_USE_MOCK_AUTH=true</code> for <code>npm run dev</code></li>
+        <li>Set <code>VITE_USE_MOCK_AUTH=false</code> for <code>swa start</code></li>
+        <li>Restart the dev server after changing <code>.env.local</code></li>
+      </ol>
+    </div>
+
+    <div class="step">
+      <div class="step-row"><span class="dot">&#x21</span><div class="step-head">localStorage data not persisting</div></div>
+      <ol class="list">
+        <li>Check that <code>formData.localId</code> is set — auto-persist only fires when localId exists</li>
+        <li>Call <code>startAssessment(formType)</code> or <code>resetFormData()</code> before trying to save — these create the localId</li>
+        <li>Check DevTools → Application → Local Storage for <code>iia_assessments</code> and <code>iia_active</code> keys</li>
+      </ol>
+    </div>
+
+    <div class="step">
+      <div class="step-row"><span class="dot">&#x21</span><div class="step-head">DB save returns wrong assessmentId / duplicates appearing</div></div>
+      <ol class="list">
+        <li>Verify you are calling <code>commitStep()</code> not <code>updateFormData()</code> in <code>handleNext</code></li>
+        <li>Verify you are passing <code>dataToSave</code> (the commitStep return value) to <code>saveAssessment()</code> — not the stale <code>formData</code></li>
+        <li>Verify you are calling <code>confirmDbSave(result.id)</code> after the first successful save</li>
+      </ol>
+    </div>
+
+    <div class="step">
+      <div class="step-row"><span class="dot">&#x21</span><div class="step-head">swa: command not found</div></div>
+<pre>npm install -g @azure/static-web-apps-cli</pre>
+    </div>
+
+    <div class="step">
+      <div class="step-row"><span class="dot">&#x21</span><div class="step-head">Port 7071 already in use</div></div>
+<pre># Windows:
+netstat -ano | findstr :7071
+taskkill /PID [number] /F
+
+# Mac/Linux:
+lsof -ti:7071 | xargs kill</pre>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════ FILE REFERENCE ══════════════════════════ -->
+<div class="block" id="ref-files">
+  <div class="block-hdr">
+    <span class="block-tag">Reference</span>
+    <span class="block-title">File &amp; Command Quick Reference</span>
+  </div>
+  <div class="block-body">
+    <table class="t">
+      <tr><th>File</th><th>Purpose</th><th>Location</th></tr>
+      <tr><td>vite.config.js</td><td>Proxy /api/* to port 7071 during local dev</td><td>/app/</td></tr>
+      <tr><td>.env.example</td><td>Template showing required env vars — committed to Git</td><td>root /</td></tr>
+      <tr><td>.env.local</td><td>Your personal config — never committed to Git</td><td>root / (create it)</td></tr>
+      <tr><td>AuthContext.jsx</td><td>Auth state, login/logout, mock vs real Azure AD</td><td>/app/src/context/</td></tr>
+      <tr><td>FormContext.jsx</td><td>All form state, localStorage, multi-assessment store</td><td>/app/src/context/</td></tr>
+      <tr><td>api.js</td><td>All backend API calls — single source of truth</td><td>/app/src/services/</td></tr>
+      <tr><td>SaveButton.jsx</td><td>Manual save with feedback states</td><td>/app/src/components/ui/</td></tr>
+      <tr><td>staticwebapp.config.json</td><td>Azure auth, route protection, SPA fallback</td><td>/app/</td></tr>
+      <tr><td>swa-cli.config.json</td><td>Local full-stack orchestration (ignored by Azure)</td><td>root /</td></tr>
+      <tr><td>azure-static-web-apps.yml</td><td>GitHub Actions CI/CD — auto-deploy on push</td><td>/.github/workflows/</td></tr>
+    </table>
+
+    <p style="margin-top:1rem;"><strong>Commands:</strong></p>
+<pre># React only (mock auth, UI testing)
+cd app &amp;&amp; npm run dev
+
+# API only
+cd api &amp;&amp; npm start
+
+# Full stack (recommended for integration testing)
+swa start
+
+# Install all dependencies
+cd app &amp;&amp; npm install
+cd ../api &amp;&amp; npm install
+
+# Create your personal env file
+cp .env.example .env.local</pre>
+  </div>
+</div>
+
+<div class="footer">
+  <strong>Sport Wales — IIA Portal</strong> &nbsp;|&nbsp; Frontend Integration Guide &nbsp;|&nbsp; Internal Developer Documentation
+</div>
+
+</div>
+</body>
+</html>

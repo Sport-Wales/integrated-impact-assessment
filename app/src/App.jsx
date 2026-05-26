@@ -2,7 +2,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
 import LandingPage from './pages/LandingPage';
+import IntroPage from './pages/IntroPage';
 import FormSelection from './pages/FormSelection';
+import AssessmentDocument from './pages/AssessmentDocument';
 import FormIntroduction from './pages/FormIntroduction';
 
 // Form 1 Components
@@ -35,8 +37,10 @@ function App() {
             <main className="flex-grow">
               <Routes>
                 <Route path="/" element={<LandingPage />} />
+                <Route path="/intro" element={<IntroPage />} />
                 <Route path="/form-selection" element={<FormSelection />} />
                 <Route path="/form-introduction" element={<FormIntroduction />} />
+                <Route path="/assessment/:id/document" element={<AssessmentDocument />} />
                 
                 {/* Form 1 Routes */}
                 <Route path="/form1/step1" element={<Form1Step1 />} />

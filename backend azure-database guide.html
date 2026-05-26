@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Azure SWA Setup Guide — IIA Portal</title>
+<style>
+  :root {
+    --sw-red:        #e32434;
+    --sw-blue:       #164b64;
+    --sw-green:      #299d91;
+    --sw-yellow:     #f6b207;
+    --sw-blue-dark:  #001830;
+    --sw-blue-light: #e8f4f8;
+    --sw-grey:       #bfbec5;
+    --sw-light-grey: #f4f5f7;
+    --sw-white:      #ffffff;
+    --font:          "Montserrat", Arial, sans-serif;
+    --radius:        8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); font-size: 15px; line-height: 1.65; color: #1a1a1a; background: #f9f9f9; }
+  .site-header { background: var(--sw-blue); color: white; padding: 2rem 2.5rem; border-bottom: 4px solid var(--sw-red); }
+  .site-header .label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 0.4rem; }
+  .site-header h1 { font-size: 1.75rem; font-weight: 800; line-height: 1.15; margin-bottom: 0.5rem; }
+  .site-header .subtitle { font-size: 0.875rem; color: rgba(255,255,255,0.7); margin-bottom: 1rem; }
+  .status-badge { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--sw-green); color: white; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 0.3rem 0.75rem; border-radius: 20px; }
+  .doc-wrap { max-width: 900px; margin: 0 auto; padding: 2.5rem 2rem 5rem; }
+  .phase { background: white; border: 1px solid #e2e2e8; border-radius: var(--radius); margin-bottom: 2.5rem; overflow: hidden; }
+  .phase-header { display: flex; align-items: center; gap: 1rem; padding: 1.1rem 1.5rem; background: var(--sw-blue); color: white; }
+  .phase-header.pending { background: #4a5568; }
+  .phase-num { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.65; white-space: nowrap; }
+  .phase-title { font-size: 1rem; font-weight: 800; flex: 1; }
+  .phase-badge { font-size: 11px; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 20px; white-space: nowrap; }
+  .phase-badge.done { background: var(--sw-green); color: white; }
+  .phase-badge.pending { background: var(--sw-yellow); color: #1a1a1a; }
+  .phase-body { padding: 1.5rem; }
+  .step { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid #eee; }
+  .step:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .step-title { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.85rem; }
+  .step-num { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--sw-red); color: white; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+  .step-num.done { background: var(--sw-green); }
+  .step-heading { font-size: 0.95rem; font-weight: 700; color: var(--sw-blue); line-height: 1.3; }
+  .step-heading small { display: block; font-size: 0.75rem; font-weight: 400; color: #666; margin-top: 2px; }
+  p { margin-bottom: 0.75rem; color: #333; }
+  p:last-child { margin-bottom: 0; }
+  ol.instructions { margin: 0.5rem 0 0.75rem 0; padding-left: 1.4rem; }
+  ol.instructions li { margin-bottom: 0.4rem; color: #333; font-size: 0.9rem; }
+  ul.bullets { margin: 0.5rem 0 0.75rem 0; padding-left: 1.4rem; }
+  ul.bullets li { margin-bottom: 0.35rem; color: #333; font-size: 0.9rem; list-style: disc; }
+  pre { background: #1e1e2e; color: #cdd6f4; font-family: "Courier New", Courier, monospace; font-size: 0.8rem; line-height: 1.6; border-radius: var(--radius); padding: 1.1rem 1.25rem; overflow-x: auto; margin: 0.75rem 0; border-left: 3px solid var(--sw-blue); }
+  code { font-family: "Courier New", Courier, monospace; font-size: 0.82rem; background: #eef2f7; color: var(--sw-blue); padding: 0.1rem 0.35rem; border-radius: 3px; }
+  pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+  .callout { border-radius: var(--radius); padding: 0.85rem 1.1rem; margin: 0.75rem 0; font-size: 0.875rem; }
+  .callout-label { font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 0.3rem; }
+  .callout.warning { background: #fff8e1; border-left: 4px solid var(--sw-yellow); }
+  .callout.warning .callout-label { color: #a77b00; }
+  .callout.security { background: #fef2f2; border-left: 4px solid var(--sw-red); }
+  .callout.security .callout-label { color: var(--sw-red); }
+  .callout.info { background: var(--sw-blue-light); border-left: 4px solid var(--sw-blue); }
+  .callout.info .callout-label { color: var(--sw-blue); }
+  .callout.success { background: #f0fdf4; border-left: 4px solid var(--sw-green); }
+  .callout.success .callout-label { color: var(--sw-green); }
+  table.kv { width: 100%; border-collapse: collapse; font-size: 0.875rem; margin: 0.75rem 0; }
+  table.kv th { background: var(--sw-light-grey); font-weight: 700; text-align: left; padding: 0.5rem 0.75rem; border-bottom: 2px solid #ddd; font-size: 0.8rem; color: #444; }
+  table.kv td { padding: 0.45rem 0.75rem; border-bottom: 1px solid #eee; vertical-align: top; }
+  table.kv tr:last-child td { border-bottom: none; }
+  table.kv td:first-child { font-family: "Courier New", monospace; font-size: 0.8rem; color: var(--sw-blue); font-weight: 700; white-space: nowrap; }
+  table.kv td.plain:first-child { font-family: var(--font); font-size: 0.875rem; color: #1a1a1a; font-weight: 600; white-space: normal; }
+  .verify { display: flex; align-items: flex-start; gap: 0.6rem; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius); padding: 0.65rem 0.9rem; font-size: 0.875rem; margin: 0.75rem 0; }
+  .verify-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+  .verify strong { color: var(--sw-green); }
+  .status-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; margin: 0.75rem 0; }
+  .status-table th { background: var(--sw-blue); color: white; padding: 0.5rem 0.85rem; text-align: left; font-size: 0.8rem; }
+  .status-table td { padding: 0.45rem 0.85rem; border-bottom: 1px solid #eee; }
+  .status-table tr:last-child td { border-bottom: none; }
+  .status-table tr:nth-child(even) td { background: #fafafa; }
+  .tick { color: var(--sw-green); font-weight: 700; }
+  .pend { color: #a77b00; font-weight: 700; }
+  .arch-diagram { background: #1e1e2e; color: #cdd6f4; font-family: "Courier New", monospace; font-size: 0.8rem; line-height: 1.7; border-radius: var(--radius); padding: 1.1rem 1.25rem; margin: 0.75rem 0; border-left: 3px solid var(--sw-green); overflow-x: auto; white-space: pre; }
+  .file-tree { background: #1e1e2e; color: #cdd6f4; font-family: "Courier New", monospace; font-size: 0.8rem; line-height: 1.7; border-radius: var(--radius); padding: 1.1rem 1.25rem; margin: 0.75rem 0; overflow-x: auto; white-space: pre; border-left: 3px solid var(--sw-yellow); }
+  .ft-done { color: #a6e3a1; }
+  .ft-dir { color: #89b4fa; }
+  .ft-label { color: #6c7086; font-style: italic; }
+  .trouble-item { margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid #eee; }
+  .trouble-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .trouble-issue { font-weight: 700; color: var(--sw-red); margin-bottom: 0.35rem; font-size: 0.9rem; }
+  .trouble-cause { font-size: 0.82rem; color: #666; margin-bottom: 0.35rem; }
+  .glossary-item { padding: 0.85rem 0; border-bottom: 1px solid #eee; }
+  .glossary-item:last-child { border-bottom: none; }
+  .glossary-term { font-weight: 700; color: var(--sw-blue); margin-bottom: 0.3rem; }
+  .doc-footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 2px solid var(--sw-red); font-size: 0.8rem; color: #888; text-align: center; }
+  .contents { max-width: 900px; margin: 0 auto; padding: 1.25rem 2rem 0; }
+  .contents-inner { background: white; border: 1px solid #e2e2e8; border-radius: 8px; padding: 0.9rem 1.5rem; }
+  .contents-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #888; display: block; margin-bottom: 0.5rem; }
+  .contents-inner ul { list-style: none; padding: 0; margin: 0; columns: 3; column-gap: 1.5rem; }
+  .contents-inner ul li { margin-bottom: 0.2rem; break-inside: avoid; }
+  .contents-inner ul li a { font-size: 0.72rem; color: #164b64; text-decoration: none; }
+  .contents-inner ul li a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="label">Sport Wales — Internal Developer Documentation</div>
+  <h1>Azure Static Web Apps &amp; Managed Functions Setup Guide</h1>
+  <p class="subtitle">IIA Portal — Backend, Azure Config, Frontend Integration &amp; Authentication</p>
+  <span class="status-badge">&#10003; Phases 1–8 Complete &nbsp;|&nbsp; &#9203; Phase 9 Awaiting Infrastructure</span>
+</header>
+
+<nav class="contents">
+  <div class="contents-inner">
+    <span class="contents-label">Contents</span>
+    <ul>
+      <li><a href="#glossary">Glossary</a></li>
+      <li><a href="#phase-1">Phase 1 — Tool Installation</a></li>
+      <li><a href="#phase-2">Phase 2 — Backend Foundation</a></li>
+      <li><a href="#phase-3">Phase 3 — Security</a></li>
+      <li><a href="#phase-4">Phase 4 — Test Endpoint</a></li>
+      <li><a href="#phase-5">Phase 5 — Frontend Config</a></li>
+      <li><a href="#phase-6">Phase 6 — Database Layer</a></li>
+      <li><a href="#phase-7">Phase 7 — Frontend Integration</a></li>
+      <li><a href="#phase-8">Phase 8 — CI/CD Pipeline</a></li>
+      <li><a href="#phase-9">Phase 9 — Production Deployment</a></li>
+      <li><a href="#b11">B11 — deleteAssessment</a></li>
+      <li><a href="#ref-testing">Testing</a></li>
+      <li><a href="#ref-arch">Architecture</a></li>
+      <li><a href="#ref-files">File Structure</a></li>
+      <li><a href="#ref-status">Status Summary</a></li>
+      <li><a href="#ref-trouble">Troubleshooting</a></li>
+      <li><a href="#ref-security">Security Checklist</a></li>
+      <li><a href="#ref-next">Next Steps</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="doc-wrap">
+
+<!-- GLOSSARY -->
+<div class="phase" id="glossary">
+  <div class="phase-header done">
+    <span class="phase-num">Before You Start</span>
+    <span class="phase-title">Deep-Dive Glossary of Concepts</span>
+  </div>
+  <div class="phase-body">
+    <p>Before writing any code, you must understand the infrastructure you are building.</p>
+    <div class="glossary-item">
+      <div class="glossary-term">Azure Static Web Apps (SWA)</div>
+      <p>SWA is not just a hosting platform — it is an "Orchestrator". In a traditional setup, you rent a server for your React app, rent a different server for your Express API, and configure massive security rules so they can talk. SWA takes your GitHub repository, reads the <code>/app</code> folder (Frontend), reads the <code>/api</code> folder (Backend), hosts them under the exact same domain (e.g. <code>sportwales.com/</code> and <code>sportwales.com/api</code>), and automatically handles the security handshake between them.</p>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Managed Functions (Azure Functions)</div>
+      <p>This is the replacement for Express.js. An Express server stays "awake" 24/7, costing money and requiring maintenance. Managed Functions are "Serverless." When you write a Managed Function it is completely asleep (costing £0) until a user clicks "Submit". It wakes up in milliseconds, processes the data, saves it to the database, and immediately goes back to sleep.</p>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Base64 Identity Scrambling</div>
+      <p>When a user logs in via Sport Wales Azure AD, Azure intercepts that login. Instead of forcing you to write complex token-validation logic, Azure confirms the user is valid, bundles their name and ID into a string of text, scrambles it using Base64 encoding, and attaches it as a hidden header (<code>x-ms-client-principal</code>) to every API request. Your backend script only has to unscramble it to securely know who is saving the form.</p>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Single Page Application (SPA) Routing</div>
+      <p>Your React application is an SPA. This means it only generates one physical file: <code>index.html</code>. Pages like <code>/form1/step3</code> do not actually exist as folders on a server — React fakes them in the browser using JavaScript. The backend must be explicitly told to route all traffic back to <code>index.html</code>, otherwise if a user hits "refresh" the server will look for a folder named <code>step3</code>, fail, and throw a 404 error.</p>
+    </div>
+    <div class="glossary-item">
+      <div class="glossary-term">Connection Pooling</div>
+      <p>Instead of opening a new database connection for every single request (which would quickly overwhelm the database), connection pooling creates a "pool" of 10 reusable connections. When a request needs the database, it borrows a connection from the pool, uses it, and returns it. This is critical for serverless functions because hundreds of simultaneous users would otherwise create hundreds of database connections.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 1 -->
+<div class="phase" id="phase-1">
+  <div class="phase-header done">
+    <span class="phase-num">Phase 1</span>
+    <span class="phase-title">Tool Installation &amp; Environment Preparation</span>
+    <span class="phase-badge done">&#10003; Completed</span>
+  </div>
+  <div class="phase-body">
+    <p>To build and test Azure architecture on your local machine, your laptop needs specific software known as the "Azure Core Tools" to simulate the cloud environment.</p>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">1.1</span><div class="step-heading">Install Visual Studio Code Extensions<small>Microsoft provides extensions that write complicated configuration files automatically.</small></div></div>
+      <ol class="instructions">
+        <li>Open Visual Studio Code.</li>
+        <li>Click the <strong>Extensions</strong> icon on the far left activity bar (four small squares).</li>
+        <li>Search for <strong>"Azure Resources"</strong> (Published by Microsoft) — click <strong>Install</strong>. This extension includes management tools for Azure Static Web Apps.</li>
+        <li>Search for <strong>"Azure Functions"</strong> (Published by Microsoft) — click <strong>Install</strong>.</li>
+      </ol>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">1.2</span><div class="step-heading">Install the Azure Functions Engine (Core Tools)<small>The internal engine that processes Serverless code.</small></div></div>
+      <div class="callout warning"><div class="callout-label">Requires Admin Rights</div>You require Local Administrator rights on your computer to do this. Do not proceed until IT unblocks you.</div>
+      <ol class="instructions">
+        <li>Navigate to: Azure Functions Core Tools Download — <code>learn.microsoft.com/en-us/azure/azure-functions/functions-run-local</code></li>
+        <li>Download the Windows <code>.msi</code> 64-bit installer.</li>
+        <li>Run the installer and complete the setup.</li>
+      </ol>
+      <div class="verify"><span class="verify-icon">&#10003;</span><span><strong>Verification:</strong> Open Terminal and type <code>func --version</code>. You should see version <code>4.x.x</code></span></div>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">1.3</span><div class="step-heading">Install the Local Orchestrator (SWA CLI)<small>Tricks your laptop into behaving exactly like the Azure cloud servers.</small></div></div>
+      <p>The SWA Command Line Interface (CLI) acts as a local proxy, allowing you to test the "Fake Login" mechanism.</p>
+      <ol class="instructions">
+        <li>Open a new Terminal inside VS Code (<code>Terminal &rarr; New Terminal</code>).</li>
+        <li>Run:</li>
+      </ol>
+<pre>npm install -g @azure/static-web-apps-cli</pre>
+      <div class="verify"><span class="verify-icon">&#10003;</span><span><strong>Verification:</strong> Type <code>swa --version</code>. You should see version 2.0.9 or higher.</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 2 -->
+<div class="phase" id="phase-2">
+  <div class="phase-header done">
+    <span class="phase-num">Phase 2</span>
+    <span class="phase-title">Generating the Backend Foundation (/api)</span>
+    <span class="phase-badge done">&#10003; Completed</span>
+  </div>
+  <div class="phase-body">
+    <p>The backend is a completely separate mini-project living inside your main repository. We used the VS Code extension to generate it to guarantee the versioning is flawless.</p>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">2.1</span><div class="step-heading">Pre-Create the Backend Folder &amp; Use the Azure Setup Wizard</div></div>
+      <ol class="instructions">
+        <li>Ensure the entire project (<code>SW_IIA/integrated-impact-assessment</code>) is open in VS Code.</li>
+        <li><strong>CRITICAL FIRST STEP:</strong> Create a brand new folder at the very root of the project named exactly <code>api</code>.</li>
+        <li>Click the new <strong>Azure Icon</strong> (the large 'A') on the far-left sidebar.</li>
+        <li>In the lower section titled "Workspace", click the small lightning bolt icon with a <strong>+</strong> sign.</li>
+        <li>Follow these exact prompts:
+          <table class="kv" style="margin-top:0.5rem;">
+            <tr><th>Prompt</th><th>Selection</th></tr>
+            <tr><td>Select the folder</td><td>Browse to select the <code>api</code> folder created above</td></tr>
+            <tr><td>Select a language</td><td>JavaScript</td></tr>
+            <tr><td>Select a programming model</td><td>Model V4 (newest, streamlined standard)</td></tr>
+            <tr><td>Select a template</td><td>HTTP trigger</td></tr>
+            <tr><td>Provide a function name</td><td>hello</td></tr>
+            <tr><td>Authorization level</td><td>Anonymous</td></tr>
+          </table>
+        </li>
+      </ol>
+      <div class="callout success"><div class="callout-label">Result</div>Files generated inside <code>/api</code> folder including <code>host.json</code> (server config) and <code>package.json</code> (backend dependencies).</div>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">2.2</span><div class="step-heading">Hard-Install the Azure Dependencies</div></div>
+      <p>The wizard created the folders but did not download the actual code libraries needed to make Node.js work with Azure.</p>
+      <ol class="instructions">
+        <li>Open VS Code Terminal.</li>
+        <li>Type <code>cd api</code> and press Enter.</li>
+        <li>Run:</li>
+      </ol>
+<pre>npm install</pre>
+      <p>This installs the core Azure Functions library and both database drivers: <code>mssql</code> and <code>pg</code>.</p>
+      <div class="callout success"><div class="callout-label">Result</div>Created <code>/api/node_modules/</code> folder with all dependencies installed.</div>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">2.3</span><div class="step-heading">CRITICAL SECURITY — Create <code>/api/.gitignore</code></div></div>
+      <div class="callout security"><div class="callout-label">Security Protection</div>This file prevents accidentally committing database passwords to GitHub. The <code>local.settings.json</code> file contains your database password — this <code>.gitignore</code> ensures it is never pushed to GitHub.</div>
+      <p>Inside the <code>/api</code> folder, create a file named exactly <code>.gitignore</code> and paste the following:</p>
+<pre># Azure Functions artifacts
+bin/
+obj/
+appsettings.json
+local.settings.json
+
+# Node dependencies
+node_modules/
+npm-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+out/
+
+# Logs
+*.log
+logs/
+
+# Azure Functions local storage
+__blobstorage__/
+__queuestorage__/
+__azurite_db*__.json</pre>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">2.4</span><div class="step-heading">Establish Local Secrets (<code>local.settings.json</code>)</div></div>
+      <p>Azure Functions do not use standard <code>.env</code> files. They require a specific JSON structure to hold API keys and Connection Strings. Create <code>/api/local.settings.json</code>:</p>
+<pre>{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsFeatureFlags": "EnableWorkerIndexing",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "NODE_ENV": "development",
+    "DB_TYPE": "postgres",
+    "DB_CONNECTION_STRING": "Replace_This_With_Database_Connection_String",
+    "TENANT_ID": "Replace_This_When_Matt_Gives_It",
+    "AAD_CLIENT_ID": "Replace_This_When_Matt_Gives_It",
+    "AAD_CLIENT_SECRET": "Replace_This_When_Matt_Gives_It"
+  }
+}</pre>
+      <table class="kv">
+        <tr><th>Key</th><th>Explanation</th></tr>
+        <tr><td>FUNCTIONS_WORKER_RUNTIME</td><td>Tells Azure this code is Node.js JavaScript</td></tr>
+        <tr><td>EnableWorkerIndexing</td><td>Forces the server to scan folders to find endpoints</td></tr>
+        <tr><td>NODE_ENV</td><td>Identifies environment for logging</td></tr>
+        <tr><td>DB_TYPE</td><td>Switches between PostgreSQL (<code>postgres</code>) and SQL Server (<code>sql</code>)</td></tr>
+      </table>
+      <div class="callout warning"><div class="callout-label">Production Note</div>This file is <strong>NEVER</strong> uploaded to Azure. In production, these secrets must be manually entered into Azure Portal.</div>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">2.5</span><div class="step-heading">Update <code>/api/package.json</code> Metadata</div></div>
+      <p>Replace the minimal wizard-generated <code>package.json</code> with proper documentation:</p>
+<pre>{
+  "name": "iia-backend-api",
+  "version": "1.0.0",
+  "description": "Azure Functions backend for Sport Wales IIA Portal",
+  "author": "Sport Wales Development Team",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "func start",
+    "test": "echo \"No tests yet...\""
+  },
+  "dependencies": {
+    "@azure/functions": "^4.0.0",
+    "mssql": "^12.3.1",
+    "pg": "^8.11.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "main": "src/{index.js,functions/*.js}"
+}</pre>
+      <ul class="bullets">
+        <li>The <code>engines</code> field documents the Node.js 18+ requirement</li>
+        <li>Both <code>mssql</code> and <code>pg</code> included for database flexibility</li>
+        <li>Switching databases requires only changing the <code>DB_TYPE</code> environment variable — no code changes in function files</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 3 -->
+<div class="phase" id="phase-3">
+  <div class="phase-header done">
+    <span class="phase-num">Phase 3</span>
+    <span class="phase-title">Securing the Project Root &amp; Environment Documentation</span>
+    <span class="phase-badge done">&#10003; Completed</span>
+  </div>
+  <div class="phase-body">
+    <p>Protected the entire project from accidentally leaking secrets and documented environment variables.</p>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">3.1</span><div class="step-heading">Create Environment Variable Documentation (<code>/.env.example</code>)</div></div>
+      <p>Create at the project root — shows all required variables without exposing secrets:</p>
+<pre># ============================================
+# IIA APPLICATION ENVIRONMENT CONFIGURATION
+# ============================================
+# Copy this file to .env.local and fill in actual values
+# NEVER commit .env.local to Git (it contains secrets)
+
+# ============================================
+# FRONTEND CONFIGURATION (React/Vite)
+# ============================================
+
+NODE_ENV=development
+
+# Enable mock authentication for pure local development (npm run dev)
+# Set to 'true' for local UI work without SWA CLI
+# Set to 'false' when using 'swa start' or in Azure
+VITE_USE_MOCK_AUTH=true
+
+# API Base URL (automatically handled by SWA in production)
+# Local dev (npm run dev):  /api (proxied via vite.config.js)
+# SWA CLI (swa start):      /api (handled by SWA proxy)
+# Azure dev/prod:           /api (automatic)
+VITE_API_BASE_URL=/api</pre>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">3.2</span><div class="step-heading">CRITICAL SECURITY — Update <code>/app/.gitignore</code></div></div>
+      <div class="callout security"><div class="callout-label">Security Alert</div>The React/Vite <code>.gitignore</code> does NOT properly protect environment variable files by default. Without updating this, frontend secrets could leak to GitHub.</div>
+      <ol class="instructions">
+        <li>Open <code>/app/.gitignore</code> in VS Code.</li>
+        <li>Find the line that says just <code>.env</code> (around line 17).</li>
+        <li>Replace that single line with this block:</li>
+      </ol>
+<pre># CRITICAL: Environment files with secrets
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local</pre>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">3.3</span><div class="step-heading">Verify Root <code>.gitignore</code> Protection</div></div>
+      <p>Verify the root <code>.gitignore</code> already protects <code>local.settings.json</code> at the project level.</p>
+      <div class="callout success"><div class="callout-label">Security Checkpoint — Three Layers of Protection</div>
+        <ul class="bullets">
+          <li><code>/api/.gitignore</code> — Protects backend secrets</li>
+          <li><code>/app/.gitignore</code> — Protects frontend secrets</li>
+          <li><code>/.gitignore</code> — Root-level protection as backup</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 4 -->
+<div class="phase" id="phase-4">
+  <div class="phase-header done">
+    <span class="phase-num">Phase 4</span>
+    <span class="phase-title">Writing Your First Secure API Endpoint</span>
+    <span class="phase-badge done">&#10003; Completed</span>
+  </div>
+  <div class="phase-body">
+    <p>The connectivity test endpoint <code>hello.js</code> was auto-generated by the Azure wizard and serves as a baseline for testing.</p>
+    <div class="callout info"><div class="callout-label">Note</div>The <code>hello.js</code> file serves as a connectivity test only. Real endpoints like <code>saveAssessment.js</code>, <code>getAssessment.js</code> etc. are created in a later phase once data requirements were finalised.</div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">4.1</span><div class="step-heading">Understanding the Test Endpoint Structure<small>Location: <code>/api/src/functions/hello.js</code></small></div></div>
+      <p>Purpose: Tests that the backend is running and accepting requests.</p>
+<pre>const { app } = require('@azure/functions');
+
+app.http('hello', {
+    methods: ['GET', 'POST'],
+    authLevel: 'anonymous',
+    handler: async (request, context) => {
+        context.log(`Http function processed request for url "${request.url}"`);
+        const name = request.query.get('name')
+            || await request.text()
+            || 'world';
+        return { body: `Hello, ${name}!` };
+    }
+});</pre>
+      <table class="kv">
+        <tr><th>Feature</th><th>Explanation</th></tr>
+        <tr><td>authLevel: 'anonymous'</td><td>The function itself does not demand authentication — Azure SWA handles that at the infrastructure level</td></tr>
+        <tr><td>context.log()</td><td>Azure's logging system (replaces console.log)</td></tr>
+      </table>
+      <div class="verify"><span class="verify-icon">&#10003;</span><span><strong>Testing:</strong> Visit <code>http://localhost:7071/api/hello?name=Test</code> when backend is running. Should return: <code>Hello, Test!</code></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 5 -->
+<div class="phase" id="phase-5">
+  <div class="phase-header done">
+    <span class="phase-num">Phase 5</span>
+    <span class="phase-title">Securing the Frontend &amp; Automating the Proxy</span>
+    <span class="phase-badge done">&#10003; Completed</span>
+  </div>
+  <div class="phase-body">
+    <p>Configuration files created that instruct Azure how to protect and route traffic.</p>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">5.1</span><div class="step-heading">The Security Firewall (<code>staticwebapp.config.json</code>)<small>Location: <code>/app/staticwebapp.config.json</code> — The most critical file in the repository.</small></div></div>
+      <p>This file sits in front of both React and the API and acts as a strict bouncer. Azure enforces these exact rules in the cloud.</p>
+<pre>{
+  "auth": {
+    "identityProviders": {
+      "azureActiveDirectory": {
+        "registration": {
+          "openIdIssuer": "https://login.microsoftonline.com/YOUR_TENANT_ID/v2.0",
+          "clientIdSettingName": "AAD_CLIENT_ID",
+          "clientSecretSettingName": "AAD_CLIENT_SECRET"
+        }
+      }
+    }
+  },
+  "routes": [
+    {
+      "route": "/api/healthCheck",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/*",
+      "allowedRoles": ["authenticated"]
+    }
+  ],
+  "responseOverrides": {
+    "401": {
+      "statusCode": 302,
+      "redirect": "/.auth/login/aad"
+    }
+  },
+  "navigationFallback": {
+    "rewrite": "/index.html"
+  }
+}</pre>
+      <table class="kv">
+        <tr><th>Block</th><th>What it does</th></tr>
+        <tr><td>auth block</td><td>Tells Azure: "Use the Custom B2B Sport Wales Tenant — not consumer Microsoft accounts like @hotmail."</td></tr>
+        <tr><td>/api/healthCheck route</td><td>Allows anonymous access — Azure Portal monitoring tools cannot log in and need this.</td></tr>
+        <tr><td>/api/* route</td><td>All other API routes require authentication. Routes processed top-to-bottom.</td></tr>
+        <tr><td>responseOverrides 401</td><td>If someone is rejected, invisibly redirect (302) them to the Microsoft login screen.</td></tr>
+        <tr><td>navigationFallback</td><td>CRUCIAL: Solves the SPA routing problem. Ensures users do not receive 404 errors when refreshing deeply nested form pages like Step 9.</td></tr>
+      </table>
+      <div class="callout security"><div class="callout-label">Production Impact</div>This file is the literal security guard for the live website. If you make a typo here, the live website could lock out valid staff or leave the API open.</div>
+      <div class="callout warning"><div class="callout-label">&#9888; Replace YOUR_TENANT_ID</div>The <code>openIdIssuer</code> URL above contains the placeholder <code>YOUR_TENANT_ID</code>. Once Matt provides the <code>TENANT_ID</code> value, replace it in this file:
+<pre>"openIdIssuer": "https://login.microsoftonline.com/PASTE_TENANT_ID_HERE/v2.0"</pre>
+        This must be done before Azure authentication will work in any environment. The value is the same <code>TENANT_ID</code> that goes into <code>local.settings.json</code> and Azure Portal.
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">5.2</span><div class="step-heading">The Master CLI Orchestrator (<code>swa-cli.config.json</code>)<small>Location: <code>/swa-cli.config.json</code> (project root)</small></div></div>
+      <p>Locally, React runs on port <code>5173</code> and the API runs on port <code>7071</code>. This config file instructs the SWA CLI to bridge them on port <code>4280</code>.</p>
+<pre>{
+  "$schema": "https://aka.ms/azure/static-web-apps-cli/schema",
+  "configurations": {
+    "iia-app": {
+      "appLocation": "./app",
+      "apiLocation": "./api",
+      "outputLocation": "dist",
+      "devServerUrl": "http://localhost:5173",
+      "run": "npm run dev --prefix ./app"
+    }
+  }
+}</pre>
+      <p>When you type <code>swa start</code>, this file executes automatically:</p>
+      <ol class="instructions">
+        <li>Reads <code>"run"</code> and automatically launches Vite</li>
+        <li>Reads <code>"devServerUrl"</code> and connects to the running React app on port 5173</li>
+        <li>Reads <code>"apiLocation"</code> and boots up Azure Functions Core Tools on port 7071</li>
+        <li>Wraps both inside a master proxy on port 4280 so they can talk securely without CORS errors</li>
+      </ol>
+      <div class="callout info"><div class="callout-label">Production Note</div>Azure completely ignores this file when deployed to the cloud. It exists purely to trick your laptop into behaving like Azure so you can test authentication and routing locally.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 6 -->
+<div class="phase" id="phase-6">
+  <div class="phase-header done">
+    <span class="phase-num">Phase 6</span>
+    <span class="phase-title">Database Layer &amp; Critical Bug Fixes</span>
+    <span class="phase-badge done">&#10003; Completed</span>
+  </div>
+  <div class="phase-body">
+    <p>Built a production-ready database connection layer with connection pooling, health monitoring, and dual-database support.</p>
+    <div class="callout info"><div class="callout-label">Overview</div>
+      <ul class="bullets">
+        <li>Works with PostgreSQL (primary choice) or SQL Server (fallback)</li>
+        <li>Uses connection pooling for scalability</li>
+        <li>Includes health monitoring</li>
+        <li>Requires NO code changes when switching databases — only change the <code>DB_TYPE</code> environment variable</li>
+      </ul>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">6.1</span><div class="step-heading">Create Database Connection Manager (<code>/api/src/db/index.js</code>)</div></div>
+      <p>This is the <strong>only</strong> file that functions import for database operations. It creates a connection pool and provides a simple <code>query()</code> function that works with both database types.</p>
+      <p><strong>How connection pooling works:</strong></p>
+      <ul class="bullets">
+        <li><strong>First request:</strong> Creates pool of 10 database connections, stores in memory</li>
+        <li><strong>Second request:</strong> Reuses existing pool (fast!)</li>
+        <li><strong>100 concurrent requests:</strong> All share the same 10-connection pool — database not overwhelmed</li>
+      </ul>
+      <div class="callout warning"><div class="callout-label">Critical Bug Fixed</div>The original code checked <code>if (pool &amp;&amp; pool.connected)</code> but PostgreSQL's <code>pg</code> library does not have a <code>.connected</code> property. This caused a NEW pool to be created on EVERY request, defeating connection pooling entirely. Fixed by checking database type first:</div>
+<pre>if (pool) {
+  const dbType = process.env.DB_TYPE || 'postgres';
+  if (dbType === 'postgres') {
+    return pool; // PostgreSQL pool is always ready once created
+  } else if (dbType === 'sql' &amp;&amp; pool.connected) {
+    return pool; // SQL Server requires .connected check
+  }
+}</pre>
+      <div class="callout warning"><div class="callout-label">&#9888; Action Required Before Azure Deployment</div>
+        The current pool config in <code>db/index.js</code> does not yet have an SSL setting. Azure Database for PostgreSQL enforces SSL on all connections — without this the database will refuse to connect in production. Add <code>ssl: { rejectUnauthorized: false }</code> to the pool config:
+<pre>pool = new dbClient({
+  connectionString,
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
+  ssl: { rejectUnauthorized: false }  // &#x2190; ADD THIS LINE before deploying to Azure
+});</pre>
+        <strong>Why <code>rejectUnauthorized: false</code>:</strong> Azure PostgreSQL uses a self-signed certificate chain. This tells the <code>pg</code> driver to accept it without verifying against a local CA bundle. Standard and safe for Azure PostgreSQL.
+      </div>
+
+      <p><strong>Usage in any function file:</strong></p>
+<pre>const db = require('../db');
+
+// Simple query - the db module handles everything:
+const rows = await db.query(
+  'SELECT * FROM assessments WHERE id = $1',
+  [assessmentId]
+);</pre>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">6.2</span><div class="step-heading">Create Logging Utility (<code>/api/src/utils/logger.js</code>)</div></div>
+      <p>Simple logging wrapper that works locally AND in Azure.</p>
+      <table class="kv">
+        <tr><th>Environment</th><th>Behaviour</th></tr>
+        <tr><td>Local development</td><td>Uses <code>console.log()</code> — output visible in terminal</td></tr>
+        <tr><td>Azure production</td><td>Uses <code>context.log()</code> — logs sent to Azure Application Insights</td></tr>
+      </table>
+<pre>const logger = require('../utils/logger');
+
+// At start of every function handler:
+logger.setContext(context);
+
+// Then use anywhere:
+logger.info('User submitted form');
+logger.error('Database connection failed', error);
+logger.warn('Slow query detected');</pre>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">6.3</span><div class="step-heading">Create Health Check Endpoint (<code>/api/src/functions/healthCheck.js</code>)</div></div>
+      <p>Health monitoring endpoint. URL: <code>/api/healthCheck</code> — Method: <code>GET</code> — Auth: Anonymous.</p>
+      <ul class="bullets">
+        <li>Tests if database connection works by running <code>SELECT 1</code></li>
+        <li>Returns HTTP <code>200</code> if healthy, <code>503</code> if unhealthy</li>
+        <li>Azure Portal can monitor this endpoint and automatically restart the app if unhealthy</li>
+      </ul>
+      <table class="kv">
+        <tr><th colspan="2">Example Response — Healthy</th></tr>
+        <tr><td>status</td><td>"healthy"</td></tr>
+        <tr><td>database</td><td>"connected"</td></tr>
+        <tr><td>dbType</td><td>"postgres"</td></tr>
+        <tr><td>environment</td><td>"development"</td></tr>
+      </table>
+      <table class="kv" style="margin-top:0.75rem;">
+        <tr><th colspan="2">Example Response — Unhealthy (Before Database Connected)</th></tr>
+        <tr><td>status</td><td>"unhealthy"</td></tr>
+        <tr><td>database</td><td>"disconnected"</td></tr>
+        <tr><td>error</td><td>"DB_CONNECTION_STRING not configured..."</td></tr>
+      </table>
+      <div class="verify"><span class="verify-icon">&#10003;</span><span><strong>Testing:</strong> Visit <code>http://localhost:4280/api/healthCheck</code>. You will see JSON immediately — it will show "unhealthy" until Matt provides credentials, which is expected and normal.</span></div>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">6.4</span><div class="step-heading">Create Database Schema File (<code>/api/src/db/schema.sql</code>)</div></div>
+      <p>This SQL file must be created and run once against the Azure PostgreSQL database before any endpoint will work. Without it the database has no tables and every API call will fail with a "relation does not exist" error.</p>
+      <p><strong>When to run it:</strong> Once Matt hands over the <code>DB_CONNECTION_STRING</code>, run this file against the database using pgAdmin, Azure Data Studio, or the <code>psql</code> CLI.</p>
+<pre>-- Run once against Azure PostgreSQL
+-- Tool: pgAdmin, Azure Data Studio, or psql
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+CREATE TABLE assessments (
+  id                UUID          DEFAULT gen_random_uuid() PRIMARY KEY,
+  owner_id          VARCHAR(255)  NOT NULL,
+  owner_email       VARCHAR(255)  NOT NULL,
+  form_type         VARCHAR(10)   NOT NULL CHECK (form_type IN ('form1','form2')),
+  title             VARCHAR(500),
+  lead_name         VARCHAR(255),
+  status            VARCHAR(20)   NOT NULL DEFAULT 'draft'
+                    CHECK (status IN ('draft','complete','signed_off')),
+  form_data         JSONB         NOT NULL DEFAULT '{}',
+  completed_steps   JSONB         NOT NULL DEFAULT '[]',
+  created_at        TIMESTAMP     NOT NULL DEFAULT NOW(),
+  updated_at        TIMESTAMP     NOT NULL DEFAULT NOW(),
+  completed_at      TIMESTAMP,
+  signed_off_at     TIMESTAMP,
+  signed_off_by     VARCHAR(255)
+);
+
+CREATE TABLE assessment_permissions (
+  id             UUID         DEFAULT gen_random_uuid() PRIMARY KEY,
+  assessment_id  UUID         NOT NULL REFERENCES assessments(id) ON DELETE CASCADE,
+  user_email     VARCHAR(255) NOT NULL,
+  role           VARCHAR(10)  NOT NULL CHECK (role IN ('view','edit')),
+  granted_at     TIMESTAMP    NOT NULL DEFAULT NOW(),
+  UNIQUE (assessment_id, user_email)
+);
+
+-- Indexes
+CREATE INDEX idx_assessments_owner_id   ON assessments (owner_id);
+CREATE INDEX idx_assessments_status     ON assessments (status);
+CREATE INDEX idx_assessments_updated    ON assessments (updated_at DESC);
+CREATE INDEX idx_permissions_email      ON assessment_permissions (user_email);
+CREATE INDEX idx_permissions_assessment ON assessment_permissions (assessment_id);</pre>
+      <div class="callout success"><div class="callout-label">&#10003; Run Once</div>Run this script once. The <code>ON DELETE CASCADE</code> constraint on <code>assessment_permissions</code> means all permission rows are automatically cleaned up if an assessment is ever deleted.</div>
+    </div>
+
+    <div class="step">
+      <div class="step-title"><span class="step-num done">6.5</span><div class="step-heading">Updated Configuration Files</div></div>
+      <p><strong>Updated <code>/api/local.settings.json</code></strong> — Added <code>NODE_ENV</code> and <code>DB_TYPE</code> values.</p>
+      <p><strong>Updated <code>/api/package.json</code></strong> — Added <code>"pg": "^8.11.3"</code>. After updating, run:</p>
+<pre>cd api
+npm install</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 7 -->
+<div class="phase" id="phase-7">
+  <div class="phase-header done">
+    <span class="phase-num">Phase 7</span>
+    <span class="phase-title">Frontend Integration &amp; Authentication</span>
+    <span class="phase-badge done">&#10003; Completed</span>
+  </div>
+  <div class="phase-body">
+    <p>Connected the React frontend to Azure Functions backend with a full authentication system.</p>
+    <div class="callout info"><div class="callout-label">Overview — Files Created/Updated</div>
+      <ul class="bullets">
+        <li>Authentication context (mock for local dev, real for Azure)</li>
+        <li>API service layer (centralised backend calls)</li>
+        <li>Vite proxy configuration (routes <code>/api/*</code> to port 7071)</li>
+        <li>App.jsx wrapper updated</li>
+      </ul>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">7.1</span><div class="step-heading">Update Vite Configuration for API Proxy<small>Location: <code>/app/vite.config.js</code></small></div></div>
+      <p>When running <code>npm run dev</code> (React only on port 5173), the app needs to talk to the backend on port 7071. Without this proxy, requests to <code>/api/*</code> would fail with CORS errors.</p>
+<pre>export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:7071',
+        changeOrigin: true,
+        secure: false
+      }
+    }
+  }
+})</pre>
+      <p>React makes a request to <code>/api/hello</code> &rarr; Vite intercepts it &rarr; forwards to <code>http://localhost:7071/api/hello</code> &rarr; backend responds &rarr; Vite passes response back to React.</p>
+      <div class="callout info"><div class="callout-label">When this is used</div>Only during pure React development (<code>npm run dev</code>). When using <code>swa start</code>, the SWA CLI handles routing instead.</div>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">7.2</span><div class="step-heading">Create Authentication Context<small>Location: <code>/app/src/context/AuthContext.jsx</code></small></div></div>
+      <p>Manages user authentication state across the entire application via the <code>useAuth()</code> hook.</p>
+      <table class="kv">
+        <tr><th>Mode</th><th>Behaviour</th></tr>
+        <tr><td>Mock Auth (VITE_USE_MOCK_AUTH=true)</td><td>No real login required. Uses fake user for UI development. Perfect for local work without Azure credentials.</td></tr>
+        <tr><td>Real Auth (swa start or Azure)</td><td>Fetches <code>/.auth/me</code> (Azure's built-in endpoint). Azure AD handles actual login and returns real Sport Wales user information.</td></tr>
+      </table>
+<pre>import { useAuth } from '../context/AuthContext';
+
+function MyComponent() {
+  const { user, isAuthenticated, login, logout } = useAuth();
+
+  if (!isAuthenticated) {
+    return &lt;button onClick={login}&gt;Log In&lt;/button&gt;;
+  }
+  return (
+    &lt;div&gt;
+      &lt;p&gt;Welcome, {user.userDetails}!&lt;/p&gt;
+      &lt;button onClick={logout}&gt;Log Out&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</pre>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">7.3</span><div class="step-heading">Update App.jsx Wrapper Structure<small>Location: <code>/app/src/App.jsx</code></small></div></div>
+      <p>Wrapped the entire app with <code>&lt;AuthProvider&gt;</code>. The order is critical:</p>
+<pre>&lt;AuthProvider&gt;          {/* Authentication FIRST  */}
+  &lt;FormProvider&gt;        {/* Form state SECOND     */}
+    &lt;Router&gt;            {/* Routing LAST          */}
+      &lt;Routes&gt;...&lt;/Routes&gt;
+    &lt;/Router&gt;
+  &lt;/FormProvider&gt;
+&lt;/AuthProvider&gt;</pre>
+      <p>Authentication must wrap form context because form operations need user information (e.g. "Save this form for user X"). If <code>FormProvider</code> came first it would not have access to authentication data.</p>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">7.4</span><div class="step-heading">Create API Service Layer<small>Location: <code>/app/src/services/api.js</code></small></div></div>
+      <p>Centralises ALL backend API calls in one file. Without this, 20+ React components each write their own fetch code — if the API URL changes you update 20 files. With the service layer, everything is in one place.</p>
+      <table class="kv">
+        <tr><th>Method</th><th>Purpose</th></tr>
+        <tr><td>saveAssessment(formData)</td><td>Save or update an assessment in the database</td></tr>
+        <tr><td>getAssessment(id)</td><td>Fetch a single assessment by ID</td></tr>
+        <tr><td>listAssessments()</td><td>Get all assessments for the current user</td></tr>
+        <tr><td>completeAssessment(id)</td><td>Mark an assessment as complete</td></tr>
+        <tr><td>signOffAssessment(id)</td><td>Permanently lock a signed-off assessment</td></tr>
+        <tr><td>shareAssessment(id, email, role)</td><td>Give a colleague view or edit access</td></tr>
+        <tr><td>getPermissions(id)</td><td>List everyone with access to an assessment</td></tr>
+        <tr><td>removeShare(id, email)</td><td>Revoke a colleague's access</td></tr>
+      </table>
+<pre>import { apiService } from '../services/api';
+
+try {
+  const result = await apiService.saveAssessment(formData);
+  console.log('Saved!', result.id);
+} catch (error) {
+  console.error('Save failed:', error.message);
+}</pre>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 8 -->
+<div class="phase" id="phase-8">
+  <div class="phase-header done">
+    <span class="phase-num">Phase 8</span>
+    <span class="phase-title">GitHub Actions CI/CD Pipeline</span>
+    <span class="phase-badge done">&#10003; Completed</span>
+  </div>
+  <div class="phase-body">
+    <p>GitHub Actions automatically builds and deploys to Azure on every push to <code>main</code> or <code>develop</code>. File created: <code>/.github/workflows/azure-static-web-apps.yml</code></p>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">8.1</span><div class="step-heading">Create GitHub Actions Workflow</div></div>
+      <table class="kv">
+        <tr><th>Config Path</th><th>Value</th><th>Why critical</th></tr>
+        <tr><td>app_location</td><td>/app</td><td>Where React code lives — if wrong, deploys empty folder</td></tr>
+        <tr><td>api_location</td><td>/api</td><td>Where backend code lives</td></tr>
+        <tr><td>output_location</td><td>dist</td><td>Where Vite builds to — if set to "build", live site shows blank white page</td></tr>
+      </table>
+      <p><strong>Workflow trigger:</strong></p>
+<pre>on:
+  push:
+    branches:
+      - main
+      - develop</pre>
+      <p><strong>End-to-end flow:</strong></p>
+      <ol class="instructions">
+        <li>You type <code>git push origin develop</code></li>
+        <li>GitHub detects push to <code>develop</code> branch</li>
+        <li>GitHub Actions workflow automatically starts</li>
+        <li>Builds frontend and backend</li>
+        <li>Deploys to Azure Static Web App</li>
+        <li>You receive email: "Deployment successful"</li>
+        <li>Visit your Azure URL — new code is live</li>
+      </ol>
+      <div class="callout warning"><div class="callout-label">Deployment Token</div>Azure automatically creates a secret token called <code>AZURE_STATIC_WEB_APPS_API_TOKEN</code> in your GitHub repository. This grants GitHub permission to deploy to Azure. <strong>Never delete this token</strong> or deployments will stop working.</div>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">8.2</span><div class="step-heading">Verify Workflow File Exists</div></div>
+<pre>ls .github/workflows/azure-static-web-apps.yml</pre>
+      <div class="callout info"><div class="callout-label">When it activates</div>The moment Matt creates the Azure Static Web App and connects it to GitHub, this workflow will start working automatically.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 9 -->
+<div class="phase" id="phase-9">
+  <div class="phase-header pending">
+    <span class="phase-num">Phase 9</span>
+    <span class="phase-title">Production Deployment (Awaiting Matt)</span>
+    <span class="phase-badge pending">&#9203; Pending</span>
+  </div>
+  <div class="phase-body">
+    <p>Waiting for the IT Team to set up Azure resources. Goal: hand off the codebase to Azure Cloud infrastructure.</p>
+    <div class="step">
+      <div class="step-title"><span class="step-num">9.1</span><div class="step-heading">Azure Portal Configuration (Matt)</div></div>
+      <p>When the IT team creates the Azure Static Web App, they MUST enter these exact paths:</p>
+      <table class="kv">
+        <tr><th>Field</th><th>Value</th></tr>
+        <tr><td>App location</td><td>/app</td></tr>
+        <tr><td>Api location</td><td>/api</td></tr>
+        <tr><td>Output location</td><td>dist</td></tr>
+      </table>
+      <div class="callout security"><div class="callout-label">Critical</div>If <code>Output location</code> is set to anything other than <code>dist</code>, deployment will push an empty folder and the live site will show a blank white page.</div>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num">9.2</span><div class="step-heading">GitHub Deployment Secret (Automatic)</div></div>
+      <p>Azure automatically creates a secret token named <code>AZURE_STATIC_WEB_APPS_API_TOKEN</code> in your GitHub Repository under <strong>Settings &rarr; Secrets and variables &rarr; Actions</strong>. This grants GitHub Actions permission to automatically update the live site every time you <code>git push</code>.</p>
+      <div class="callout security"><div class="callout-label">Never Delete This Token</div>If deleted, automatic deployments stop working permanently until it is regenerated.</div>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num">9.3</span><div class="step-heading">CRITICAL — Configure Production Secrets in Azure Portal</div></div>
+      <div class="callout security"><div class="callout-label">Security Alert</div>The <code>local.settings.json</code> file is <strong>NEVER</strong> uploaded to Azure. Azure has no idea what your database password or Azure AD credentials are unless Matt manually configures them in the portal.</div>
+      <ol class="instructions">
+        <li>Go to Azure Portal</li>
+        <li>Navigate to Static Web App</li>
+        <li>Click <strong>Configuration</strong> in the left menu</li>
+        <li>Click <strong>Add</strong> for each of these settings:</li>
+      </ol>
+      <table class="kv">
+        <tr><th>Key</th><th>Value</th></tr>
+        <tr><td>NODE_ENV</td><td>production</td></tr>
+        <tr><td>DB_TYPE</td><td>postgres</td></tr>
+        <tr><td>DB_CONNECTION_STRING</td><td>[Production database connection string from Matt]</td></tr>
+        <tr><td>TENANT_ID</td><td>[Sport Wales Azure AD tenant ID]</td></tr>
+        <tr><td>AAD_CLIENT_ID</td><td>[App registration client ID]</td></tr>
+        <tr><td>AAD_CLIENT_SECRET</td><td>[App registration client secret]</td></tr>
+      </table>
+      <div class="callout warning"><div class="callout-label">If This Step Is Forgotten</div>The live API will crash immediately when it tries to connect to the database or validate authentication.</div>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num">9.4</span><div class="step-heading">Pull GitHub Actions Workflow After Azure Setup</div></div>
+      <p>The moment Azure connects to GitHub, it may modify the workflow file directly in your online repository. You must pull changes immediately:</p>
+<pre>git pull</pre>
+      <div class="callout warning"><div class="callout-label">Do Not Skip This</div>If you skip this step and continue coding, you will create a merge conflict the next time you try to push.</div>
+    </div>
+  </div>
+</div>
+
+<!-- TESTING -->
+<div class="phase" id="ref-testing">
+  <div class="phase-header done">
+    <span class="phase-num">Reference</span>
+    <span class="phase-title">Testing Your Local Environment</span>
+  </div>
+  <div class="phase-body">
+    <div class="step">
+      <div class="step-title"><span class="step-num done">T1</span><div class="step-heading">Test 1 — Pure React Frontend Only<small>Purpose: Test UI without backend complications</small></div></div>
+<pre>cd app
+npm run dev</pre>
+      <table class="kv">
+        <tr><th>Expected</th><th></th></tr>
+        <tr><td class="plain">React URL</td><td>http://localhost:5173</td></tr>
+        <tr><td class="plain">Console</td><td>"Using mock authentication"</td></tr>
+        <tr><td class="plain">Login required</td><td>No — mock auth active</td></tr>
+      </table>
+      <p><strong>When to use:</strong> Pure UI development, styling, component testing.</p>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">T2</span><div class="step-heading">Test 2 — Backend API Only<small>Purpose: Test database connections and functions in isolation</small></div></div>
+<pre>cd api
+npm start</pre>
+      <div class="verify"><span class="verify-icon">&#10003;</span><span>Azure Functions run on <code>http://localhost:7071</code></span></div>
+      <div class="verify"><span class="verify-icon">&#10003;</span><span>Visit <code>http://localhost:7071/api/hello?name=Test</code> &rarr; returns: <code>Hello, Test!</code></span></div>
+      <div class="verify"><span class="verify-icon">&#10003;</span><span>Visit <code>http://localhost:7071/api/healthCheck</code> &rarr; returns JSON with system status</span></div>
+      <p><strong>When to use:</strong> Testing database queries, debugging backend logic.</p>
+    </div>
+    <div class="step">
+      <div class="step-title"><span class="step-num done">T3</span><div class="step-heading">Test 3 — Full Stack (Frontend + Backend + Mock Auth)<small>Purpose: Test complete application flow with simulated Azure environment</small></div></div>
+<pre># From project root
+swa start</pre>
+      <div class="verify"><span class="verify-icon">&#10003;</span><span>Master proxy runs on <code>http://localhost:4280</code></span></div>
+      <div class="verify"><span class="verify-icon">&#10003;</span><span>React automatically starts on port 5173, API on port 7071</span></div>
+      <div class="verify"><span class="verify-icon">&#10003;</span><span>Mock Azure AD login at <code>http://localhost:4280/.auth/login/aad</code></span></div>
+      <div class="verify"><span class="verify-icon">&#10003;</span><span>Health check at <code>http://localhost:4280/api/healthCheck</code></span></div>
+      <p><strong>When to use:</strong> Testing authentication flows, frontend-to-backend communication, final integration testing, demonstrating to stakeholders.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ARCHITECTURE -->
+<div class="phase" id="ref-arch">
+  <div class="phase-header done">
+    <span class="phase-num">Reference</span>
+    <span class="phase-title">Architecture Overview</span>
+  </div>
+  <div class="phase-body">
+    <p><strong>Local Development — React only:</strong></p>
+    <div class="arch-diagram">&#x250C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2510;
+&#x2502;  YOU TYPE: npm run dev (React only)             &#x2502;
+&#x251C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2524;
+&#x2502;  React on 5173 &#x2192; Vite Proxy &#x2192; API on 7071      &#x2502;
+&#x2502;  Mock authentication, fast UI iteration         &#x2502;
+&#x2514;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2518;</div>
+    <p><strong>Local Development — Full stack:</strong></p>
+    <div class="arch-diagram">&#x250C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2510;
+&#x2502;  YOU TYPE: swa start (Full stack)               &#x2502;
+&#x251C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2524;
+&#x2502;  SWA CLI on 4280 coordinates:                   &#x2502;
+&#x2502;    - React on 5173                              &#x2502;
+&#x2502;    - API on 7071                                &#x2502;
+&#x2502;    - Mock Azure AD                              &#x2502;
+&#x2502;  Tests complete integration                     &#x2502;
+&#x2514;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2518;</div>
+    <p><strong>Production Deployment:</strong></p>
+    <div class="arch-diagram">&#x250C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2510;
+&#x2502;  YOU TYPE: git push origin develop              &#x2502;
+&#x251C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2524;
+&#x2502;  GitHub Actions triggers automatically          &#x2502;
+&#x2502;    &#x2193;                                            &#x2502;
+&#x2502;  Builds React (npm run build &#x2192; /dist)           &#x2502;
+&#x2502;    &#x2193;                                            &#x2502;
+&#x2502;  Builds Azure Functions                         &#x2502;
+&#x2502;    &#x2193;                                            &#x2502;
+&#x2502;  Deploys to Azure Static Web Apps               &#x2502;
+&#x2502;    &#x2193;                                            &#x2502;
+&#x2502;  Live site updated (sw-iia-dev.azurestaticapps) &#x2502;
+&#x2514;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2518;</div>
+    <p><strong>Database Connection Pooling:</strong></p>
+    <div class="arch-diagram">Request 1 (first user):
+  User clicks Submit &#x2192; db.query() called
+  No pool exists &#x2192; Create pool (10 connections)
+  Store in memory &#x2192; Execute query &#x2192; Return result
+
+Requests 2-100 (concurrent users):
+  100 users click Submit simultaneously
+  All call db.query() &#x2192; Pool already exists!
+  Reuse 10 connections (FAST!)
+  All 100 queries handled &#x2192; Database not overwhelmed
+
+Without pooling: 100 users = 100 connections &#x2192; database crashes
+With pooling:    100 users = 10 reused connections &#x2192; database happy</div>
+  </div>
+</div>
+
+<!-- FILE STRUCTURE -->
+<div class="phase" id="ref-files">
+  <div class="phase-header done">
+    <span class="phase-num">Reference</span>
+    <span class="phase-title">Complete File Structure</span>
+  </div>
+  <div class="phase-body">
+    <div class="file-tree"><span class="ft-dir">integrated-impact-assessment/</span>
+&#x251C;&#x2500;&#x2500; <span class="ft-dir">.github/workflows/</span>
+&#x2502;   &#x2514;&#x2500;&#x2500; azure-static-web-apps.yml   <span class="ft-done">&#x2713; CI/CD automation</span>
+&#x251C;&#x2500;&#x2500; .gitignore                      <span class="ft-done">&#x2713; Root protection</span>
+&#x251C;&#x2500;&#x2500; .env.example                    <span class="ft-done">&#x2713; Environment docs</span>
+&#x251C;&#x2500;&#x2500; swa-cli.config.json             <span class="ft-done">&#x2713; SWA CLI orchestrator</span>
+&#x251C;&#x2500;&#x2500; README.md
+&#x2502;
+&#x251C;&#x2500;&#x2500; <span class="ft-dir">app/</span>                              <span class="ft-label">[REACT FRONTEND]</span>
+&#x2502;   &#x251C;&#x2500;&#x2500; .gitignore                  <span class="ft-done">&#x2713; Frontend protection</span>
+&#x2502;   &#x251C;&#x2500;&#x2500; package.json
+&#x2502;   &#x251C;&#x2500;&#x2500; vite.config.js              <span class="ft-done">&#x2713; Proxy configuration</span>
+&#x2502;   &#x251C;&#x2500;&#x2500; staticwebapp.config.json    <span class="ft-done">&#x2713; Security firewall</span>
+&#x2502;   &#x2514;&#x2500;&#x2500; <span class="ft-dir">src/</span>
+&#x2502;       &#x251C;&#x2500;&#x2500; App.jsx                 <span class="ft-done">&#x2713; Updated wrapper</span>
+&#x2502;       &#x251C;&#x2500;&#x2500; <span class="ft-dir">context/</span>
+&#x2502;       &#x2502;   &#x251C;&#x2500;&#x2500; AuthContext.jsx     <span class="ft-done">&#x2713; Authentication</span>
+&#x2502;       &#x2502;   &#x2514;&#x2500;&#x2500; FormContext.jsx
+&#x2502;       &#x2514;&#x2500;&#x2500; <span class="ft-dir">services/</span>
+&#x2502;           &#x2514;&#x2500;&#x2500; api.js              <span class="ft-done">&#x2713; API service layer</span>
+&#x2502;
+&#x2514;&#x2500;&#x2500; <span class="ft-dir">api/</span>                              <span class="ft-label">[AZURE FUNCTIONS BACKEND]</span>
+    &#x251C;&#x2500;&#x2500; .gitignore                  <span class="ft-done">&#x2713; Backend protection</span>
+    &#x251C;&#x2500;&#x2500; package.json                <span class="ft-done">&#x2713; Both DB drivers</span>
+    &#x251C;&#x2500;&#x2500; local.settings.json         <span class="ft-done">&#x2713; Local secrets (git-ignored)</span>
+    &#x251C;&#x2500;&#x2500; host.json
+    &#x2514;&#x2500;&#x2500; <span class="ft-dir">src/</span>
+        &#x251C;&#x2500;&#x2500; <span class="ft-dir">db/</span>
+        &#x2502;   &#x251C;&#x2500;&#x2500; index.js            <span class="ft-done">&#x2713; Database connection manager</span>
+        &#x2502;   &#x2514;&#x2500;&#x2500; schema.sql          <span class="ft-done">&#x2713; Run once — creates both tables + indexes</span>
+        &#x251C;&#x2500;&#x2500; <span class="ft-dir">utils/</span>
+        &#x2502;   &#x2514;&#x2500;&#x2500; logger.js           <span class="ft-done">&#x2713; Logging utility</span>
+        &#x2514;&#x2500;&#x2500; <span class="ft-dir">functions/</span>
+            &#x251C;&#x2500;&#x2500; hello.js            <span class="ft-done">&#x2713; Test endpoint</span>
+            &#x2514;&#x2500;&#x2500; healthCheck.js      <span class="ft-done">&#x2713; Health monitoring</span></div>
+  </div>
+</div>
+
+<!-- DELETE ASSESSMENT ENDPOINT -->
+<div class="phase" id="b11">
+  <div class="phase-header done">
+    <span class="phase-num">Backend Endpoint</span>
+    <span class="phase-title">B11: Create <code>deleteAssessment.js</code> Endpoint</span>
+    <span class="phase-badge pending">&#9203; Pending</span>
+  </div>
+  <div class="phase-body">
+    <p><strong>File:</strong> New file <code>api/src/functions/deleteAssessment.js</code></p>
+    <p><strong>URL:</strong> <code>POST /api/deleteAssessment</code> &nbsp;|&nbsp; <strong>Auth:</strong> function</p>
+    <p><strong>Why it's needed:</strong> The frontend's <code>api.js</code> already calls <code>POST /api/deleteAssessment</code> — the frontend deletes local drafts immediately via <code>deleteLocalAssessment()</code> and then tries to sync the deletion to the database in the background. Without this endpoint, that background call will fail silently (which is safe by design) but the DB record will never be cleaned up.</p>
+    <p><strong>What it does:</strong> Permanently deletes an assessment row from the database. Only the owner can call this. The frontend always removes from localStorage first — this DB delete is best-effort background sync.</p>
+    <div class="callout info"><div class="callout-label">Note on error handling</div>This endpoint uses Pattern B (silent fail) — the same pattern as <code>saveAssessment</code>. The caller in the frontend swallows the error silently because <code>deleteLocalAssessment()</code> already removed it from localStorage before the DB call is made.</div>
+
+    <p><strong>Full file:</strong></p>
+<pre>const { app } = require('@azure/functions');
+const db = require('../db');
+const logger = require('../utils/logger');
+
+function getUser(request) {
+  const header = request.headers.get('x-ms-client-principal');
+  if (!header) return null;
+  try {
+    return JSON.parse(Buffer.from(header, 'base64').toString('utf8'));
+  } catch { return null; }
+}
+
+app.http('deleteAssessment', {
+  methods: ['POST'],
+  authLevel: 'function',
+  handler: async (request, context) => {
+    logger.setContext(context);
+
+    const user = getUser(request);
+    if (!user) return { status: 401, jsonBody: { error: 'Unauthorised' } };
+
+    const { assessmentId } = await request.json();
+    if (!assessmentId) {
+      return { status: 400, jsonBody: { error: 'Missing assessmentId' } };
+    }
+
+    try {
+      // Only the owner can delete — backend enforces this
+      const ownerCheck = await db.query(
+        `SELECT id FROM assessments WHERE id = $1 AND owner_id = $2`,
+        [assessmentId, user.userId]
+      );
+
+      if (ownerCheck.length === 0) {
+        return { status: 403, jsonBody: { error: 'Only the owner can delete this assessment' } };
+      }
+
+      // ON DELETE CASCADE on assessment_permissions means
+      // all permission rows are automatically removed too
+      await db.query(
+        `DELETE FROM assessments WHERE id = $1`,
+        [assessmentId]
+      );
+
+      logger.info('Assessment deleted:', assessmentId);
+      return { status: 200, jsonBody: { success: true } };
+
+    } catch (error) {
+      logger.error('deleteAssessment error:', error.message);
+      return { status: 500, jsonBody: { error: 'Failed to delete assessment' } };
+    }
+  }
+});</pre>
+
+    <table class="kv">
+      <tr><th>Detail</th><th></th></tr>
+      <tr><td>Permission check</td><td>Only <code>owner_id</code> matches — no editors can delete</td></tr>
+      <tr><td>Cascade</td><td><code>ON DELETE CASCADE</code> on <code>assessment_permissions</code> automatically removes all permission rows</td></tr>
+      <tr><td>Frontend call</td><td>Always silent fail — <code>deleteLocalAssessment()</code> already removed from localStorage before this is called</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- STATUS SUMMARY -->
+<div class="phase" id="ref-status">
+  <div class="phase-header done">
+    <span class="phase-num">Reference</span>
+    <span class="phase-title">Implementation Status Summary</span>
+  </div>
+  <div class="phase-body">
+    <table class="status-table">
+      <tr><th>Phase</th><th>Description</th><th>Status</th></tr>
+      <tr><td>Phase 1</td><td>Tool Installation — VS Code extensions, Azure Functions Core Tools, SWA CLI</td><td><span class="tick">&#10003; Complete</span></td></tr>
+      <tr><td>Phase 2</td><td>Backend Foundation — /api folder, dependencies, security configured</td><td><span class="tick">&#10003; Complete</span></td></tr>
+      <tr><td>Phase 3</td><td>Security Protection — .gitignore files, environment documentation</td><td><span class="tick">&#10003; Complete</span></td></tr>
+      <tr><td>Phase 4</td><td>Test Endpoint — hello.js function for connectivity testing</td><td><span class="tick">&#10003; Complete</span></td></tr>
+      <tr><td>Phase 5</td><td>Frontend Security — staticwebapp.config.json, SWA CLI configured</td><td><span class="tick">&#10003; Complete</span></td></tr>
+      <tr><td>Phase 6</td><td>Database Layer — connection pooling fixed, health monitoring, dual-database support</td><td><span class="tick">&#10003; Complete</span></td></tr>
+      <tr><td>Phase 7</td><td>Frontend Integration — auth context, API service layer, Vite proxy</td><td><span class="tick">&#10003; Complete</span></td></tr>
+      <tr><td>Phase 8</td><td>CI/CD Pipeline — GitHub Actions workflow for automatic deployment</td><td><span class="tick">&#10003; Complete</span></td></tr>
+      <tr><td>Phase 9</td><td>Production Deployment — awaiting Matt to create Azure resources</td><td><span class="pend">&#9203; Pending</span></td></tr>
+      <tr><td>Phase 10</td><td>Database Connection — awaiting Matt to provide database credentials</td><td><span class="pend">&#9203; Pending</span></td></tr>
+      <tr><td>Phase 11</td><td>Real API Endpoints — saveAssessment, getAssessment, listAssessments etc.</td><td><span class="pend">&#9203; Pending</span></td></tr>
+      <tr><td>B11</td><td>deleteAssessment.js endpoint — permanent delete, owner only, CASCADE cleans permissions</td><td><span class="pend">&#9203; Pending</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- TROUBLESHOOTING -->
+<div class="phase" id="ref-trouble">
+  <div class="phase-header done">
+    <span class="phase-num">Reference</span>
+    <span class="phase-title">Troubleshooting Common Issues</span>
+  </div>
+  <div class="phase-body">
+    <div class="trouble-item">
+      <div class="trouble-issue">Cannot find module 'pg' when starting backend</div>
+      <div class="trouble-cause">Cause: Database drivers not installed</div>
+<pre>cd api
+npm install</pre>
+    </div>
+    <div class="trouble-item">
+      <div class="trouble-issue">Health check returns "DB_CONNECTION_STRING not configured"</div>
+      <div class="trouble-cause">Cause: Expected — database credentials not yet provided by Matt</div>
+      <p>This is normal until Matt provides database credentials. Health check will show "unhealthy" until then. No action needed.</p>
+    </div>
+    <div class="trouble-item">
+      <div class="trouble-issue">React app shows blank page</div>
+      <div class="trouble-cause">Cause: Multiple possible causes</div>
+      <ol class="instructions">
+        <li>Check console for errors (F12 in browser)</li>
+        <li>Verify <code>npm run dev</code> shows no build errors</li>
+        <li>Check <code>vite.config.js</code> exists and has proxy configuration</li>
+        <li>Try clearing browser cache (Ctrl+Shift+Delete)</li>
+      </ol>
+    </div>
+    <div class="trouble-item">
+      <div class="trouble-issue">swa: command not found</div>
+      <div class="trouble-cause">Cause: SWA CLI not installed globally</div>
+<pre>npm install -g @azure/static-web-apps-cli</pre>
+    </div>
+    <div class="trouble-item">
+      <div class="trouble-issue">Backend returns CORS errors in console</div>
+      <div class="trouble-cause">Cause: Vite proxy not configured OR backend not running</div>
+      <ol class="instructions">
+        <li>Verify <code>/app/vite.config.js</code> has proxy configuration</li>
+        <li>Make sure backend is running: <code>cd api &amp;&amp; npm start</code></li>
+        <li>Or use <code>swa start</code> instead — handles routing automatically</li>
+      </ol>
+    </div>
+    <div class="trouble-item">
+      <div class="trouble-issue">Port 7071 already in use</div>
+      <div class="trouble-cause">Cause: Azure Functions already running in another terminal</div>
+<pre># Windows:
+netstat -ano | findstr :7071
+taskkill /PID [number] /F
+
+# Mac/Linux:
+lsof -ti:7071 | xargs kill</pre>
+    </div>
+    <div class="trouble-item">
+      <div class="trouble-issue">Git push does not trigger deployment</div>
+      <div class="trouble-cause">Cause: GitHub Actions workflow not configured or Azure token missing</div>
+      <ol class="instructions">
+        <li>Check GitHub repo &rarr; Actions tab &rarr; Verify workflow exists</li>
+        <li>Check GitHub repo &rarr; Settings &rarr; Secrets &rarr; Verify <code>AZURE_STATIC_WEB_APPS_API_TOKEN</code> exists</li>
+        <li>Matt must connect Azure Static Web App to GitHub — this auto-creates the token</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- SECURITY CHECKLIST -->
+<div class="phase" id="ref-security">
+  <div class="phase-header done">
+    <span class="phase-num">Reference</span>
+    <span class="phase-title">Security Checklist</span>
+  </div>
+  <div class="phase-body">
+    <table class="status-table">
+      <tr><th>Item</th><th>Status</th></tr>
+      <tr><td><code>/api/.gitignore</code> protects <code>local.settings.json</code></td><td><span class="tick">&#10003;</span></td></tr>
+      <tr><td><code>/app/.gitignore</code> protects <code>.env.local</code> and all variants</td><td><span class="tick">&#10003;</span></td></tr>
+      <tr><td><code>/.gitignore</code> provides root-level backup protection</td><td><span class="tick">&#10003;</span></td></tr>
+      <tr><td><code>/.env.example</code> documents all required variables — no actual secrets</td><td><span class="tick">&#10003;</span></td></tr>
+      <tr><td><code>staticwebapp.config.json</code> enforces Azure AD authentication</td><td><span class="tick">&#10003;</span></td></tr>
+      <tr><td>Health check endpoint allows anonymous access (Azure monitoring needs it)</td><td><span class="tick">&#10003;</span></td></tr>
+      <tr><td>All other API endpoints require authentication</td><td><span class="tick">&#10003;</span></td></tr>
+      <tr><td>401 errors redirect to Azure AD login</td><td><span class="tick">&#10003;</span></td></tr>
+      <tr><td>Database connection string configured in Azure Portal</td><td><span class="pend">&#9203; Awaiting Matt</span></td></tr>
+      <tr><td>Azure AD credentials (Tenant ID, Client ID, Client Secret) configured</td><td><span class="pend">&#9203; Awaiting Matt</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- NEXT STEPS -->
+<div class="phase" id="ref-next">
+  <div class="phase-header pending">
+    <span class="phase-num">Next Steps</span>
+    <span class="phase-title">Pending Items Before Production</span>
+    <span class="phase-badge pending">&#9203; Awaiting External Dependencies</span>
+  </div>
+  <div class="phase-body">
+    <table class="status-table">
+      <tr><th>Item</th><th>Waiting on</th><th>Details</th></tr>
+      <tr><td>Database credentials</td><td>Matt</td><td>PostgreSQL connection string format: <code>postgresql://username:password@server:5432/database?sslmode=require</code>. Update <code>local.settings.json</code> for local testing.</td></tr>
+      <tr><td>Azure AD credentials</td><td>Matt</td><td>TENANT_ID, AAD_CLIENT_ID, AAD_CLIENT_SECRET. Update <code>staticwebapp.config.json</code> with TENANT_ID once received.</td></tr>
+      <tr><td>Azure Static Web Apps created</td><td>Matt</td><td>Two environments: <code>sw-iia-dev</code> and <code>sw-iia-live</code> — both connected to GitHub repo with correct build paths.</td></tr>
+      <tr><td>Production secrets in Azure Portal</td><td>Matt</td><td>NODE_ENV, DB_TYPE, DB_CONNECTION_STRING, TENANT_ID, AAD_CLIENT_ID, AAD_CLIENT_SECRET entered in SWA Configuration.</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="doc-footer">
+  <strong>Sport Wales — IIA Portal</strong> &nbsp;|&nbsp; Azure SWA Setup Guide &nbsp;|&nbsp; Internal Developer Documentation<br>
+  Phases 1–8 Complete &nbsp;&middot;&nbsp; Phase 9 Awaiting Infrastructure
+</div>
+
+</div>
+</body>
+</html>

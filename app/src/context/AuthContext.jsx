@@ -60,11 +60,29 @@ export const AuthProvider = ({ children }) => {
   }, [useMockAuth]);
 
   const login = () => {
-    window.location.href = '/.auth/login/aad';
+    if (useMockAuth) {
+      // Mock login — just set the user directly
+      console.log('[Auth] Mock login triggered');
+      setUser({
+        userId: 'LOCAL_DEV_USER',
+        userDetails: 'Dev User',
+        userRoles: ['authenticated', 'user']
+      });
+    } else {
+      // Real Azure login
+      window.location.href = '/.auth/login/aad';
+    }
   };
 
   const logout = () => {
-    window.location.href = '/.auth/logout';
+    if (useMockAuth) {
+      // Mock logout — clear the user
+      console.log('[Auth] Mock logout triggered');
+      setUser(null);
+    } else {
+      // Real Azure logout
+      window.location.href = '/.auth/logout';
+    }
   };
 
   const value = {

@@ -1,20 +1,21 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
+import { apiService } from '../../services/api';
 import ProgressBar from '../../components/ui/ProgressBar';
 import { form2Steps } from './constants'; 
 
 const Form2Step3 = () => {
   const navigate = useNavigate();
-  const { formData, updateFormData, resetFormData } = useFormContext();
+  const { formData, updateFormData, commitStep, confirmDbSave } = useFormContext();
+
+  const isReadOnly = formData.status === 'signed_off' || formData.userRole === 'view';
 
   const [formState, setFormState] = useState({
     review: formData.form2?.review || '',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState(null);
 
   useEffect(() => {
     if (!formData.formType) {
@@ -24,39 +25,35 @@ const Form2Step3 = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormState(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormState(prev => ({ ...prev, [name]: value }));
+    // Sync to FormContext immediately so SaveButton always has current data
+    updateFormData({ form2: { ...formData.form2, [name]: value } });
   };
 
-  const handleSubmit = async () => {
-    // Update the global form data first
-    updateFormData({
+  // Save this step's data to localStorage + DB in background, then return to workspace
+  const handleDone = async () => {
+    setIsSubmitting(true);
+
+    const updatedData = {
       form2: {
         ...formData.form2,
         review: formState.review,
       }
-    });
+    };
 
-    // Simulate submission process
-    setIsSubmitting(true);
-    setSubmitError(null);
+    const dataToSave = commitStep(2, updatedData);
 
     try {
-      // In a real application, you would send the data to your backend
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      setSubmitSuccess(true);
-      
-      // Optionally reset the form data after successful submission
-      // resetFormData();
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      setSubmitError('There was a problem submitting your assessment. Please try again.');
-    } finally {
-      setIsSubmitting(false);
+      const result = await apiService.saveAssessment(dataToSave);
+      if (!formData.assessmentId && result?.id) {
+        confirmDbSave(result.id);
+      }
+    } catch (err) {
+      console.warn('[AutoSave] Form2/Step3 DB save failed. Data is safe in localStorage.', err.message);
     }
+
+    setIsSubmitting(false);
+    navigate('/');
   };
 
   // Handle clicking on a step in the progress bar
@@ -79,7 +76,6 @@ const Form2Step3 = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
-      {/* Progress Bar */}
       <ProgressBar 
         steps={form2Steps} 
         currentStep={2} 
@@ -91,55 +87,31 @@ const Form2Step3 = () => {
         Final Review
       </h2>
 
-      {submitSuccess ? (
-        <div className="bg-green-50 border-l-4 border-green-500 p-6 rounded-lg mb-8">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <svg className="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <div className="ml-4">
-              <h3 className="text-lg font-medium text-green-800">Assessment successfully submitted!</h3>
-              <p className="text-green-700 mt-2">
-                Your Integrated Impact Assessment has been successfully submitted. You can now view your assessment in the completed assessments section.
-              </p>
-              <div className="mt-4">
-                <button
-                  onClick={() => navigate('/')}
-                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                >
-                  Return to Home
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-white rounded-lg shadow p-6 space-y-6">
-          <div>
-            <label htmlFor="review" className="block text-lg font-semibold mb-2">
-              Use this space to detail the outcome of your work. What were the positive and negative impacts? Did you have to take any actions?
-            </label>
-            <textarea
-              id="review"
-              name="review"
-              value={formState.review}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-              rows={6}
-              placeholder="Describe the outcomes, impacts, and any actions taken"
-            />
-          </div>
-          
-          {submitError && (
-            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700">
-              <p className="font-medium">Submission Error</p>
-              <p>{submitError}</p>
-            </div>
-          )}
-        </div>
+      {isReadOnly && (
+        <p className="mb-6 text-sm text-gray-500">
+          {formData.status === 'signed_off'
+            ? 'This assessment has been signed off and cannot be edited.'
+            : 'You have view-only access to this assessment.'}
+        </p>
       )}
+
+      <div className="bg-white rounded-lg shadow p-6 space-y-6">
+        <div>
+          <label htmlFor="review" className="block text-lg font-semibold mb-2">
+            Use this space to detail the outcome of your work. What were the positive and negative impacts? Did you have to take any actions?
+          </label>
+          <textarea
+            id="review"
+            name="review"
+            value={formState.review}
+            onChange={handleChange}
+            readOnly={isReadOnly}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            rows={6}
+            placeholder="Describe the outcomes, impacts, and any actions taken"
+          />
+        </div>
+      </div>
 
       <div className="mt-12 flex justify-between">
         <Link to="/form2/step2" className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">
@@ -148,23 +120,21 @@ const Form2Step3 = () => {
           </svg>
           Prev
         </Link>
-        {!submitSuccess && (
+        {!isReadOnly && (
           <button
-            className="inline-flex items-center px-6 py-2 rounded-md text-sm bg-[--color-sw-red] text-white font-medium transition-colors duration-200 hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={handleSubmit}
+            onClick={handleDone}
             disabled={isSubmitting}
+            className="inline-flex items-center px-6 py-2 rounded-md text-sm font-medium bg-[--color-sw-blue] text-white hover:bg-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
           >
-            {isSubmitting ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Submitting...
-              </>
-            ) : (
-              'Submit Assessment'
-            )}
+            {isSubmitting ? 'Saving...' : 'Save & Back to My Assessments'}
+          </button>
+        )}
+        {isReadOnly && (
+          <button
+            onClick={() => navigate('/')}
+            className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-[--color-sw-blue] text-white hover:bg-cyan-700"
+          >
+            Back to My Assessments
           </button>
         )}
       </div>

@@ -1,112 +1,320 @@
-// page 1
-import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+// src/pages/LandingPage.jsx
+// The main home page — shows all of the user's assessments in a simple table.
+// Users start new assessments or open existing ones from here.
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useFormContext } from '../context/FormContext';
+import { apiService, ASSESSMENT_STATUS } from '../services/api';
+import ShareModal from '../components/ui/ShareModal';
 
 const LandingPage = () => {
-	const { resetFormData } = useFormContext();
-	const [showWhySection, setShowWhySection] = useState(false);
+  const navigate = useNavigate();
+  const { formData, resetFormData, loadAssessment, deleteLocalAssessment } = useFormContext();
 
-	useEffect(() => {
-		resetFormData();
-	}, [resetFormData]);
+  const [assessments, setAssessments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [openingId, setOpeningId] = useState(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [shareModalId, setShareModalId] = useState(null); // assessment id currently open in share modal
 
-	// bug fix: FormSelection not loading. Quick and dirty solution:
-	const handleStart = () => {
-		window.location.href = '/form-selection';
-	};
+  // Fetch all assessments for this user on mount
+  useEffect(() => {
+    const fetchAssessments = async () => {
+      try {
+        const data = await apiService.listAssessments();
+        setAssessments(data || []);
+      } catch (err) {
+        // Distinguish between different error types for better UX
+        if (err.status === 401) {
+          setError('You are not logged in. Please log in to see your assessments.');
+        } else if (err.status === 403) {
+          setError('You do not have permission to access assessments.');
+        } else {
+          // Backend not connected yet (network error / 404 / 500).
+          // Fall back to whatever is currently in localStorage so the user can
+          // still see and reopen their in-progress work without the backend.
+          console.warn('[Workspace] Backend not available. Falling back to localStorage.');
+          buildLocalStorageFallback();
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAssessments();
+  }, []);
 
-	return (
-		<div className="max-w-4xl mx-auto px-4 py-12">
-			<h2 className="sw-heading-primary text-3xl font-bold mb-8">
-				Integrated Impact Assessments (IIA)
-			</h2>
+  // Build display rows from ALL assessments currently in localStorage.
+  // Reads from the new multi-assessment store (iia_assessments).
+  // Each stored assessment becomes one row in the table.
+  // Only includes entries where formType is set (real in-progress forms).
+  const buildLocalStorageFallback = () => {
+    let store = {};
+    try {
+      const raw = localStorage.getItem('iia_assessments');
+      store = raw ? JSON.parse(raw) : {};
+    } catch {
+      // Corrupted localStorage — nothing to show
+    }
 
-			<div className="space-y-6">
-				<p className="text-lg">
-					Integrated Impact Assessments (IIA) are a tool to help make sure our work supports as many people as possible.
-				</p>
+    const rows = Object.values(store)
+      .filter(local => !!local?.formType)
+      .map(local => ({
+        id:           local.assessmentId || local.localId,
+        title:        local.title     || '',
+        form_type:    local.formType,
+        status:       local.status    || 'draft',
+        user_role:    local.userRole  || 'owner',
+        created_at:   local.createdAt   || null,   // set by resetFormData on creation
+        updated_at:   local.lastSavedAt || null,   // updated by writeAssessmentToStore on every save
+        completed_at:  (local.status === 'complete' || local.status === 'signed_off') ? (local.lastSavedAt || true) : null,
+        signed_off_at: local.status === 'signed_off' ? (local.lastSavedAt || true) : null,
+        _isLocalOnly:  true,
+        _localId:      local.localId,
+      }));
 
-				<div className="mb-6">
-					<p className="text-lg mb-4">
-						The aims of an Integrated Impact Assessment are to make sure we:
-					</p>
-					<ul className="space-y-2 ml-6">
-						<li className="flex items-start">
-							<span className="text-green-500 mr-2 text-xl">✅</span>
-							<span>do better work and make better decisions so our work benefits more people,</span>
-						</li>
-						<li className="flex items-start">
-							<span className="text-green-500 mr-2 text-xl">✅</span>
-							<span>support fairness and equality for all communities,</span>
-						</li>
-						<li className="flex items-start">
-							<span className="text-green-500 mr-2 text-xl">✅</span>
-							<span>protect the environment for future generations,</span>
-						</li>
-						<li className="flex items-start">
-							<span className="text-green-500 mr-2 text-xl">✅</span>
-							<span>strengthen the Welsh language and culture,</span>
-						</li>
-						<li className="flex items-start">
-							<span className="text-green-500 mr-2 text-xl">✅</span>
-							<span>meet our legal and ethical responsibilities as a public body (Public Duties).</span>
-						</li>
-					</ul>
-				</div>
+    setAssessments(rows);
+  };
 
-				{/* Why we have impact assessments - Collapsible */}
-				<div className="border rounded-lg overflow-hidden">
-					<button 
-						className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 text-left"
-						onClick={() => setShowWhySection(!showWhySection)}
-					>
-						<h3 className="text-xl font-bold">Why we have impact assessments</h3>
-						<svg 
-							className={`w-5 h-5 transition-transform ${showWhySection ? 'transform rotate-180' : ''}`} 
-							fill="none" 
-							stroke="currentColor" 
-							viewBox="0 0 24 24" 
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-						</svg>
-					</button>
-					
-					{showWhySection && (
-						<div className="p-4 border-t space-y-4">
-							<p className="text-lg">
-								At Sport Wales, we're committed to making a real difference to people in our communities.
-							</p>
-							<p className="text-lg">
-								<a href="#" className="text-sw-blue underline font-semibold hover:text-sw-blue-dark">
-									Our vision and strategy
-								</a> states Sport Wales' aim is to create an active nation where everyone can have a lifetime enjoyment of sport.
-							</p>
-							<p className="text-lg">
-								Every piece of work, project or policy you work on has the potential to improve lives. Considering how your piece of work impacts people at the start helps
-							</p>
-							<p className="text-lg">
-								Over time, our records of these assessments help us use what you learnt. That helps us provide more opportunities for everyone to enjoy sport.
-							</p>
-						</div>
-					)}
-				</div>
+  // Start a brand-new assessment — clears any in-progress form data
+  const handleStartNew = () => {
+    resetFormData();
+    navigate('/Intro');
+  };
 
-				<div className="mt-8 flex justify-center">
-					<button
-						onClick={handleStart}
-						className="inline-flex  hover:bg-cyan-700 items-center px-6 py-2 rounded-md text-sm bg-[--color-sw-blue] text-white font-medium transition-colors duration-200 hover:bg-opacity-90"
-					>
-						Next: Select an impact assessment
-						<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-						</svg>
-					</button>
-				</div>
-			</div>
-		</div>
-	);
+
+
+  // Open an existing assessment — loads it into FormContext then navigates
+  const handleOpenAssessment = async (assessment) => {
+    const { id, form_type, status, _isLocalOnly, _localId } = assessment;
+
+    // Local-only row: load the specific assessment from the store into FormContext,
+    // then navigate. We must explicitly load it in case another form was active.
+    if (_isLocalOnly) {
+      try {
+        const raw = localStorage.getItem('iia_assessments');
+        const store = raw ? JSON.parse(raw) : {};
+        const localData = store[_localId];
+        if (localData) {
+          loadAssessment({
+            id:        localData.assessmentId || _localId,
+            form_data: localData,
+            form_type: localData.formType,
+            status:    localData.status || 'draft',
+            user_role: localData.userRole || 'owner',
+          });
+        }
+      } catch {
+        // Corrupted entry — navigate anyway, FormContext already has something loaded
+      }
+      navigate(form_type === 'form1' ? '/form1/step1' : '/form2/step1');
+      return;
+    }
+
+    // DB-backed row: fetch full form_data from backend and load into FormContext
+    setOpeningId(id);
+    try {
+      const data = await apiService.getAssessment(id);
+      loadAssessment(data);
+      // Completed or signed-off assessments go straight to the document view
+      if (status === ASSESSMENT_STATUS.COMPLETE || status === ASSESSMENT_STATUS.SIGNED_OFF) {
+        navigate(`/assessment/${id}/document`);
+      } else {
+        navigate(form_type === 'form1' ? '/form1/step1' : '/form2/step1');
+      }
+    } catch (err) {
+      setError('Could not open that assessment. Please try again.');
+    } finally {
+      setOpeningId(null);
+    }
+  };
+
+  // Delete an assessment — removes from localStorage immediately, then attempts DB delete silently.
+  // Only owners can delete; signed-off assessments cannot be deleted (UI enforces this).
+  const handleDelete = async (assessment) => {
+    // Resolve the localStorage key: for DB-backed rows localId === assessmentId (UUID);
+    // for local-only rows _localId holds the local_ prefixed key.
+    const localId = assessment._localId || assessment.id;
+    const dbId    = assessment._isLocalOnly ? null : assessment.id;
+
+    // 1. Remove from localStorage and reset FormContext if this was the active form
+    deleteLocalAssessment(localId);
+
+    // 2. Remove from the table immediately — instant feedback, no waiting
+    setAssessments(prev => prev.filter(a => a.id !== assessment.id));
+    setConfirmDeleteId(null);
+
+    // 3. Attempt DB delete silently in background — failure is fine, data already cleared locally
+    if (dbId) {
+      try {
+        await apiService.deleteAssessment(dbId);
+      } catch (err) {
+        console.warn('[Delete] DB delete failed (backend not available). Local data already removed.', err.message);
+      }
+    }
+  };
+
+  // Format ISO date string to UK date format (DD/MM/YYYY)
+  const formatDate = (isoString) => {
+    if (!isoString) return '—';
+    return new Date(isoString).toLocaleDateString('en-GB');
+  };
+
+  const formTypeLabel = (type) => type === 'form1' ? 'Full IIA' : 'Short IIA';
+
+  // ===== RENDER =====
+  return (
+    <div className="max-w-5xl mx-auto px-4 py-12">
+
+      {/* Page header with IIA intro text and Start button */}
+      <div className="mb-8">
+        <h2 className="sw-heading-primary text-3xl font-bold mb-3">
+          Integrated Impact Assessments (IIA)
+        </h2>
+        <p className="text-gray-600 mb-6">
+          Integrated Impact Assessments are a tool to help make sure our work supports as many people as possible.
+        </p>
+        <button
+          onClick={handleStartNew}
+          className="inline-flex items-center px-5 py-2 rounded-md text-sm bg-[--color-sw-blue] text-white font-medium hover:bg-cyan-700 transition-colors duration-200"
+        >
+          + Start New Assessment
+        </button>
+      </div>
+
+      {/* Error message */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded">
+          <p>{error}</p>
+        </div>
+      )}
+
+      {/* Loading state */}
+      {loading && (
+        <div className="text-center py-16 text-gray-400">
+          <p className="text-lg">Loading your assessments...</p>
+        </div>
+      )}
+
+      {/* Empty state — no assessments yet */}
+      {!loading && !error && assessments.length === 0 && (
+        <div className="text-center py-16 bg-white rounded-lg shadow border border-gray-100">
+          <p className="text-gray-500 text-lg mb-4">You have no assessments yet.</p>
+
+        </div>
+      )}
+
+      {/* Assessments table */}
+      {!loading && assessments.length > 0 && (
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="text-left px-4 py-3 font-semibold text-gray-700">Title</th>
+                <th className="text-left px-4 py-3 font-semibold text-gray-700">Type</th>
+                <th className="text-left px-4 py-3 font-semibold text-gray-700">Created</th>
+                <th className="text-left px-4 py-3 font-semibold text-gray-700">Last Edited</th>
+                <th className="text-center px-4 py-3 font-semibold text-gray-700">Role</th>
+                <th className="text-center px-4 py-3 font-semibold text-gray-700">Complete</th>
+                <th className="text-center px-4 py-3 font-semibold text-gray-700">Sign Off</th>
+                <th className="text-center px-4 py-3 font-semibold text-gray-700">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {assessments.map((assessment) => (
+                <tr
+                  key={assessment.id}
+                  onClick={() => handleOpenAssessment(assessment)}
+                  className="cursor-pointer hover:bg-blue-50 transition-colors duration-150"
+                >
+                  <td className="px-4 py-3 font-medium text-gray-900">
+                    {openingId === assessment.id ? (
+                      <span className="text-gray-400">Opening...</span>
+                    ) : (
+                      assessment.title || <span className="text-gray-400 italic">Untitled</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-gray-600">{formTypeLabel(assessment.form_type)}</td>
+                  <td className="px-4 py-3 text-gray-600">{formatDate(assessment.created_at)}</td>
+                  <td className="px-4 py-3 text-gray-600">{formatDate(assessment.updated_at)}</td>
+                  <td className="px-4 py-3 text-center">
+                    <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                      assessment.user_role === 'owner'
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      {assessment.user_role === 'owner' ? 'Owner' : 'Shared'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    {assessment.completed_at
+                      ? <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500"><svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg></span>
+                      : <span className="text-gray-300">—</span>}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    {assessment.signed_off_at
+                      ? <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500"><svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg></span>
+                      : <span className="text-gray-300">—</span>}
+                  </td>
+                  <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                    {assessment.user_role === 'owner' && !assessment.signed_off_at ? (
+                      <div className="flex items-center justify-center gap-3">
+
+                        {/* Share button */}
+                        <button
+                          onClick={() => setShareModalId(assessment.id)}
+                          className="text-xs text-[--color-sw-blue] hover:text-cyan-700 font-medium transition-colors"
+                        >
+                          Share
+                        </button>
+
+                        {/* Delete — confirm/cancel inline, or default delete link */}
+                        {confirmDeleteId === assessment.id ? (
+                          <span className="flex items-center gap-1 text-xs">
+                            <button
+                              onClick={() => handleDelete(assessment)}
+                              className="text-red-600 font-semibold hover:text-red-800"
+                            >
+                              Confirm
+                            </button>
+                            <span className="text-gray-300">|</span>
+                            <button
+                              onClick={() => setConfirmDeleteId(null)}
+                              className="text-gray-500 hover:text-gray-700"
+                            >
+                              Cancel
+                            </button>
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmDeleteId(assessment.id)}
+                            className="text-xs text-red-500 hover:text-red-700 font-medium transition-colors"
+                          >
+                            Delete
+                          </button>
+                        )}
+
+                      </div>
+                    ) : (
+                      <span className="text-gray-300">—</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Share modal — rendered at page level so it sits above the table */}
+      {shareModalId && (
+        <ShareModal
+          assessmentId={shareModalId}
+          onClose={() => setShareModalId(null)}
+        />
+      )}
+    </div>
+  );
 };
 
 export default LandingPage;
