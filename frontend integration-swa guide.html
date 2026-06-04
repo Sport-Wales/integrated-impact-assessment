@@ -156,10 +156,10 @@
     <table class="t">
       <tr><th>Area</th><th>Files</th><th>Status</th></tr>
       <tr><td class="plain">Development Configuration</td><td>vite.config.js, .env.example, .env.local</td><td class="badge-ok">&#10003; Done</td></tr>
-      <tr><td class="plain">Authentication System</td><td>AuthContext.jsx, App.jsx</td><td class="badge-ok">&#10003; Done</td></tr>
+      <tr><td class="plain">Authentication System</td><td>AuthContext.jsx, LoginPage.jsx, App.jsx (AuthGate)</td><td class="badge-ok">&#10003; Done</td></tr>
       <tr><td class="plain">API Service Layer</td><td>services/api.js</td><td class="badge-ok">&#10003; Done</td></tr>
       <tr><td class="plain">localStorage &amp; State</td><td>context/FormContext.jsx</td><td class="badge-ok">&#10003; Done</td></tr>
-      <tr><td class="plain">Auto-save on Navigation</td><td>All 12 form step files</td><td class="badge-ok">&#10003; Done</td></tr>
+      <tr><td class="plain">Auto-save on Navigation</td><td>All 14 form step files (Form 1: 10, Form 2: 4)</td><td class="badge-ok">&#10003; Done</td></tr>
       <tr><td class="plain">Manual Save Button</td><td>components/ui/SaveButton.jsx</td><td class="badge-ok">&#10003; Done</td></tr>
       <tr><td class="plain">Azure Deployment</td><td>staticwebapp.config.json, GitHub Actions</td><td class="badge-ok">&#10003; Done</td></tr>
     </table>
@@ -378,16 +378,37 @@ const useMockAuth = import.meta.env.VITE_USE_MOCK_AUTH === 'true';
     <div class="step">
       <div class="step-row"><span class="dot">B3</span><div class="step-head">App.jsx — Provider Wrapping Order<small>File: <code>/app/src/App.jsx</code></small></div></div>
       <p>The entire app is wrapped with <code>AuthProvider</code> so every component can access the logged-in user. The order matters.</p>
-<pre>&lt;AuthProvider&gt;        {/* Outermost — authentication state */}
-  &lt;FormProvider&gt;      {/* Can access auth data when saving */}
-    &lt;Router&gt;          {/* Can access both auth and form data */}
-      &lt;Routes&gt;
-        {/* All form steps, pages, routes */}
-      &lt;/Routes&gt;
+<pre>&lt;AuthProvider&gt;          {/* Outermost — authentication state */}
+  &lt;FormProvider&gt;        {/* Can access auth data when saving */}
+    &lt;Router&gt;            {/* Can access both auth and form data */}
+      &lt;AuthGate&gt;        {/* Blocks unauthenticated users — shows LoginPage */}
+        &lt;Routes&gt;
+          {/* All form steps, pages, routes */}
+        &lt;/Routes&gt;
+      &lt;/AuthGate&gt;
     &lt;/Router&gt;
   &lt;/FormProvider&gt;
 &lt;/AuthProvider&gt;</pre>
       <div class="note info"><div class="note-lbl">Why order matters</div>AuthProvider must be outermost so FormProvider can access user identity when saving data (e.g. "save this form for user X"). If FormProvider came first, it would have no access to auth data.</div>
+    </div>
+
+    <!-- B.4 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">B4</span><div class="step-head">AuthGate — Blocking Unauthenticated Access<small>File: <code>/app/src/App.jsx</code> (AuthGate component) &amp; <code>/app/src/pages/LoginPage.jsx</code></small></div></div>
+      <p>An <code>AuthGate</code> component wraps the entire router inside <code>App.jsx</code>. It checks authentication status before rendering any page. Unauthenticated users see only a full-screen login page — no routes, no form data, no workspace.</p>
+
+<pre>// Inside App.jsx — sits between AuthProvider and the Router
+const AuthGate = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading)          return &lt;FullScreenSpinner /&gt;;
+  if (!isAuthenticated) return &lt;LoginPage /&gt;;
+  return children;
+};</pre>
+
+      <p><code>LoginPage.jsx</code> renders a full-screen branded login page with a "Log in with Microsoft" button that calls the <code>login()</code> function from <code>useAuth()</code>. In mock mode this sets a fake user instantly. In production it redirects to <code>/.auth/login/aad</code>.</p>
+
+      <div class="note ok"><div class="note-lbl">Zero code changes for production</div>When Azure is ready, only the environment variable <code>VITE_USE_MOCK_AUTH</code> changes from <code>true</code> to <code>false</code>. The AuthGate, LoginPage, and AuthContext all adapt automatically — no code changes needed.</div>
     </div>
 
   </div>
@@ -464,6 +485,36 @@ ASSESSMENT_STATUS.SIGNED_OFF  // 'signed_off'
 
 PERMISSION_ROLE.VIEW          // 'view'
 PERMISSION_ROLE.EDIT          // 'edit'</pre>
+    </div>
+
+    <!-- C.4 -->
+    <div class="step">
+      <div class="step-row"><span class="dot">C4</span><div class="step-head">Assessment Lifecycle — When Each API Method Is Called</div></div>
+      <p>The status constants above drive a specific lifecycle through the form. Understanding this flow explains when and why each API method gets called.</p>
+
+      <div class="flow">DRAFT ──────────────────────────────────────── COMPLETE ──── SIGNED OFF ──── REVIEWED
+  │                                                │              │               │
+  │  User fills in form steps                      │              │               │
+  │  saveAssessment() on every Next click          │              │               │
+  │                                                │              │               │
+  │  Step 8 (Form1) or Step 2 (Form2):             │              │               │
+  │  completeAssessment() ─────────────────────────┘              │               │
+  │                                                               │               │
+  │  Step 9 (Form1) or Step 3 (Form2) — Sign Off page:           │               │
+  │  signOffAssessment() ─────────────────────────────────────────┘               │
+  │                                                                               │
+  │  Step 10 (Form1) or Step 4 (Form2) — Review page:                            │
+  │  saveAssessment() with review answers ────────────────────────────────────────┘</div>
+
+      <table class="t">
+        <tr><th>Status transition</th><th>API method called</th><th>Triggered by</th></tr>
+        <tr><td class="plain">draft &#x2192; draft (save)</td><td>saveAssessment()</td><td>Every Next button, SaveButton, title blur</td></tr>
+        <tr><td class="plain">draft &#x2192; complete</td><td>completeAssessment(id)</td><td>Form1/Step8 or Form2/Step2 "Mark as Complete"</td></tr>
+        <tr><td class="plain">complete &#x2192; signed_off</td><td>signOffAssessment(id)</td><td>Sign Off button on the Assessment Document page</td></tr>
+        <tr><td class="plain">signed_off &#x2192; reviewed</td><td>saveAssessment()</td><td>Review step (Step10/Step4) "Save &amp; Back to My Assessments"</td></tr>
+      </table>
+
+      <div class="note info"><div class="note-lbl">Permanent lock</div>Once <code>signOffAssessment()</code> is called, the assessment is permanently locked. All form inputs become read-only via the <code>isReadOnly</code> check in every step. There is no "undo sign-off" — this is by design for audit compliance.</div>
     </div>
 
   </div>
@@ -868,42 +919,45 @@ const handleNext = async () => {
 }, []);</pre>
 
       <p><strong>Opening an existing assessment — two paths depending on source:</strong></p>
-<pre>const handleOpenAssessment = async (assessmentId, formType, status) => {
+      <p>The function accepts an assessment object and an optional <code>destination</code> parameter. By default, draft assessments open at Step 1, while completed or signed-off assessments open at the Sign Off step. The destination override lets the Review column navigate directly to the review step.</p>
+<pre>const handleOpenAssessment = async (assessment, destination = null) => {
+  const { id, form_type, status, _isLocalOnly, _localId } = assessment;
 
-  // Path A: DB-backed assessment (assessmentId is a real UUID)
-  if (assessmentId &amp;&amp; !assessmentId.startsWith('local_')) {
-    const data = await apiService.getAssessment(assessmentId);
-    loadAssessment(data);  // populates FormContext from DB row
-    navigate(formType === 'form1' ? '/form1/step1' : '/form2/step1');
+  // Default destination based on status
+  const defaultDest = (status === 'complete' || status === 'signed_off')
+    ? (form_type === 'form1' ? '/form1/step9' : '/form2/step3')
+    : (form_type === 'form1' ? '/form1/step1' : '/form2/step1');
+  const target = destination || defaultDest;
+
+  // Path A: Local-only draft — load from localStorage
+  if (_isLocalOnly) {
+    const store = JSON.parse(localStorage.getItem('iia_assessments') || '{}');
+    const localData = store[_localId];
+    if (localData) loadAssessment({ id: _localId, form_data: localData, ... });
+    navigate(target);
     return;
   }
 
-  // Path B: Local-only draft (assessmentId starts with 'local_')
-  // Load directly from localStorage — no DB call needed
-  const store = readAssessmentsStore();
-  const localData = store[assessmentId];
-  if (localData) {
-    loadAssessment({ id: assessmentId, form_data: localData,
-                     status: localData.status, form_type: localData.formType,
-                     user_role: 'owner' });
-    navigate(formType === 'form1' ? '/form1/step1' : '/form2/step1');
-  }
+  // Path B: DB-backed — fetch from backend
+  const data = await apiService.getAssessment(id);
+  loadAssessment(data);
+  navigate(target);
 };</pre>
 
       <p><strong>Deleting an assessment — two steps in the correct order:</strong></p>
-<pre>const handleDelete = async (assessmentId) => {
+<pre>const handleDelete = async (assessment) => {
+  const localId = assessment._localId || assessment.id;
+  const dbId    = assessment._isLocalOnly ? null : assessment.id;
 
   // Step 1: Remove from localStorage immediately (always succeeds)
-  deleteLocalAssessment(assessmentId);
-  setAssessments(prev => prev.filter(a => a.id !== assessmentId));
+  deleteLocalAssessment(localId);
+  setAssessments(prev => prev.filter(a => a.id !== assessment.id));
 
   // Step 2: Sync deletion to DB in background (silent fail — Pattern B)
-  if (assessmentId &amp;&amp; !assessmentId.startsWith('local_')) {
+  if (dbId) {
     try {
-      await apiService.deleteAssessment(assessmentId);
+      await apiService.deleteAssessment(dbId);
     } catch (err) {
-      // Silent — localStorage already cleaned up. DB will eventually
-      // be cleaned by the backend if the record is orphaned.
       console.warn('[Delete] DB delete failed:', err.message);
     }
   }
@@ -913,8 +967,8 @@ const handleNext = async () => {
 
       <p><strong>Starting a new assessment from the workspace:</strong></p>
 <pre>const handleStartNew = () => {
-  resetFormData();          // Creates fresh localId, stamps createdAt
-  navigate('/form-selection');  // User picks form1 or form2
+  resetFormData();       // Creates fresh localId, stamps createdAt
+  navigate('/intro');    // IntroPage → user clicks Next → FormSelection
   // startAssessment(formType) is called by FormSelection
   // when the user makes their choice
 };</pre>
@@ -1072,9 +1126,14 @@ lsof -ti:7071 | xargs kill</pre>
       <tr><td>.env.example</td><td>Template showing required env vars — committed to Git</td><td>root /</td></tr>
       <tr><td>.env.local</td><td>Your personal config — never committed to Git</td><td>root / (create it)</td></tr>
       <tr><td>AuthContext.jsx</td><td>Auth state, login/logout, mock vs real Azure AD</td><td>/app/src/context/</td></tr>
+      <tr><td>LoginPage.jsx</td><td>Full-screen login — shown by AuthGate when not authenticated</td><td>/app/src/pages/</td></tr>
       <tr><td>FormContext.jsx</td><td>All form state, localStorage, multi-assessment store</td><td>/app/src/context/</td></tr>
       <tr><td>api.js</td><td>All backend API calls — single source of truth</td><td>/app/src/services/</td></tr>
       <tr><td>SaveButton.jsx</td><td>Manual save with feedback states</td><td>/app/src/components/ui/</td></tr>
+      <tr><td>ShareButton.jsx</td><td>Pre-saves if needed, opens ShareModal, passes current URL</td><td>/app/src/components/ui/</td></tr>
+      <tr><td>ShareModal.jsx</td><td>Add/remove colleagues with @sport.wales validation, pending model, copy link</td><td>/app/src/components/ui/</td></tr>
+      <tr><td>AssessmentDocument.jsx</td><td>Read-only report of all form answers, sign-off button, Word export</td><td>/app/src/pages/</td></tr>
+      <tr><td>generateDocx.js</td><td>Builds and downloads .docx Word file in browser</td><td>/app/src/utils/</td></tr>
       <tr><td>staticwebapp.config.json</td><td>Azure auth, route protection, SPA fallback</td><td>/app/</td></tr>
       <tr><td>swa-cli.config.json</td><td>Local full-stack orchestration (ignored by Azure)</td><td>root /</td></tr>
       <tr><td>azure-static-web-apps.yml</td><td>GitHub Actions CI/CD — auto-deploy on push</td><td>/.github/workflows/</td></tr>

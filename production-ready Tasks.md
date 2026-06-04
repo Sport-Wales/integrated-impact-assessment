@@ -1,5 +1,7 @@
 production-ready Tasks
 
+LoginPage.jsx still references /images/sport-wales-logo.svg with the old base64 onError fallback. Should be updated to the GitHub raw URL like Header.
+
 Issue 1:
 Implementation Complete
 File 1: LoginPage.jsx (NEW)
