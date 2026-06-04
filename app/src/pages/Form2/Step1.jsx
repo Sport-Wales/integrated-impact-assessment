@@ -35,6 +35,28 @@ const Form2Step1 = () => {
     updateFormData({ [name]: value });
   };
 
+  // Save to DB as soon as a title is entered and the user clicks off the field.
+  // This is the first meaningful save — gives the assessment an identity before
+  // the user clicks Next. Silent fail: localStorage always has the data.
+  // Skipped if assessmentId already exists (DB record already created).
+  const handleTitleBlur = async () => {
+    if (!formState.title.trim() || formData.assessmentId) return;
+
+    const dataToSave = {
+      ...formData,
+      title: formState.title,
+    };
+
+    try {
+      const result = await apiService.saveAssessment(dataToSave);
+      if (result?.id) {
+        confirmDbSave(result.id);
+      }
+    } catch (err) {
+      console.warn('[TitleBlur] Early save failed. Data is safe in localStorage.', err.message);
+    }
+  };
+
   const handleNext = async () => {
     // Build updated data
     const updatedData = {
@@ -50,8 +72,9 @@ const Form2Step1 = () => {
     try {
       const result = await apiService.saveAssessment(dataToSave);
       
-      // Store returned ID on first save
-      if (!formData.assessmentId && result?.id) {
+      // Use dataToSave.assessmentId (committed snapshot) not formData.assessmentId
+      // (stale closure) — prevents duplicate INSERT if blur save already ran.
+      if (!dataToSave.assessmentId && result?.id) {
         confirmDbSave(result.id);
       }
     } catch (err) {
@@ -86,6 +109,7 @@ const Form2Step1 = () => {
         <div>
           <label htmlFor="title" className="block text-lg font-semibold mb-2">
             Give this assessment a title
+            {!isReadOnly && <span className="ml-2 pb-2 text-xs font-normal text-red-400">* Required</span>}
           </label>
           <input
             type="text"
@@ -93,6 +117,7 @@ const Form2Step1 = () => {
             name="title"
             value={formState.title}
             onChange={handleChange}
+            onBlur={handleTitleBlur}
             readOnly={isReadOnly}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg"
             required

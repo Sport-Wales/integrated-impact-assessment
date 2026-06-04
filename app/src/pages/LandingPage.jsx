@@ -58,7 +58,7 @@ const LandingPage = () => {
     }
 
     const rows = Object.values(store)
-      .filter(local => !!local?.formType)
+      .filter(local => !!local?.formType && !!local?.title?.trim())
       .map(local => ({
         id:           local.assessmentId || local.localId,
         title:        local.title     || '',
@@ -260,13 +260,15 @@ const LandingPage = () => {
                     {assessment.user_role === 'owner' && !assessment.signed_off_at ? (
                       <div className="flex items-center justify-center gap-3">
 
-                        {/* Share button */}
-                        <button
-                          onClick={() => setShareModalId(assessment.id)}
-                          className="text-xs text-[--color-sw-blue] hover:text-cyan-700 font-medium transition-colors"
-                        >
-                          Share
-                        </button>
+                        {/* Share button — only shown for DB-backed assessments (real UUID) */}
+                        {!assessment.id?.startsWith('local_') && (
+                          <button
+                            onClick={() => setShareModalId(assessment.id)}
+                            className="text-xs text-[--color-sw-blue] hover:text-cyan-700 font-medium transition-colors"
+                          >
+                            Share
+                          </button>
+                        )}
 
                         {/* Delete — confirm/cancel inline, or default delete link */}
                         {confirmDeleteId === assessment.id ? (
