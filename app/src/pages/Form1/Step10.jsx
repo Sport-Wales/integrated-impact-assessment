@@ -47,7 +47,21 @@ const Form1Step10 = () => {
 				confirmDbSave(result.id);
 			}
 		} catch (err) {
-			console.warn('[AutoSave] Step9 DB save failed. Data is safe in localStorage.', err.message);
+			console.warn('[AutoSave] Step10 DB save failed. Data is safe in localStorage.', err.message);
+		}
+
+		// Write reviewedAt directly to localStorage before navigating —
+		// same pattern as sign-off in AssessmentDocument to avoid race condition.
+		const localId = formData.localId;
+		if (localId) {
+			try {
+				const raw = localStorage.getItem('iia_assessments');
+				const store = raw ? JSON.parse(raw) : {};
+				if (store[localId]) {
+					store[localId] = { ...store[localId], reviewedAt: new Date().toISOString() };
+					localStorage.setItem('iia_assessments', JSON.stringify(store));
+				}
+			} catch { /* safe to ignore */ }
 		}
 
 		navigate('/');

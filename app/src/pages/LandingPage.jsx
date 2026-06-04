@@ -69,6 +69,7 @@ const LandingPage = () => {
         updated_at:   local.lastSavedAt || null,   // updated by writeAssessmentToStore on every save
         completed_at:  (local.status === 'complete' || local.status === 'signed_off') ? (local.lastSavedAt || true) : null,
         signed_off_at: local.status === 'signed_off' ? (local.lastSavedAt || true) : null,
+        reviewed_at:   local.reviewedAt || null,
         _isLocalOnly:  true,
         _localId:      local.localId,
       }));
@@ -84,9 +85,17 @@ const LandingPage = () => {
 
 
 
-  // Open an existing assessment — loads it into FormContext then navigates
-  const handleOpenAssessment = async (assessment) => {
+  // Open an existing assessment — loads it into FormContext then navigates.
+  // Optional destination param lets the Review column navigate to a specific step
+  // without changing the default behaviour for every other row click.
+  const handleOpenAssessment = async (assessment, destination = null) => {
     const { id, form_type, status, _isLocalOnly, _localId } = assessment;
+
+    // Determine default destination based on status if none explicitly provided
+    const defaultDest = (status === ASSESSMENT_STATUS.COMPLETE || status === ASSESSMENT_STATUS.SIGNED_OFF)
+      ? (form_type === 'form1' ? '/form1/step9' : '/form2/step3')
+      : (form_type === 'form1' ? '/form1/step1' : '/form2/step1');
+    const target = destination || defaultDest;
 
     // Local-only row: load the specific assessment from the store into FormContext,
     // then navigate. We must explicitly load it in case another form was active.
@@ -107,11 +116,7 @@ const LandingPage = () => {
       } catch {
         // Corrupted entry — navigate anyway, FormContext already has something loaded
       }
-      if (status === ASSESSMENT_STATUS.COMPLETE || status === ASSESSMENT_STATUS.SIGNED_OFF) {
-        navigate(form_type === 'form1' ? '/form1/step9' : '/form2/step3');
-      } else {
-        navigate(form_type === 'form1' ? '/form1/step1' : '/form2/step1');
-      }
+      navigate(target);
       return;
     }
 
@@ -120,12 +125,7 @@ const LandingPage = () => {
     try {
       const data = await apiService.getAssessment(id);
       loadAssessment(data);
-      // Completed or signed-off assessments go straight to the sign-off step
-      if (status === ASSESSMENT_STATUS.COMPLETE || status === ASSESSMENT_STATUS.SIGNED_OFF) {
-        navigate(form_type === 'form1' ? '/form1/step9' : '/form2/step3');
-      } else {
-        navigate(form_type === 'form1' ? '/form1/step1' : '/form2/step1');
-      }
+      navigate(target);
     } catch (err) {
       setError('Could not open that assessment. Please try again.');
     } finally {
@@ -221,6 +221,7 @@ const LandingPage = () => {
                 <th className="text-center px-4 py-3 font-semibold text-gray-700">Role</th>
                 <th className="text-center px-4 py-3 font-semibold text-gray-700">Complete</th>
                 <th className="text-center px-4 py-3 font-semibold text-gray-700">Sign Off</th>
+                <th className="text-center px-4 py-3 font-semibold text-gray-700">Review</th>
                 <th className="text-center px-4 py-3 font-semibold text-gray-700">Actions</th>
               </tr>
             </thead>
@@ -259,6 +260,29 @@ const LandingPage = () => {
                     {assessment.signed_off_at
                       ? <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500"><svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg></span>
                       : <span className="text-gray-300">—</span>}
+                  </td>
+
+                  {/* Review column — blank until signed off, then clickable "Review" in SW Blue,
+                      then "Reviewed" in SW Green once the review step has been completed */}
+                  <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                    {!assessment.signed_off_at ? (
+                      <span className="text-gray-300">—</span>
+                    ) : assessment.reviewed_at ? (
+                      <span className="text-xs font-semibold" style={{ color: 'var(--color-sw-green)' }}>
+                        Reviewed
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => handleOpenAssessment(
+                          assessment,
+                          assessment.form_type === 'form1' ? '/form1/step10' : '/form2/step4'
+                        )}
+                        className="text-xs font-semibold hover:underline transition-colors"
+                        style={{ color: 'var(--color-sw-blue)' }}
+                      >
+                        Review
+                      </button>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
                     {assessment.user_role === 'owner' && !assessment.signed_off_at ? (

@@ -1,12 +1,3 @@
-great before we do another task lets fix the landing page., we have the table with the user assessments.  we have the complete and the sign off what we are missing is the Review. it should be next to the sign off and instead of a click  it will be blank until the form is signed off. once the form is sign off it will say review, in the sw blue, once the review is complete it will then say reviewed in sw green.  you can also click on it to go to the review page (depending if its a short form 1 or form 2)
-
-
-
-
-
-
-
-
 production-ready Tasks
 
 Issue 1:
