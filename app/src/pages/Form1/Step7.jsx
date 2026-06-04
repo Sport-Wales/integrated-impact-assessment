@@ -73,48 +73,13 @@ const Form1Step7 = () => {
 		navigate('/form1/step8');
 	};
 
-	const handleStepClick = (stepIndex) => {
-		// Navigate to the appropriate step
-		switch (stepIndex) {
-			case 0:
-				navigate('/form1/step1');
-				break;
-			case 1:
-				navigate('/form1/step2');
-				break;
-			case 2:
-				navigate('/form1/step3');
-				break;
-			case 3:
-				navigate('/form1/step4');
-				break;
-			case 4:
-				navigate('/form1/step5');
-				break;
-			case 5:
-				navigate('/form1/step6');
-				break;
-			case 6:
-				navigate('/form1/step7');
-				break;
-			case 7:
-				navigate('/form1/step8');
-				break;
-			case 8:
-				navigate('/form1/step9');
-				break;
-			default:
-				break;
-		}
-	};
-
 	return (
 		<div className="max-w-4xl mx-auto px-4 py-12">
 			<ProgressBar
 				steps={form1Steps}
 				currentStep={6}
 				completedSteps={formData.completedSteps?.form1 || []}
-				onStepClick={handleStepClick}
+				formType={formData.formType}
 			/>
 
 			<h2 className="text-3xl font-bold mb-8">

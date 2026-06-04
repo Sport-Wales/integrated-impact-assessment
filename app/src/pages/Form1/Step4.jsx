@@ -57,40 +57,6 @@ const Form1Step4 = () => {
 		navigate('/form1/step5');
 	};
 
-	const handleStepClick = (stepIndex) => {
-		switch (stepIndex) {
-			case 0:
-				navigate('/form1/step1');
-				break;
-			case 1:
-				navigate('/form1/step2');
-				break;
-			case 2:
-				navigate('/form1/step3');
-				break;
-			case 3:
-				navigate('/form1/step4');
-				break;
-			case 4:
-				navigate('/form1/step5');
-				break;
-			case 5:
-				navigate('/form1/step6');
-				break;
-			case 6:
-				navigate('/form1/step7');
-				break;
-			case 7:
-				navigate('/form1/step8');
-				break;
-			case 8:
-				navigate('/form1/step9');
-				break;
-			default:
-				break;
-		}
-	};
-
 	const wellBeingGoals = [
 		{ label: 'Prosperity', description: 'Good jobs, fair pay, low carbon impact.' },
 		{ label: 'Resilience', description: 'Strong environment and nature.' },
@@ -126,7 +92,7 @@ const Form1Step4 = () => {
 				steps={form1Steps}
 				currentStep={3}
 				completedSteps={formData.completedSteps?.form1 || []}
-				onStepClick={handleStepClick}
+				formType={formData.formType}
 			/>
 
 			<h2 className="text-3xl font-bold mb-8">

@@ -3,12 +3,15 @@
 // The Workspace is now the main home page for logged-in users.
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useFormContext } from '../context/FormContext';
 
 const IntroPage = () => {
 	const navigate = useNavigate();
+	const { resetFormData } = useFormContext();
 	const [showWhySection, setShowWhySection] = useState(false);
 
 	const handleStart = () => {
+		resetFormData();
 		navigate('/form-selection');
 	};
 

@@ -56,31 +56,13 @@ const Form2Step3 = () => {
     navigate('/');
   };
 
-  // Handle clicking on a step in the progress bar
-  const handleStepClick = (stepIndex) => {
-    // Navigate to the appropriate step
-    switch(stepIndex) {
-      case 0:
-        navigate('/form2/step1');
-        break;
-      case 1:
-        navigate('/form2/step2');
-        break;
-      case 2:
-        // Current step - do nothing
-        break;
-      default:
-        break;
-    }
-  };
-
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
       <ProgressBar 
         steps={form2Steps} 
         currentStep={2} 
         completedSteps={formData.completedSteps?.form2 || []} 
-        onStepClick={handleStepClick} 
+        formType={formData.formType}
       />
 
       <h2 className="text-3xl font-bold mb-8">

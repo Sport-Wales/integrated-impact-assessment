@@ -79,7 +79,7 @@ const LandingPage = () => {
   // Start a brand-new assessment — clears any in-progress form data
   const handleStartNew = () => {
     resetFormData();
-    navigate('/Intro');
+    navigate('/intro');
   };
 
 
@@ -178,7 +178,7 @@ const LandingPage = () => {
           onClick={handleStartNew}
           className="inline-flex items-center px-5 py-2 rounded-md text-sm bg-[--color-sw-blue] text-white font-medium hover:bg-cyan-700 transition-colors duration-200"
         >
-          + Start New Assessment
+          <span className="text-xl mr-2">+</span> Start New Assessment
         </button>
       </div>
 

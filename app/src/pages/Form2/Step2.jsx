@@ -72,24 +72,6 @@ const Form2Step2 = () => {
     navigate(`/assessment/${idToUse}/document`);
   };
 
-  // Handle clicking on a step in the progress bar
-  const handleStepClick = (stepIndex) => {
-    // Navigate to the appropriate step
-    switch(stepIndex) {
-      case 0:
-        navigate('/form2/step1');
-        break;
-      case 1:
-        // Current step - do nothing
-        break;
-      case 2:
-        navigate('/form2/step3');
-        break;
-      default:
-        break;
-    }
-  };
-
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
       {/* Progress Bar */}
@@ -97,7 +79,7 @@ const Form2Step2 = () => {
         steps={form2Steps} 
         currentStep={1} 
         completedSteps={formData.completedSteps?.form2 || []} 
-        onStepClick={handleStepClick} 
+        formType={formData.formType}
       />
 
       <h2 className="text-3xl font-bold mb-8">
