@@ -1,6 +1,7 @@
 // src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
+import LoginPage from './pages/LoginPage';
 import LandingPage from './pages/LandingPage';
 import IntroPage from './pages/IntroPage';
 import FormSelection from './pages/FormSelection';
@@ -25,13 +26,34 @@ import Form2Step3 from './pages/Form2/Step3';
 
 // Context Providers
 import { FormProvider } from './context/FormContext';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
+
+// Auth gate — sits inside AuthProvider so it can read auth state.
+// Shows loading spinner or login page before the app renders.
+const AuthGate = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-[--color-sw-blue]">
+        <p className="text-white text-lg">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
+
+  return children;
+};
 
 function App() {
   return (
     <AuthProvider>
-      <FormProvider>
-        <Router>
+      <AuthGate>
+        <FormProvider>
+          <Router>
           <div className="min-h-screen flex flex-col">
             <Header />
             <main className="flex-grow">
@@ -60,8 +82,9 @@ function App() {
               </Routes>
             </main>
           </div>
-        </Router>
-      </FormProvider>
+          </Router>
+        </FormProvider>
+      </AuthGate>
     </AuthProvider>
   );
 }

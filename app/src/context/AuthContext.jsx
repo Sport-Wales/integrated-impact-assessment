@@ -22,6 +22,16 @@ export const AuthProvider = ({ children }) => {
       // Use mock auth for pure local development
       if (useMockAuth) {
         console.log('[Auth] Using mock authentication');
+
+        // If user explicitly logged out, respect that — don't auto-login
+        const isLoggedOut = localStorage.getItem('iia_user_logged_out') === 'true';
+        if (isLoggedOut) {
+          console.log('[Auth] User has logged out — staying logged out');
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+
         setUser({
           userId: 'LOCAL_DEV_USER',
           userDetails: 'Dev User',
@@ -61,8 +71,8 @@ export const AuthProvider = ({ children }) => {
 
   const login = () => {
     if (useMockAuth) {
-      // Mock login — just set the user directly
       console.log('[Auth] Mock login triggered');
+      localStorage.removeItem('iia_user_logged_out');
       setUser({
         userId: 'LOCAL_DEV_USER',
         userDetails: 'Dev User',
@@ -76,8 +86,8 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     if (useMockAuth) {
-      // Mock logout — clear the user
       console.log('[Auth] Mock logout triggered');
+      localStorage.setItem('iia_user_logged_out', 'true');
       setUser(null);
     } else {
       // Real Azure logout
