@@ -1,46 +1,72 @@
 // src/pages/LoginPage.jsx
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
   const { login } = useAuth();
+  const [email, setEmail]       = useState('');
+  const [password, setPassword] = useState('');
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[--color-sw-blue]">
-      <div className="text-center px-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Full-bleed background image */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: "url('/images/login_image.webp')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      />
+
+      {/* Login card */}
+      <div className="relative z-10 bg-white px-10 py-10 w-full max-w-md mx-4">
         {/* Sport Wales Logo */}
-        <div className="mb-8">
+        <div className="flex justify-center mb-6">
           <img
-            src="/images/sport-wales-logo.svg"
+            src="https://raw.githubusercontent.com/Sport-Wales/sport-wales-design-assets/main/logos/Sport_Wales_Logo_Red.png"
             alt="Sport Wales"
-            className="h-16 mx-auto brightness-0 invert"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgNTAiPjx0ZXh0IHg9IjEwIiB5PSIzMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE2IiBmaWxsPSIjZmZmZmZmIj5TcG9ydCBXYWxlczwvdGV4dD48L3N2Zz4=';
-            }}
+            className="h-20"
           />
         </div>
 
-        {/* Title */}
-        <h1 className="text-3xl font-extrabold text-white mb-3">
-          Integrated Impact Assessment
+        {/* Heading */}
+        <h1 className="text-xl font-semibold text-gray-900 mb-6">
+          Sign in with your email address
         </h1>
-        <p className="text-white/70 mb-10 text-lg">
-          Log in with your Sport Wales account to continue.
-        </p>
 
-        {/* Login Button */}
+        {/* Email field */}
+        <div className="mb-4">
+          <input
+            type="email"
+            placeholder="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded text-gray-800 text-sm focus:outline-none focus:border-blue-500"
+          />
+        </div>
+
+        {/* Password field */}
+        <div className="mb-3">
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded text-gray-800 text-sm focus:outline-none focus:border-blue-500"
+          />
+        </div>
+
+        {/* Sign in button — calls login() regardless of field values for now */}
         <button
           onClick={login}
-          className="inline-flex items-center px-8 py-3 rounded-md text-base font-semibold bg-white text-[--color-sw-blue] hover:bg-gray-100 transition-colors duration-200 shadow-lg"
+          className="w-full py-3 mt-3 bg-[#0067b8] hover:bg-[#005a9e] text-white text-sm font-semibold rounded transition-colors duration-200 mb-4"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" viewBox="0 0 23 23" fill="none">
-            <path fill="#f35325" d="M1 1h10v10H1z"/>
-            <path fill="#81bc06" d="M12 1h10v10H12z"/>
-            <path fill="#05a6f0" d="M1 12h10v10H1z"/>
-            <path fill="#ffba08" d="M12 12h10v10H12z"/>
-          </svg>
-          Log in with Microsoft
+          Sign in
         </button>
+
+
       </div>
     </div>
   );
