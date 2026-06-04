@@ -5,8 +5,9 @@ import ShareModal from './ShareModal';
 
 const ShareButton = ({ isOwner }) => {
   const { formData, updateFormData } = useFormContext();
-  const [showModal, setShowModal] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [showModal, setShowModal]   = useState(false);
+  const [saving, setSaving]         = useState(false);
+  const [resolvedId, setResolvedId] = useState(null);
 
   // Only the owner can share
   if (!isOwner) return null;
@@ -15,20 +16,21 @@ const ShareButton = ({ isOwner }) => {
   if (!formData.formType) return null;
 
   const handleClick = async () => {
-    // If already saved to DB, open modal immediately
+    // Path A: already saved to DB — capture ID directly, open immediately
     if (formData.assessmentId) {
+      setResolvedId(formData.assessmentId);
       setShowModal(true);
       return;
     }
 
-    // Not yet in DB — attempt a save first so we have a real assessmentId.
-    // If the backend is unavailable, skip silently and still open the modal
-    // (sharing won't work until backend is live, but the button stays usable).
+    // Path B: not yet in DB — pre-save first, capture the returned ID directly
+    // so the modal never receives a stale null from formData's render cycle.
     setSaving(true);
     try {
       const result = await apiService.saveAssessment(formData);
       if (result?.id) {
-        updateFormData({ assessmentId: result.id });
+        updateFormData({ assessmentId: result.id }); // keep FormContext in sync
+        setResolvedId(result.id);                    // capture fresh — guaranteed stable
       }
     } catch (err) {
       console.warn('[ShareButton] Pre-save before share failed (backend not available):', err.message);
@@ -65,10 +67,14 @@ const ShareButton = ({ isOwner }) => {
         {saving ? 'Saving...' : 'Share'}
       </button>
 
+      {/* resolvedId is set when the assessment exists in DB.
+          When backend is unavailable (local dev), resolvedId stays null
+          but we still open the modal so the UI remains usable. */}
       {showModal && (
         <ShareModal
-          assessmentId={formData.assessmentId}
-          onClose={() => setShowModal(false)}
+          assessmentId={resolvedId}
+          onClose={() => { setShowModal(false); setResolvedId(null); }}
+          shareUrl={window.location.href}
         />
       )}
     </>

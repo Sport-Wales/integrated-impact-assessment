@@ -32,14 +32,10 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <div className="flex items-center">
           <Link to="/">
-            <img 
-              src="/images/sport-wales-logo.svg" 
-              alt="Sport Wales" 
-              className="h-10"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgNTAiPjx0ZXh0IHg9IjEwIiB5PSIzMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE2IiBmaWxsPSIjRTMyNDM0Ij5TcG9ydCBXYWxlczwvdGV4dD48L3N2Zz4=';
-              }}
+            <img
+              src="https://raw.githubusercontent.com/Sport-Wales/sport-wales-design-assets/main/logos/Sport_Wales_Logo_Red.png"
+              alt="Sport Wales"
+              className="h-16 w-auto"
             />
           </Link>
           <Link to="/" className="ml-4 text-xl font-bold text-sw-blue hover:opacity-80 transition-opacity duration-200">
