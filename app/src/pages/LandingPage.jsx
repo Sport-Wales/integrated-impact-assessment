@@ -210,10 +210,10 @@ const LandingPage = () => {
 
       {/* Assessments table */}
       {!loading && assessments.length > 0 && (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
+            <thead>
+              <tr className="border-b-2 border-gray-200">
                 <th className="text-left px-4 py-3 font-semibold text-gray-700">Title</th>
                 <th className="text-left px-4 py-3 font-semibold text-gray-700">Type</th>
                 <th className="text-left px-4 py-3 font-semibold text-gray-700">Created</th>
