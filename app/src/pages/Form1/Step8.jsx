@@ -84,7 +84,7 @@ const Form1Step8 = () => {
 
     // 3. Navigate. local_ ids are fine — the document page reads localStorage.
     setIsCompleting(false);
-    navigate(`/assessment/${idToUse}/document`);
+    navigate('/form1/step9');
   };
 
   return (

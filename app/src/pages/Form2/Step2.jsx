@@ -69,7 +69,7 @@ const Form2Step2 = () => {
     }
 
     setIsCompleting(false);
-    navigate(`/assessment/${idToUse}/document`);
+    navigate('/form2/step3');
   };
 
   return (

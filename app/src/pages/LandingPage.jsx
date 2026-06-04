@@ -107,7 +107,11 @@ const LandingPage = () => {
       } catch {
         // Corrupted entry — navigate anyway, FormContext already has something loaded
       }
-      navigate(form_type === 'form1' ? '/form1/step1' : '/form2/step1');
+      if (status === ASSESSMENT_STATUS.COMPLETE || status === ASSESSMENT_STATUS.SIGNED_OFF) {
+        navigate(form_type === 'form1' ? '/form1/step9' : '/form2/step3');
+      } else {
+        navigate(form_type === 'form1' ? '/form1/step1' : '/form2/step1');
+      }
       return;
     }
 
@@ -116,9 +120,9 @@ const LandingPage = () => {
     try {
       const data = await apiService.getAssessment(id);
       loadAssessment(data);
-      // Completed or signed-off assessments go straight to the document view
+      // Completed or signed-off assessments go straight to the sign-off step
       if (status === ASSESSMENT_STATUS.COMPLETE || status === ASSESSMENT_STATUS.SIGNED_OFF) {
-        navigate(`/assessment/${id}/document`);
+        navigate(form_type === 'form1' ? '/form1/step9' : '/form2/step3');
       } else {
         navigate(form_type === 'form1' ? '/form1/step1' : '/form2/step1');
       }

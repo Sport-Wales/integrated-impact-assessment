@@ -17,12 +17,14 @@ import Form1Step5 from './pages/Form1/Step5';
 import Form1Step6 from './pages/Form1/Step6';
 import Form1Step7 from './pages/Form1/Step7';
 import Form1Step8 from './pages/Form1/Step8';
-import Form1Step9 from './pages/Form1/Step9';
+import Form1Step9  from './pages/Form1/Step9';
+import Form1Step10 from './pages/Form1/Step10';
 
 // Form 2 Components
 import Form2Step1 from './pages/Form2/Step1';
 import Form2Step2 from './pages/Form2/Step2';
 import Form2Step3 from './pages/Form2/Step3';
+import Form2Step4 from './pages/Form2/Step4';
 
 // Context Providers
 import { FormProvider } from './context/FormContext';
@@ -73,12 +75,14 @@ function App() {
                 <Route path="/form1/step6" element={<Form1Step6 />} />
                 <Route path="/form1/step7" element={<Form1Step7 />} />
                 <Route path="/form1/step8" element={<Form1Step8 />} />
-                <Route path="/form1/step9" element={<Form1Step9 />} />
+                <Route path="/form1/step9"  element={<Form1Step9 />} />
+                <Route path="/form1/step10" element={<Form1Step10 />} />
                 
                 {/* Form 2 Routes */}
                 <Route path="/form2/step1" element={<Form2Step1 />} />
                 <Route path="/form2/step2" element={<Form2Step2 />} />
                 <Route path="/form2/step3" element={<Form2Step3 />} />
+                <Route path="/form2/step4" element={<Form2Step4 />} />
               </Routes>
             </main>
           </div>
