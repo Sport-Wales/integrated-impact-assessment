@@ -290,9 +290,12 @@ export const FormProvider = ({ children }) => {
   // For local-only rows: dbResponse.id is the localId (e.g. 'local_abc123'), assessmentId is null.
   // Spread order is critical: DB column values always override stale form_data values.
   const loadAssessment = (dbResponse) => {
-    const realAssessmentId = dbResponse.form_data?.assessmentId || null;
-    // Use the real DB UUID if available; otherwise fall back to the localId passed as id.
-    const activeLocalId = realAssessmentId || dbResponse.id;
+    // For DB-backed rows: dbResponse.id is the real UUID — use it directly as assessmentId.
+    // For local-only rows: dbResponse.id is the local_ prefixed key — assessmentId stays null.
+    // We can't rely on form_data.assessmentId because saveAssessment strips it before storage.
+    const isDbBacked = dbResponse.id && !String(dbResponse.id).startsWith('local_');
+    const realAssessmentId = isDbBacked ? dbResponse.id : null;
+    const activeLocalId = dbResponse.id;
     const loaded = {
       ...getInitialState(),
       ...dbResponse.form_data,
