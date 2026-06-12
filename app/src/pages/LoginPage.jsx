@@ -21,7 +21,7 @@ const LoginPage = () => {
       />
 
       {/* Login card */}
-      <div className="relative z-10 bg-white px-10 py-10 w-full max-w-md mx-4">
+      <div className="relative z-10 bg-white px-10 py-10 w-full max-w-md mx-4 rounded">
         {/* Sport Wales Logo */}
         <div className="flex justify-center mb-6">
           <img
