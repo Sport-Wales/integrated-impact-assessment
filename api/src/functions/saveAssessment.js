@@ -57,6 +57,19 @@ app.http('saveAssessment', {
       status,
       completedSteps,
       reviewedAt,         // set by Step10/Form2Step4 — maps to reviewed_at column
+      // Strip these extra fields that come from DB responses — never store back into form_data
+      id:           _id,
+      form_type:    _ftype,
+      lead_name:    _ln,
+      created_at:   _cat,
+      updated_at:   _uat,
+      completed_at: _coat,
+      signed_off_at:_soat,
+      signed_off_by:_sob,
+      reviewed_at:  _rat,
+      user_role:    _urol,
+      form_data:    _fd,
+      completed_steps: _cs,
       ...cleanFormData    // everything else — the actual form field answers
     } = body;
 
