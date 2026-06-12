@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backend API Reference — IIA Portal</title>
+<style>
+  :root {
+    --sw-red:        #e32434;
+    --sw-blue:       #164b64;
+    --sw-green:      #299d91;
+    --sw-yellow:     #f6b207;
+    --sw-blue-dark:  #001830;
+    --sw-blue-light: #e8f4f8;
+    --sw-light:      #f4f5f7;
+    --sw-white:      #ffffff;
+    --font:          "Montserrat", Arial, sans-serif;
+    --radius:        8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); font-size: 15px; line-height: 1.65; color: #1a1a1a; background: #f9f9f9; }
+  .hdr { background: var(--sw-blue); color: white; padding: 2rem 2.5rem; border-bottom: 4px solid var(--sw-red); }
+  .hdr .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 0.4rem; }
+  .hdr h1 { font-size: 1.75rem; font-weight: 800; line-height: 1.15; margin-bottom: 0.5rem; }
+  .hdr .sub { font-size: 0.875rem; color: rgba(255,255,255,0.7); margin-bottom: 1rem; }
+  .badge { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--sw-green); color: white; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 0.3rem 0.75rem; border-radius: 20px; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 2.5rem 2rem 5rem; }
+  .block { background: white; border: 1px solid #e2e2e8; border-radius: var(--radius); margin-bottom: 2.5rem; overflow: hidden; }
+  .block-hdr { display: flex; align-items: center; gap: 1rem; padding: 1.1rem 1.5rem; background: var(--sw-blue); color: white; }
+  .block-tag { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.65; white-space: nowrap; }
+  .block-title { font-size: 1rem; font-weight: 800; flex: 1; }
+  .block-body { padding: 1.5rem; }
+  .section { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid #eee; }
+  .section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .section-title { font-size: 0.95rem; font-weight: 700; color: var(--sw-blue); margin-bottom: 0.75rem; }
+  p { margin-bottom: 0.75rem; color: #333; font-size: 0.9rem; }
+  p:last-child { margin-bottom: 0; }
+  ul.bullets { margin: 0.5rem 0 0.75rem 1.4rem; }
+  ul.bullets li { margin-bottom: 0.35rem; color: #333; font-size: 0.9rem; list-style: disc; }
+  pre { background: #1e1e2e; color: #cdd6f4; font-family: "Courier New", Courier, monospace; font-size: 0.8rem; line-height: 1.6; border-radius: var(--radius); padding: 1.1rem 1.25rem; overflow-x: auto; margin: 0.75rem 0; border-left: 3px solid var(--sw-blue); }
+  code { font-family: "Courier New", Courier, monospace; font-size: 0.82rem; background: #eef2f7; color: var(--sw-blue); padding: 0.1rem 0.35rem; border-radius: 3px; }
+  pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+  .callout { border-radius: var(--radius); padding: 0.85rem 1.1rem; margin: 0.75rem 0; font-size: 0.875rem; }
+  .callout-label { font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 0.3rem; }
+  .callout.info { background: var(--sw-blue-light); border-left: 4px solid var(--sw-blue); }
+  .callout.info .callout-label { color: var(--sw-blue); }
+  .callout.warning { background: #fff8e1; border-left: 4px solid var(--sw-yellow); }
+  .callout.warning .callout-label { color: #a77b00; }
+  .callout.success { background: #f0fdf4; border-left: 4px solid var(--sw-green); }
+  .callout.success .callout-label { color: var(--sw-green); }
+  .callout.security { background: #fef2f2; border-left: 4px solid var(--sw-red); }
+  .callout.security .callout-label { color: var(--sw-red); }
+  table.t { width: 100%; border-collapse: collapse; font-size: 0.875rem; margin: 0.75rem 0; }
+  table.t th { background: var(--sw-light); font-weight: 700; text-align: left; padding: 0.5rem 0.75rem; border-bottom: 2px solid #ddd; font-size: 0.8rem; color: #444; }
+  table.t td { padding: 0.45rem 0.75rem; border-bottom: 1px solid #eee; vertical-align: top; font-size: 0.875rem; }
+  table.t tr:last-child td { border-bottom: none; }
+  table.t td code { font-size: 0.78rem; }
+  .fn-card { background: var(--sw-light); border-radius: var(--radius); margin-bottom: 1.5rem; overflow: hidden; border: 1px solid #e2e2e8; }
+  .fn-card:last-child { margin-bottom: 0; }
+  .fn-card-hdr { display: flex; align-items: center; gap: 0.75rem; padding: 0.8rem 1.1rem; background: var(--sw-blue-dark); color: white; }
+  .fn-method { font-size: 10px; font-weight: 800; letter-spacing: 1px; padding: 0.2rem 0.55rem; border-radius: 4px; background: var(--sw-green); color: white; }
+  .fn-method.post { background: var(--sw-red); }
+  .fn-name { font-family: "Courier New", monospace; font-size: 0.9rem; font-weight: 700; flex: 1; }
+  .fn-desc { font-size: 0.8rem; color: rgba(255,255,255,0.65); }
+  .fn-body { padding: 1rem 1.1rem; }
+  .fn-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; font-size: 0.85rem; align-items: flex-start; }
+  .fn-row-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #888; width: 80px; flex-shrink: 0; padding-top: 2px; }
+  .fn-row-val { color: #333; flex: 1; }
+  .perm-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin: 0.5rem 0; }
+  .perm-table th { background: var(--sw-blue); color: white; padding: 0.4rem 0.65rem; text-align: left; font-size: 0.75rem; }
+  .perm-table td { padding: 0.35rem 0.65rem; border-bottom: 1px solid #eee; }
+  .perm-table tr:last-child td { border-bottom: none; }
+  .perm-table tr:nth-child(even) td { background: #fafafa; }
+  .tick { color: var(--sw-green); font-weight: 700; }
+  .cross { color: var(--sw-red); font-weight: 700; }
+  .db-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin: 0.75rem 0; }
+  .db-table th { background: var(--sw-blue); color: white; padding: 0.45rem 0.75rem; text-align: left; font-size: 0.78rem; }
+  .db-table td { padding: 0.4rem 0.75rem; border-bottom: 1px solid #eee; vertical-align: top; }
+  .db-table tr:last-child td { border-bottom: none; }
+  .db-table tr:nth-child(even) td { background: #fafafa; }
+  .db-table td:first-child { font-family: "Courier New", monospace; color: var(--sw-blue); font-weight: 700; font-size: 0.78rem; }
+  .db-table td:nth-child(2) { font-family: "Courier New", monospace; color: #666; font-size: 0.78rem; }
+  .arch { background: #1e1e2e; color: #cdd6f4; font-family: "Courier New", monospace; font-size: 0.8rem; line-height: 1.7; border-radius: var(--radius); padding: 1.1rem 1.25rem; margin: 0.75rem 0; border-left: 3px solid var(--sw-green); overflow-x: auto; white-space: pre; }
+  .file-tree { background: #1e1e2e; color: #cdd6f4; font-family: "Courier New", monospace; font-size: 0.8rem; line-height: 1.7; border-radius: var(--radius); padding: 1.1rem 1.25rem; margin: 0.75rem 0; overflow-x: auto; white-space: pre; border-left: 3px solid var(--sw-yellow); }
+  .ft-dir { color: #89b4fa; }
+  .ft-label { color: #6c7086; font-style: italic; }
+  .contents { max-width: 940px; margin: 0 auto; padding: 1.25rem 2rem 0; }
+  .contents-inner { background: white; border: 1px solid #e2e2e8; border-radius: 8px; padding: 0.9rem 1.5rem; }
+  .contents-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #888; display: block; margin-bottom: 0.5rem; }
+  .contents-inner ul { list-style: none; padding: 0; margin: 0; columns: 3; column-gap: 1.5rem; }
+  .contents-inner ul li { margin-bottom: 0.2rem; break-inside: avoid; }
+  .contents-inner ul li a { font-size: 0.72rem; color: var(--sw-blue); text-decoration: none; }
+  .contents-inner ul li a:hover { text-decoration: underline; }
+  .footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 2px solid var(--sw-red); font-size: 0.8rem; color: #888; text-align: center; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 0.75rem 0; }
+  @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+  .concept { background: var(--sw-light); border-radius: var(--radius); padding: 1rem 1.1rem; margin-bottom: 0.75rem; }
+  .concept-title { font-weight: 700; color: var(--sw-blue); font-size: 0.9rem; margin-bottom: 0.3rem; }
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="eyebrow">Sport Wales — Internal Developer Documentation</div>
+  <h1>Backend API Reference</h1>
+  <p class="sub">IIA Portal — Azure Functions, PostgreSQL Database, Auth, Permissions &amp; How to Scale</p>
+  <span class="badge">&#10003; Complete</span>
+</header>
+
+<nav class="contents">
+  <div class="contents-inner">
+    <span class="contents-label">Contents</span>
+    <ul>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#how-auth-works">How Auth Works</a></li>
+      <li><a href="#db-layer">Database Layer</a></li>
+      <li><a href="#schema">Database Schema</a></li>
+      <li><a href="#schema-example">Schema — Real Data Example</a></li>
+      <li><a href="#api-functions">API Functions Reference</a></li>
+      <li><a href="#permission-model">Permission Model</a></li>
+      <li><a href="#frontend-connection">Frontend Connection</a></li>
+      <li><a href="#data-flow">Data Flow — Save to DB</a></li>
+      <li><a href="#azure-infrastructure">Azure Infrastructure</a></li>
+      <li><a href="#env-vars">Environment Variables</a></li>
+      <li><a href="#adding-new-function">Adding a New Function</a></li>
+      <li><a href="#troubleshooting">Troubleshooting</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- OVERVIEW -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="overview">
+  <div class="block-hdr">
+    <span class="block-tag">Overview</span>
+    <span class="block-title">What the Backend Does</span>
+  </div>
+  <div class="block-body">
+    <p>The IIA Portal backend is a set of <strong>Azure Functions</strong> — small, self-contained Node.js functions that each handle one specific API request. They sit inside the <code>/api</code> folder and are deployed automatically alongside the React frontend as part of the Azure Static Web App (SWA).</p>
+    <p>There is no traditional server running continuously. Each function wakes up when a request comes in, runs for milliseconds, and stops. Azure manages all scaling, availability, and infrastructure automatically.</p>
+    <table class="t">
+      <tr><th>What it does</th><th>File</th></tr>
+      <tr><td>Save or update an assessment</td><td><code>api/src/functions/saveAssessment.js</code></td></tr>
+      <tr><td>Load a single assessment</td><td><code>api/src/functions/getAssessment.js</code></td></tr>
+      <tr><td>List all assessments for the workspace</td><td><code>api/src/functions/listAssessments.js</code></td></tr>
+      <tr><td>Mark an assessment complete</td><td><code>api/src/functions/completeAssessment.js</code></td></tr>
+      <tr><td>Sign off an assessment permanently</td><td><code>api/src/functions/signOffAssessment.js</code></td></tr>
+      <tr><td>Delete an assessment</td><td><code>api/src/functions/deleteAssessment.js</code></td></tr>
+      <tr><td>Share with a colleague</td><td><code>api/src/functions/shareAssessment.js</code></td></tr>
+      <tr><td>List who has access</td><td><code>api/src/functions/getPermissions.js</code></td></tr>
+      <tr><td>Remove a colleague's access</td><td><code>api/src/functions/removeShare.js</code></td></tr>
+      <tr><td>Health check (DB connectivity test)</td><td><code>api/src/functions/healthCheck.js</code></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- ARCHITECTURE -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="architecture">
+  <div class="block-hdr">
+    <span class="block-tag">Architecture</span>
+    <span class="block-title">How Everything Connects</span>
+  </div>
+  <div class="block-body">
+    <div class="arch">
+Browser (React App)
+        │
+        │  fetch('/api/saveAssessment', { method: 'POST', body: JSON })
+        ▼
+Azure Static Web App (SWA)
+        │
+        ├── /api/*  →  Routes to Azure Functions (backend)
+        └── /*      →  Serves React frontend from CDN
+                │
+                ▼
+        Azure Functions Runtime
+                │
+                ├── getUser(request)        ← reads x-ms-client-principal header
+                ├── db.query(sql, params)   ← sends parameterised SQL
+                │
+                ▼
+        Azure PostgreSQL Flexible Server
+                │
+                ├── assessments             ← one row per assessment
+                └── assessment_permissions  ← one row per shared access</div>
+
+    <div class="file-tree"><span class="ft-dir">api/</span>
+├── <span class="ft-dir">src/</span>
+│   ├── <span class="ft-dir">functions/</span>          <span class="ft-label">← one file per API endpoint</span>
+│   │   ├── saveAssessment.js
+│   │   ├── getAssessment.js
+│   │   ├── listAssessments.js
+│   │   ├── completeAssessment.js
+│   │   ├── signOffAssessment.js
+│   │   ├── deleteAssessment.js
+│   │   ├── shareAssessment.js
+│   │   ├── getPermissions.js
+│   │   ├── removeShare.js
+│   │   └── healthCheck.js
+│   ├── <span class="ft-dir">db/</span>
+│   │   ├── index.js                <span class="ft-label">← connection pool + db.query()</span>
+│   │   └── schema.sql              <span class="ft-label">← creates all tables and indexes</span>
+│   └── <span class="ft-dir">utils/</span>
+│       ├── getUser.js              <span class="ft-label">← extracts auth identity from SWA header</span>
+│       └── logger.js               <span class="ft-label">← context-aware logging</span>
+├── local.settings.json             <span class="ft-label">← local secrets — git-ignored, never committed</span>
+└── package.json</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- HOW AUTH WORKS -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="how-auth-works">
+  <div class="block-hdr">
+    <span class="block-tag">Authentication</span>
+    <span class="block-title">How the Backend Knows Who You Are</span>
+  </div>
+  <div class="block-body">
+    <p>Authentication is handled entirely by Azure SWA — the backend functions never touch passwords, tokens, or Microsoft login flows. By the time a request reaches a function, SWA has already verified the user's identity and injected it into the request as a header.</p>
+
+    <div class="section">
+      <div class="section-title">The x-ms-client-principal Header</div>
+      <p>On every authenticated request, SWA adds a header called <code>x-ms-client-principal</code>. It contains a base64-encoded JSON object with the user's identity from Azure AD. The <code>getUser.js</code> utility decodes this header and returns a simple object:</p>
+      <pre><code>// What getUser() returns
+{
+  userId:    "abc123def456...",          // Azure AD Object ID — stable, never changes
+  userEmail: "anselm.powell@sport.wales" // always lowercased
+}</code></pre>
+      <p><code>userId</code> is used as <code>owner_id</code> in the database — it uniquely identifies a user even if their email changes. <code>userEmail</code> is used for sharing, display, and the <code>@sport.wales</code> validation.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Route Protection — staticwebapp.config.json</div>
+      <p>The <code>app/staticwebapp.config.json</code> file tells SWA to block all unauthenticated requests to <code>/api/*</code> before they ever reach a function:</p>
+      <pre><code>{
+  "routes": [
+    { "route": "/api/healthCheck", "allowedRoles": ["anonymous"] },
+    { "route": "/api/*",           "allowedRoles": ["authenticated"] }
+  ],
+  "responseOverrides": {
+    "401": { "statusCode": 302, "redirect": "/.auth/login/aad" }
+  }
+}</code></pre>
+      <p>If an unauthenticated request hits <code>/api/*</code>, SWA redirects to the Microsoft login page — the function never executes. This is why all functions set <code>authLevel: 'anonymous'</code> — they rely on SWA's routing layer, not Azure Functions' own auth.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Local Development Fallback</div>
+      <p>When running locally with <code>swa start</code>, SWA's auth header is not present. <code>getUser.js</code> detects this and returns a dummy user when <code>NODE_ENV=development</code>:</p>
+      <pre><code>// Only when NODE_ENV=development (set in local.settings.json)
+{ userId: 'LOCAL_DEV_USER', userEmail: 'dev.user@sport.wales' }</code></pre>
+      <div class="callout security">
+        <div class="callout-label">Security</div>
+        <p><code>NODE_ENV=development</code> is set only in <code>local.settings.json</code>, which is git-ignored and never committed. In production on Azure, this variable is not present — the fallback can never fire.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- DATABASE LAYER -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="db-layer">
+  <div class="block-hdr">
+    <span class="block-tag">Database Layer</span>
+    <span class="block-title">db/index.js — The Only Way Functions Touch the Database</span>
+  </div>
+  <div class="block-body">
+    <p>Every function accesses the database through one shared module: <code>api/src/db/index.js</code>. Functions never import database drivers directly — they call <code>db.query()</code> and get back an array of rows. This keeps every function simple and consistent.</p>
+
+    <div class="section">
+      <div class="section-title">How to Use It</div>
+      <pre><code>const db = require('../db');
+
+// SELECT — returns array of row objects
+const rows = await db.query(
+  'SELECT id, title FROM assessments WHERE owner_id = $1',
+  [user.userId]
+);
+// rows = [{ id: 'uuid...', title: 'Community Cycling' }, ...]
+
+// INSERT with RETURNING — get the new row's ID
+const result = await db.query(
+  'INSERT INTO assessments (owner_id, title) VALUES ($1, $2) RETURNING id',
+  [user.userId, 'My Assessment']
+);
+// result = [{ id: 'generated-uuid...' }]
+
+// UPDATE — returns empty array (no rows returned)
+await db.query(
+  'UPDATE assessments SET status = $1 WHERE id = $2',
+  ['complete', assessmentId]
+);</code></pre>
+      <div class="callout info">
+        <div class="callout-label">Always use parameters</div>
+        <p>Never build SQL strings with template literals (e.g. <code>`WHERE id = '${id}'`</code>). Always use <code>$1, $2, $3</code> placeholders with a params array. This prevents SQL injection attacks and is enforced across every existing function.</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Connection Pooling</div>
+      <p>The database connection pool is created once and reused across all function invocations on the same Azure Functions instance. This prevents the serverless function from opening a new database connection on every single request, which would quickly exhaust the database's connection limit.</p>
+      <p>The pool is configured with a maximum of 10 connections, a 30-second idle timeout, and a 10-second connection timeout. If the connection fails, the pool is cleared so the next call reconnects from scratch.</p>
+      <p>SSL is required for Azure PostgreSQL: <code>ssl: { rejectUnauthorized: false }</code> is set in the pool config. This encrypts the connection without requiring a CA certificate bundle to be bundled with the code.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- DATABASE SCHEMA -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="schema">
+  <div class="block-hdr">
+    <span class="block-tag">Database Schema</span>
+    <span class="block-title">Tables, Columns, and Indexes</span>
+  </div>
+  <div class="block-body">
+    <p>The schema is defined in <code>api/src/db/schema.sql</code>. There are two tables. The schema uses <code>CREATE TABLE IF NOT EXISTS</code> so it is safe to re-run — it will not destroy existing data.</p>
+
+    <div class="section">
+      <div class="section-title">Table 1 — assessments</div>
+      <p>One row per assessment. All form field answers are stored as a single JSONB column (<code>form_data</code>) rather than individual columns, because form questions evolve over time and JSONB is flexible without requiring schema migrations.</p>
+      <table class="db-table">
+        <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+        <tr><td>id</td><td>UUID</td><td>Primary key — generated automatically by the database using <code>gen_random_uuid()</code>. Never set by the frontend.</td></tr>
+        <tr><td>owner_id</td><td>TEXT</td><td>Azure AD object ID of the person who created the assessment. Used for ownership checks and listAssessments filtering.</td></tr>
+        <tr><td>owner_email</td><td>TEXT</td><td>Email address of the owner e.g. <code>anselm.powell@sport.wales</code>. Stored for display and sharing logic.</td></tr>
+        <tr><td>form_type</td><td>TEXT</td><td><code>form1</code> = Full IIA, <code>form2</code> = Short IIA. CHECK constraint enforces only these two values.</td></tr>
+        <tr><td>title</td><td>TEXT</td><td>Assessment title entered by the user in Step 1. Shown in the workspace table.</td></tr>
+        <tr><td>lead_name</td><td>TEXT</td><td>Lead person's name from Step 1. Stored as a column for quick display without parsing form_data.</td></tr>
+        <tr><td>status</td><td>TEXT</td><td><code>draft</code> → <code>complete</code> → <code>signed_off</code>. Forward-only — the backend prevents status from going backwards.</td></tr>
+        <tr><td>form_data</td><td>JSONB</td><td>All form field answers. Mirrors the FormContext shape. Only actual user answers — internal frontend fields are stripped before storage.</td></tr>
+        <tr><td>completed_steps</td><td>JSONB</td><td>Array of completed step indexes per form type: <code>{"form1": [0,1,2], "form2": []}</code>. Stored separately for progress bar reads.</td></tr>
+        <tr><td>created_at</td><td>TIMESTAMPTZ</td><td>Set automatically on INSERT. Never updated.</td></tr>
+        <tr><td>updated_at</td><td>TIMESTAMPTZ</td><td>Updated automatically by a database trigger on every UPDATE. No code needed in functions.</td></tr>
+        <tr><td>completed_at</td><td>TIMESTAMPTZ</td><td>Set by completeAssessment when the user marks the form done. Null until then.</td></tr>
+        <tr><td>signed_off_at</td><td>TIMESTAMPTZ</td><td>Set by signOffAssessment. Null until signed off.</td></tr>
+        <tr><td>signed_off_by</td><td>TEXT</td><td>The owner_id of whoever clicked Sign Off. Audit trail.</td></tr>
+        <tr><td>reviewed_at</td><td>TIMESTAMPTZ</td><td>Set by saveAssessment when Step 10 / Form2 Step 4 sends a <code>reviewedAt</code> value. Drives the Review column in the workspace.</td></tr>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Table 2 — assessment_permissions</div>
+      <p>One row per colleague who has been granted access to an assessment. The owner is not stored here — ownership is tracked on the <code>assessments</code> table. If an assessment is deleted, all its permission rows are automatically deleted by <code>CASCADE DELETE</code>.</p>
+      <table class="db-table">
+        <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+        <tr><td>id</td><td>UUID</td><td>Primary key.</td></tr>
+        <tr><td>assessment_id</td><td>UUID</td><td>Foreign key → assessments.id. ON DELETE CASCADE.</td></tr>
+        <tr><td>user_email</td><td>TEXT</td><td>Email of the person granted access e.g. <code>tara.rhoseyn@sport.wales</code>. Always stored lowercase.</td></tr>
+        <tr><td>role</td><td>TEXT</td><td><code>view</code> = read-only, <code>edit</code> = can save changes. CHECK constraint enforces these two values only.</td></tr>
+        <tr><td>granted_at</td><td>TIMESTAMPTZ</td><td>When this permission was created. Audit trail.</td></tr>
+      </table>
+      <div class="callout info">
+        <div class="callout-label">UNIQUE Constraint</div>
+        <p>There is a UNIQUE constraint on <code>(assessment_id, user_email)</code>. This prevents the same person being added twice and enables UPSERT — if you share with someone who already has access, <code>shareAssessment</code> updates their role instead of creating a duplicate row.</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Indexes</div>
+      <table class="t">
+        <tr><th>Index</th><th>Why it exists</th></tr>
+        <tr><td><code>idx_assessments_owner_id</code></td><td>listAssessments runs on every workspace load — this makes it instant</td></tr>
+        <tr><td><code>idx_assessments_status</code></td><td>Filtering by draft/complete/signed_off</td></tr>
+        <tr><td><code>idx_permissions_assessment_id</code></td><td>getPermissions — fetching all permissions for one assessment</td></tr>
+        <tr><td><code>idx_permissions_user_email</code></td><td>listAssessments shared query — finding assessments shared with this user</td></tr>
+        <tr><td>UNIQUE constraint</td><td>Acts as a 5th index on <code>(assessment_id, user_email)</code> automatically</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SCHEMA REAL DATA EXAMPLE -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="schema-example">
+  <div class="block-hdr">
+    <span class="block-tag">Real Data Example</span>
+    <span class="block-title">What the Database Actually Looks Like</span>
+  </div>
+  <div class="block-body">
+    <p>Two assessments created by Anselm. Assessment 1 is half-complete and shared with Paul (view access). Assessment 2 is signed off and shared with Tara (edit access), awaiting review.</p>
+
+    <div class="section">
+      <div class="section-title">assessments table</div>
+      <pre><code> id                                   | owner_email                    | form_type | title                       | status      | completed_at        | signed_off_at       | reviewed_at
+--------------------------------------+--------------------------------+-----------+-----------------------------+-------------+---------------------+---------------------+-------------
+ a1b2c3d4-0001-0001-0001-000000000001 | anselm.powell@sport.wales      | form1     | Community Cycling Programme | draft        | NULL                | NULL                | NULL
+ e5f6g7h8-0002-0002-0002-000000000002 | anselm.powell@sport.wales      | form1     | Active Travel Strategy      | signed_off   | 2026-06-15 09:30:00 | 2026-06-15 10:00:00 | NULL</code></pre>
+      <p>The <code>form_data</code> column for Assessment 1 contains only actual form answers — no internal frontend fields:</p>
+      <pre><code>{
+  "leadName": "Anselm Powell",
+  "leadRole": "Development Officer",
+  "otherPeople": "Tara Rhoseyn",
+  "workDetails": "A programme to increase cycling participation...",
+  "form1": {
+    "affectedGroups": "All age groups, particularly 18-35",
+    "existingKnowledge": "Survey data from 2025",
+    "missingInfo": "no",
+    "impactOnProtectedCharacteristics": {
+      "age": { "impact": ["positive"], "reason": "Benefits all ages", "improvement": "" },
+      "disability": { "impact": ["neutral"], "reason": "", "improvement": "" }
+      ...
+    }
+  }
+}</code></pre>
+      <div class="callout warning">
+        <div class="callout-label">What is NOT stored in form_data</div>
+        <p>The following fields are stripped by <code>saveAssessment</code> before writing to the database and will never appear inside <code>form_data</code>: <code>assessmentId</code>, <code>localId</code>, <code>userRole</code>, <code>createdAt</code>, <code>lastSavedAt</code>, <code>formType</code>, and any database column names (<code>id</code>, <code>form_type</code>, <code>status</code>, <code>created_at</code> etc). These are stored as dedicated columns or are frontend-only.</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">assessment_permissions table</div>
+      <pre><code> id       | assessment_id                        | user_email                  | role | granted_at
+----------+--------------------------------------+-----------------------------+------+---------------------
+ perm-001 | a1b2c3d4-0001-0001-0001-000000000001 | paul.batcup@sport.wales     | view | 2026-06-15 08:45:00
+ perm-002 | e5f6g7h8-0002-0002-0002-000000000002 | tara.rhoseyn@sport.wales    | edit | 2026-06-15 09:00:00</code></pre>
+      <p>Assessment 1 links to Paul with <code>view</code>. Assessment 2 links to Tara with <code>edit</code>. Both emails are lowercase. If Assessment 1 is deleted, perm-001 is automatically deleted by CASCADE — no orphaned rows.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">What the workspace table reads from these rows</div>
+      <p>When Anselm's workspace loads, <code>listAssessments</code> returns both rows because he owns them. Paul's workspace returns Assessment 1 with <code>user_role: 'view'</code>. Tara's workspace returns Assessment 2 with <code>user_role: 'edit'</code>. The workspace table shows:</p>
+      <table class="t">
+        <tr><th>Title</th><th>Status</th><th>Role</th><th>Complete ✓</th><th>Sign Off ✓</th><th>Review</th></tr>
+        <tr><td>Community Cycling Programme</td><td>draft</td><td>Owner</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>Active Travel Strategy</td><td>signed_off</td><td>Owner</td><td>✓</td><td>✓</td><td>Review (clickable)</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- API FUNCTIONS REFERENCE -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="api-functions">
+  <div class="block-hdr">
+    <span class="block-tag">API Functions Reference</span>
+    <span class="block-title">All 9 Functions — What They Do and How They Work</span>
+  </div>
+  <div class="block-body">
+    <p>Every function follows the same structure: get user identity, validate input, query the database, return a response. The pattern is identical across all functions so they are easy to read and extend.</p>
+
+    <div class="fn-card">
+      <div class="fn-card-hdr">
+        <span class="fn-method post">POST</span>
+        <span class="fn-name">/api/saveAssessment</span>
+        <span class="fn-desc">Insert new or update existing assessment</span>
+      </div>
+      <div class="fn-body">
+        <div class="fn-row"><span class="fn-row-label">Called by</span><span class="fn-row-val">Every form step on Next, SaveButton, ShareButton (pre-save), handleTitleBlur in Step 1</span></div>
+        <div class="fn-row"><span class="fn-row-label">Returns</span><span class="fn-row-val"><code>{ id: "uuid..." }</code> — frontend stores this as assessmentId in FormContext</span></div>
+        <div class="fn-row"><span class="fn-row-label">INSERT path</span><span class="fn-row-val">When <code>assessmentId</code> is null — creates a new row, returns the generated UUID</span></div>
+        <div class="fn-row"><span class="fn-row-label">UPDATE path</span><span class="fn-row-val">When <code>assessmentId</code> is a UUID — updates the existing row after permission check</span></div>
+        <div class="fn-row"><span class="fn-row-label">Key logic</span><span class="fn-row-val">Strips all internal frontend fields before storing. Status is forward-only (can't go from complete → draft). reviewed_at only updates when the frontend sends a reviewedAt value.</span></div>
+      </div>
+    </div>
+
+    <div class="fn-card">
+      <div class="fn-card-hdr">
+        <span class="fn-method">GET</span>
+        <span class="fn-name">/api/getAssessment?id=</span>
+        <span class="fn-desc">Fetch one full assessment including all form answers</span>
+      </div>
+      <div class="fn-body">
+        <div class="fn-row"><span class="fn-row-label">Called by</span><span class="fn-row-val">LandingPage when user clicks to open a DB-backed assessment row</span></div>
+        <div class="fn-row"><span class="fn-row-label">Returns</span><span class="fn-row-val">Full assessment row including <code>form_data</code> JSONB and a computed <code>user_role</code> field</span></div>
+        <div class="fn-row"><span class="fn-row-label">user_role</span><span class="fn-row-val">Computed in the SQL query: <code>'owner'</code> if requester is the owner, otherwise the role from assessment_permissions</span></div>
+        <div class="fn-row"><span class="fn-row-label">Key logic</span><span class="fn-row-val">Returns 404 (not 403) for unauthorised access — avoids leaking that the assessment exists. Injects completedSteps back into form_data so FormContext loads the progress bar correctly.</span></div>
+      </div>
+    </div>
+
+    <div class="fn-card">
+      <div class="fn-card-hdr">
+        <span class="fn-method">GET</span>
+        <span class="fn-name">/api/listAssessments</span>
+        <span class="fn-desc">List all assessments for the workspace table</span>
+      </div>
+      <div class="fn-body">
+        <div class="fn-row"><span class="fn-row-label">Called by</span><span class="fn-row-val">LandingPage on every page load</span></div>
+        <div class="fn-row"><span class="fn-row-label">Returns</span><span class="fn-row-val">Lightweight array — metadata only, no form_data. Ordered by updated_at DESC.</span></div>
+        <div class="fn-row"><span class="fn-row-label">Query</span><span class="fn-row-val">UNION ALL — first SELECT fetches owned assessments, second fetches shared ones. <code>AND a.owner_id != $1</code> prevents duplicates if the owner was accidentally added to permissions.</span></div>
+      </div>
+    </div>
+
+    <div class="fn-card">
+      <div class="fn-card-hdr">
+        <span class="fn-method post">POST</span>
+        <span class="fn-name">/api/completeAssessment</span>
+        <span class="fn-desc">Mark assessment as complete</span>
+      </div>
+      <div class="fn-body">
+        <div class="fn-row"><span class="fn-row-label">Called by</span><span class="fn-row-val">Form1/Step8 and Form2/Step2 after "Mark as Complete"</span></div>
+        <div class="fn-row"><span class="fn-row-label">Sets</span><span class="fn-row-val"><code>status = 'complete'</code>, <code>completed_at = NOW()</code></span></div>
+        <div class="fn-row"><span class="fn-row-label">Allowed</span><span class="fn-row-val">Owner or editor. Blocked for view-only users and already signed-off assessments.</span></div>
+      </div>
+    </div>
+
+    <div class="fn-card">
+      <div class="fn-card-hdr">
+        <span class="fn-method post">POST</span>
+        <span class="fn-name">/api/signOffAssessment</span>
+        <span class="fn-desc">Permanently lock an assessment as read-only</span>
+      </div>
+      <div class="fn-body">
+        <div class="fn-row"><span class="fn-row-label">Called by</span><span class="fn-row-val">AssessmentDocument.jsx Sign Off button</span></div>
+        <div class="fn-row"><span class="fn-row-label">Sets</span><span class="fn-row-val"><code>status = 'signed_off'</code>, <code>signed_off_at = NOW()</code>, <code>signed_off_by = userId</code></span></div>
+        <div class="fn-row"><span class="fn-row-label">Allowed</span><span class="fn-row-val">Owner only. Blocked for draft status (must be complete first). Idempotent — calling twice returns 200 both times.</span></div>
+      </div>
+    </div>
+
+    <div class="fn-card">
+      <div class="fn-card-hdr">
+        <span class="fn-method post">POST</span>
+        <span class="fn-name">/api/deleteAssessment</span>
+        <span class="fn-desc">Permanently delete an assessment</span>
+      </div>
+      <div class="fn-body">
+        <div class="fn-row"><span class="fn-row-label">Called by</span><span class="fn-row-val">LandingPage confirm-delete flow</span></div>
+        <div class="fn-row"><span class="fn-row-label">Allowed</span><span class="fn-row-val">Owner only. CASCADE DELETE removes all permission rows automatically.</span></div>
+        <div class="fn-row"><span class="fn-row-label">Idempotent</span><span class="fn-row-val">Returns 200 if already deleted — the frontend has already removed the row from the UI.</span></div>
+      </div>
+    </div>
+
+    <div class="fn-card">
+      <div class="fn-card-hdr">
+        <span class="fn-method post">POST</span>
+        <span class="fn-name">/api/shareAssessment</span>
+        <span class="fn-desc">Grant a colleague access</span>
+      </div>
+      <div class="fn-body">
+        <div class="fn-row"><span class="fn-row-label">Called by</span><span class="fn-row-val">ShareModal on Submit</span></div>
+        <div class="fn-row"><span class="fn-row-label">Allowed</span><span class="fn-row-val">Owner only. Validates <code>@sport.wales</code> email at the backend (defence in depth beyond the frontend check). Cannot share with yourself.</span></div>
+        <div class="fn-row"><span class="fn-row-label">UPSERT</span><span class="fn-row-val">Uses <code>INSERT ... ON CONFLICT DO UPDATE</code> — if the person already has access, their role is updated cleanly rather than creating a duplicate row.</span></div>
+      </div>
+    </div>
+
+    <div class="fn-card">
+      <div class="fn-card-hdr">
+        <span class="fn-method">GET</span>
+        <span class="fn-name">/api/getPermissions?assessmentId=</span>
+        <span class="fn-desc">List everyone who has access to an assessment</span>
+      </div>
+      <div class="fn-body">
+        <div class="fn-row"><span class="fn-row-label">Called by</span><span class="fn-row-val">ShareModal when it opens, to display the current access list</span></div>
+        <div class="fn-row"><span class="fn-row-label">Returns</span><span class="fn-row-val">Array of <code>{ user_email, role, granted_at }</code> ordered by granted_at ASC</span></div>
+        <div class="fn-row"><span class="fn-row-label">Allowed</span><span class="fn-row-val">Owner only</span></div>
+      </div>
+    </div>
+
+    <div class="fn-card">
+      <div class="fn-card-hdr">
+        <span class="fn-method post">POST</span>
+        <span class="fn-name">/api/removeShare</span>
+        <span class="fn-desc">Remove a colleague's access</span>
+      </div>
+      <div class="fn-body">
+        <div class="fn-row"><span class="fn-row-label">Called by</span><span class="fn-row-val">ShareModal on Submit (pending removes)</span></div>
+        <div class="fn-row"><span class="fn-row-label">Allowed</span><span class="fn-row-val">Owner only. Idempotent — no error if the row doesn't exist.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- PERMISSION MODEL -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="permission-model">
+  <div class="block-hdr">
+    <span class="block-tag">Permission Model</span>
+    <span class="block-title">Who Can Do What</span>
+  </div>
+  <div class="block-body">
+    <p>Every function enforces its own permissions independently. There is no central middleware — each function fetches the assessment, checks ownership or the permissions table, and returns 403 if the user is not allowed. This makes each function self-contained and easy to audit.</p>
+    <p>There are three roles: <strong>owner</strong> (created the assessment), <strong>edit</strong> (shared with edit access), <strong>view</strong> (shared with read-only access). A signed-off assessment blocks all writes regardless of role.</p>
+
+    <table class="perm-table">
+      <tr><th>Function</th><th>Owner</th><th>Editor</th><th>Viewer</th><th>Signed Off</th></tr>
+      <tr><td>saveAssessment</td><td class="tick">✓</td><td class="tick">✓</td><td class="cross">✗ 403</td><td class="cross">✗ 403</td></tr>
+      <tr><td>getAssessment</td><td class="tick">✓</td><td class="tick">✓</td><td class="tick">✓</td><td class="tick">✓ (read only)</td></tr>
+      <tr><td>listAssessments</td><td class="tick">✓ owned</td><td class="tick">✓ shared</td><td class="tick">✓ shared</td><td class="tick">✓</td></tr>
+      <tr><td>completeAssessment</td><td class="tick">✓</td><td class="tick">✓</td><td class="cross">✗ 403</td><td class="cross">✗ 403</td></tr>
+      <tr><td>signOffAssessment</td><td class="tick">✓</td><td class="cross">✗ 403</td><td class="cross">✗ 403</td><td class="tick">200 (idempotent)</td></tr>
+      <tr><td>deleteAssessment</td><td class="tick">✓</td><td class="cross">✗ 403</td><td class="cross">✗ 403</td><td class="tick">✓ (owner can still delete)</td></tr>
+      <tr><td>shareAssessment</td><td class="tick">✓</td><td class="cross">✗ 403</td><td class="cross">✗ 403</td><td class="tick">✓</td></tr>
+      <tr><td>getPermissions</td><td class="tick">✓</td><td class="cross">✗ 403</td><td class="cross">✗ 403</td><td class="tick">✓</td></tr>
+      <tr><td>removeShare</td><td class="tick">✓</td><td class="cross">✗ 403</td><td class="cross">✗ 403</td><td class="tick">✓</td></tr>
+    </table>
+
+    <div class="callout info">
+      <div class="callout-label">How permission is checked in code</div>
+      <pre><code>// Every function that checks permissions follows this pattern:
+const rows = await db.query(
+  'SELECT owner_id, status FROM assessments WHERE id = $1',
+  [assessmentId]
+);
+if (rows.length === 0) return { status: 404, ... };
+
+const isOwner = rows[0].owner_id === user.userId;
+if (!isOwner) {
+  const perm = await db.query(
+    'SELECT role FROM assessment_permissions WHERE assessment_id = $1 AND user_email = $2',
+    [assessmentId, user.userEmail]
+  );
+  if (perm.length === 0 || perm[0].role === 'view') {
+    return { status: 403, jsonBody: { error: 'You do not have permission' } };
+  }
+}</code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- FRONTEND CONNECTION -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="frontend-connection">
+  <div class="block-hdr">
+    <span class="block-tag">Frontend Connection</span>
+    <span class="block-title">How the Frontend Calls the Backend</span>
+  </div>
+  <div class="block-body">
+    <p>The frontend never calls backend functions directly — all API calls go through <code>app/src/services/api.js</code>. This is the single layer between the React components and the backend. Every function in <code>api.js</code> maps to exactly one backend function.</p>
+
+    <div class="section">
+      <div class="section-title">The API Service Pattern</div>
+      <pre><code>// app/src/services/api.js
+export const apiService = {
+
+  saveAssessment: async (formData) => {
+    const response = await fetch('/api/saveAssessment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+    return await handleResponse(response); // throws on non-200
+  },
+
+  listAssessments: async () => {
+    const response = await fetch('/api/listAssessments');
+    return await handleResponse(response);
+  },
+};</code></pre>
+      <p>The URL <code>/api/saveAssessment</code> is a relative path. In development (<code>swa start</code>), the SWA CLI proxies this to your local Azure Functions. In production on Azure, SWA routes it to the deployed functions automatically. No environment-specific URL configuration needed.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Error Handling Patterns</div>
+      <p>Two patterns are used deliberately. Most methods use Pattern A (throw user-friendly errors). Two methods use Pattern B (throw raw errors silently).</p>
+      <table class="t">
+        <tr><th>Pattern</th><th>Used by</th><th>Why</th></tr>
+        <tr><td>Pattern A — handleError()</td><td>getAssessment, listAssessments, completeAssessment, signOffAssessment, shareAssessment, getPermissions, removeShare</td><td>Throws a user-friendly message. The UI surfaces this as an error notification.</td></tr>
+        <tr><td>Pattern B — raw throw</td><td>saveAssessment, deleteAssessment</td><td>Callers swallow the error silently. localStorage is always the source of truth — the DB save is best-effort background sync.</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- DATA FLOW -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="data-flow">
+  <div class="block-hdr">
+    <span class="block-tag">Data Flow</span>
+    <span class="block-title">What Happens When a User Saves a Form Step</span>
+  </div>
+  <div class="block-body">
+    <p>Understanding this flow is important before adding new features. Data always goes to localStorage first — the database save is a background sync that runs after.</p>
+    <div class="arch">1. User fills in Step 2 and clicks "Next"
+
+2. Step2.jsx calls commitStep(1, { form1: { ...answers } })
+   └── FormContext merges the answers and marks step 1 complete
+   └── Returns a full snapshot of FormContext state (dataToSave)
+
+3. FormContext's useEffect fires automatically
+   └── Writes the full snapshot to localStorage under the localId key
+   └── This happens synchronously — data is safe before the API call
+
+4. Step2.jsx calls apiService.saveAssessment(dataToSave)
+   └── POST /api/saveAssessment with the full FormContext snapshot as JSON body
+
+5. saveAssessment.js receives the request
+   └── getUser() reads x-ms-client-principal → { userId, userEmail }
+   └── Destructures the body — strips localId, userRole, createdAt, lastSavedAt,
+       formType, and all DB column names from form_data
+   └── cleanFormData contains only actual form field answers
+
+6. If assessmentId is null (first save after title entered):
+   └── INSERT INTO assessments (...) RETURNING id
+   └── Returns { id: "new-uuid-..." }
+
+   If assessmentId is a UUID (subsequent saves):
+   └── SELECT owner_id, status — verify exists and not signed off
+   └── Check permission if not owner
+   └── UPDATE assessments SET title, lead_name, form_data, completed_steps, status, reviewed_at
+
+7. Frontend receives { id: "uuid..." }
+   └── If first save: confirmDbSave(id) re-keys the localStorage entry
+       from local_abc123 → the real UUID
+
+8. Step2.jsx calls navigate('/form1/step3')
+   └── ProgressBar updates to show Step 2 as complete (green tick)</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- AZURE INFRASTRUCTURE -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="azure-infrastructure">
+  <div class="block-hdr">
+    <span class="block-tag">Azure Infrastructure</span>
+    <span class="block-title">How the Backend Lives on Azure</span>
+  </div>
+  <div class="block-body">
+    <p>The backend runs entirely within Azure's managed services. There are no virtual machines to manage, no operating systems to patch, and no servers to maintain. Everything is PaaS (Platform as a Service) — Azure handles the infrastructure and you manage only the code and configuration.</p>
+
+    <div class="section">
+      <div class="section-title">Resource Group — rg-sportwales</div>
+      <p>A resource group is simply a folder in Azure that holds related resources together. Everything for the IIA portal lives inside <code>rg-sportwales</code>. You can find it by logging into <a href="https://portal.azure.com" target="_blank">portal.azure.com</a> and searching for the resource group name.</p>
+      <table class="t">
+        <tr><th>Resource</th><th>Name</th><th>What it does</th></tr>
+        <tr><td>Static Web App</td><td>sw-iia-dev</td><td>Hosts the React frontend and Azure Functions backend for development. Deploys from the <code>dev</code> branch.</td></tr>
+        <tr><td>PostgreSQL Flexible Server</td><td>sw-iia-dev-db</td><td>The database server. Contains the <code>iia-dev-db</code> database with the assessments and permissions tables.</td></tr>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Azure Static Web App — How the API Deploys</div>
+      <p>The SWA is connected to the GitHub repository. A GitHub Actions workflow file (<code>.github/workflows/azure-static-web-apps-ashy-desert-065fb6403.yml</code>) triggers automatically on every push to the <code>dev</code> branch. It builds the React frontend with Vite and deploys the Azure Functions from the <code>/api</code> folder. No manual deployment is ever needed.</p>
+      <p>The workflow is configured with three key paths:</p>
+      <pre><code>app_location:    "/app"   # Where the React code lives
+api_location:    "/api"   # Where the Azure Functions live
+output_location: "dist"   # Where Vite puts the built frontend</code></pre>
+      <p>SWA automatically routes any request to <code>/api/*</code> to the Azure Functions. Any other request serves the React app. They appear as one application to the user even though they are two separate things behind the scenes.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">PostgreSQL Flexible Server — Azure Portal</div>
+      <p>The database server is managed entirely through the Azure Portal. You never SSH into it or manage the operating system. To view the database, connect using pgAdmin or Azure Data Studio with the credentials from <code>local.settings.json</code>.</p>
+      <p>In the Azure Portal, navigate to <code>sw-iia-dev-db</code> to find:</p>
+      <ul class="bullets">
+        <li><strong>Overview</strong> — server hostname, status, and version</li>
+        <li><strong>Databases</strong> — list and create databases (<code>iia-dev-db</code>)</li>
+        <li><strong>Networking</strong> — firewall rules. "Allow Azure services" must be enabled so the SWA functions can reach the database.</li>
+        <li><strong>Connection strings</strong> — pre-built connection strings with the hostname filled in</li>
+        <li><strong>Backups</strong> — automatic daily backups with 7-day retention. Point-in-time restore available.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-title">App Registration — Azure AD Authentication</div>
+      <p>The App Registration (<code>Integrated Impact Assessment</code>) in Azure Active Directory is what allows users to log in with their <code>@sport.wales</code> Microsoft accounts. It is managed through Azure Portal → App registrations.</p>
+      <p>The App Registration provides two values used in <code>staticwebapp.config.json</code> and SWA Configuration settings:</p>
+      <ul class="bullets">
+        <li><strong>Application (client) ID</strong> — stored as <code>AAD_CLIENT_ID</code> in SWA Configuration</li>
+        <li><strong>Directory (tenant) ID</strong> — used in the <code>openIdIssuer</code> URL in staticwebapp.config.json</li>
+        <li><strong>Client secret value</strong> — stored as <code>AAD_CLIENT_SECRET</code> in SWA Configuration</li>
+      </ul>
+      <div class="callout warning">
+        <div class="callout-label">Redirect URIs</div>
+        <p>The App Registration must have redirect URIs registered for each SWA URL. The format is: <code>https://[swa-url].azurestaticapps.net/.auth/login/aad/callback</code>. Without this, Microsoft will reject the login redirect with a "redirect URI mismatch" error.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- ENVIRONMENT VARIABLES -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="env-vars">
+  <div class="block-hdr">
+    <span class="block-tag">Environment Variables</span>
+    <span class="block-title">Secrets and Configuration</span>
+  </div>
+  <div class="block-body">
+    <p>Secrets are never stored in code or committed to Git. They are injected at runtime from two different sources depending on the environment.</p>
+
+    <div class="two-col">
+      <div class="concept">
+        <div class="concept-title">Local Development — api/local.settings.json</div>
+        <p style="font-size:0.85rem;">This file is git-ignored and never committed. It is only on your local machine. When you run <code>swa start</code>, Azure Functions reads secrets from this file.</p>
+      </div>
+      <div class="concept">
+        <div class="concept-title">Azure (Dev/Live) — SWA Configuration</div>
+        <p style="font-size:0.85rem;">In the Azure Portal → sw-iia-dev → Environment variables. Secrets are stored encrypted and injected as <code>process.env.VARIABLE_NAME</code> at runtime.</p>
+      </div>
+    </div>
+
+    <table class="t">
+      <tr><th>Variable</th><th>Where used</th><th>What it is</th></tr>
+      <tr><td><code>DB_TYPE</code></td><td>db/index.js</td><td>Set to <code>postgres</code>. Tells the connection manager which driver to use.</td></tr>
+      <tr><td><code>DB_CONNECTION_STRING</code></td><td>db/index.js</td><td>Full PostgreSQL connection string including hostname, username, password, database name, and SSL mode.</td></tr>
+      <tr><td><code>AAD_CLIENT_ID</code></td><td>staticwebapp.config.json (clientIdSettingName)</td><td>Application (client) ID from the App Registration.</td></tr>
+      <tr><td><code>AAD_CLIENT_SECRET</code></td><td>staticwebapp.config.json (clientSecretSettingName)</td><td>Client secret value from the App Registration.</td></tr>
+      <tr><td><code>TENANT_ID</code></td><td>Reference only — value used in staticwebapp.config.json</td><td>Directory (tenant) ID from the App Registration.</td></tr>
+      <tr><td><code>NODE_ENV</code></td><td>getUser.js</td><td>Set to <code>development</code> in local.settings.json only. Enables the local dev auth fallback. Never set in production.</td></tr>
+    </table>
+
+    <div class="callout security">
+      <div class="callout-label">Never commit secrets</div>
+      <p><code>api/local.settings.json</code> is in <code>.gitignore</code>. It must never be committed to GitHub. If you accidentally commit it, rotate the database password and client secret immediately through the Azure Portal.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- ADDING A NEW FUNCTION -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="adding-new-function">
+  <div class="block-hdr">
+    <span class="block-tag">Scaling the Backend</span>
+    <span class="block-title">How to Add a New API Function</span>
+  </div>
+  <div class="block-body">
+    <p>When new requirements come in that need a new backend capability, follow the established pattern exactly. Every existing function is a reference implementation — read one or two before writing your own.</p>
+
+    <div class="section">
+      <div class="section-title">The Standard Function Template</div>
+      <p>Create a new file in <code>api/src/functions/</code>. The filename becomes the URL path — <code>myNewFunction.js</code> → <code>/api/myNewFunction</code>.</p>
+      <pre><code>// api/src/functions/myNewFunction.js
+// One-line description of what this function does.
+//
+// Called by: [which frontend component calls this]
+// Returns:   [what the response body contains]
+// Allowed:   [who can call this — owner / editor / viewer]
+
+const { app }     = require('@azure/functions');
+const db          = require('../db');
+const { getUser } = require('../utils/getUser');
+const logger      = require('../utils/logger');
+
+app.http('myNewFunction', {
+  methods: ['POST'],          // GET for reads, POST for writes
+  authLevel: 'anonymous',     // always anonymous — SWA handles auth at routing level
+  handler: async (request, context) => {
+    logger.setContext(context);
+
+    // 1. Get user identity — always the first step
+    const user = getUser(request);
+    if (!user) {
+      return { status: 401, jsonBody: { error: 'Unauthorised' } };
+    }
+
+    // 2. Parse body (POST only)
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return { status: 400, jsonBody: { error: 'Invalid JSON body' } };
+    }
+
+    // 3. Validate required fields
+    const { assessmentId } = body;
+    if (!assessmentId) {
+      return { status: 400, jsonBody: { error: 'assessmentId is required' } };
+    }
+
+    try {
+      // 4. Fetch the assessment to check ownership and status
+      const rows = await db.query(
+        'SELECT owner_id, status FROM assessments WHERE id = $1',
+        [assessmentId]
+      );
+      if (rows.length === 0) {
+        return { status: 404, jsonBody: { error: 'Assessment not found' } };
+      }
+
+      // 5. Check permission
+      if (rows[0].owner_id !== user.userId) {
+        return { status: 403, jsonBody: { error: 'Only the owner can do this' } };
+      }
+
+      // 6. Perform the database operation
+      await db.query(
+        'UPDATE assessments SET some_column = $1 WHERE id = $2',
+        ['some_value', assessmentId]
+      );
+
+      logger.info(`myNewFunction: ${assessmentId} by ${user.userEmail}`);
+      return { status: 200, jsonBody: { success: true } };
+
+    } catch (error) {
+      logger.error('myNewFunction error:', error.message);
+      return { status: 500, jsonBody: { error: 'Failed to do the thing' } };
+    }
+  }
+});</code></pre>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Add the Frontend API Call</div>
+      <p>Add the corresponding method to <code>app/src/services/api.js</code> following the existing patterns:</p>
+      <pre><code>// In app/src/services/api.js — add inside the apiService object
+myNewFunction: async (assessmentId) => {
+  try {
+    const response = await fetch('/api/myNewFunction', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ assessmentId }),
+    });
+    return await handleResponse(response);
+  } catch (error) {
+    handleError('My new function', error);  // Pattern A — throws user-friendly error
+  }
+},</code></pre>
+    </div>
+
+    <div class="section">
+      <div class="section-title">If You Need a New Database Column</div>
+      <p>If your new function needs to store a new piece of data that doesn't fit in the existing <code>form_data</code> JSONB column, you need to add a column to the schema. Update <code>api/src/db/schema.sql</code> and run the following in pgAdmin against <code>iia-dev-db</code>:</p>
+      <pre><code>ALTER TABLE assessments ADD COLUMN IF NOT EXISTS my_new_column TIMESTAMPTZ;</code></pre>
+      <div class="callout warning">
+        <div class="callout-label">Update schema.sql too</div>
+        <p>Always add the new column to <code>schema.sql</code> as well, not just run the ALTER TABLE. The <code>schema.sql</code> file is the source of truth — it is what you would run to recreate the database from scratch on a new environment.</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">If the Data Fits in form_data</div>
+      <p>If the new data is simply a new form field answer, you do not need a new column or function. The <code>form_data</code> JSONB column is flexible — just add the field to <code>FormContext.jsx</code>'s <code>getInitialState()</code> and the <code>saveAssessment</code> function will store it automatically as part of <code>cleanFormData</code>.</p>
+      <p>Only create a dedicated column when the data needs to be: queried or filtered directly in SQL, displayed in the workspace table without loading full form_data, or used for access control or audit purposes.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Checklist Before Deploying a New Function</div>
+      <ul class="bullets">
+        <li>File is in <code>api/src/functions/</code> and follows the standard template</li>
+        <li><code>authLevel: 'anonymous'</code> is set — never use <code>'function'</code> or <code>'admin'</code></li>
+        <li>User identity is checked as the very first step</li>
+        <li>All SQL queries use <code>$1, $2</code> parameters — no string interpolation</li>
+        <li>Ownership or permission is verified before any write operation</li>
+        <li>A corresponding method is added to <code>api.js</code> in the frontend</li>
+        <li>If a new DB column is needed, <code>schema.sql</code> is updated and the column is added via ALTER TABLE on dev</li>
+        <li>Function is tested locally with <code>swa start</code> before pushing</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- TROUBLESHOOTING -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="troubleshooting">
+  <div class="block-hdr">
+    <span class="block-tag">Troubleshooting</span>
+    <span class="block-title">Common Issues and How to Fix Them</span>
+  </div>
+  <div class="block-body">
+
+    <div class="section">
+      <div class="section-title">API call returns 401 on the deployed SWA</div>
+      <p>The user's session has expired or the SWA auth configuration is incorrect. Check that <code>AAD_CLIENT_ID</code>, <code>AAD_CLIENT_SECRET</code>, and the Tenant ID in <code>staticwebapp.config.json</code> are all correct. Also check that the SWA URL is registered as a redirect URI in the App Registration.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Database connection fails on Azure</div>
+      <p>Check two things in the Azure Portal: (1) the <code>DB_CONNECTION_STRING</code> value in sw-iia-dev Configuration settings is correct, and (2) the PostgreSQL server's Networking settings have "Allow Azure services and resources to access this server" enabled. Without this checkbox, the SWA functions cannot reach the database even though they are in the same Azure subscription.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Function works locally but fails on Azure</div>
+      <p>The most common cause is a missing environment variable in the SWA Configuration settings. The variables in <code>local.settings.json</code> are local-only — they must also be added to Azure Portal → sw-iia-dev → Environment variables for the deployed version to read them.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">saveAssessment stores unexpected fields in form_data</div>
+      <p>If new fields are added to FormContext state that should not be stored in the database, they must be explicitly destructured and discarded in <code>saveAssessment.js</code> before the <code>...cleanFormData</code> spread. Check the destructuring block at the top of the handler — any field not listed there will end up in <code>cleanFormData</code> and be stored in the JSONB column.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">getAssessment returns stale completedSteps</div>
+      <p><code>completedSteps</code> is stored as a dedicated column in the database but FormContext reads it from inside <code>form_data</code>. The <code>getAssessment</code> function injects <code>completed_steps</code> back into <code>form_data</code> before returning. If the progress bar is loading incorrectly, check that this injection is present in <code>getAssessment.js</code>.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">reviewed_at is not updating in the database</div>
+      <p>Step 10 and Form2/Step4 include <code>reviewedAt: new Date().toISOString()</code> in their save payload. If this field is missing from the payload, <code>saveAssessment</code> receives <code>null</code> for <code>reviewedAt</code> and the <code>COALESCE</code> keeps the existing value. Check that both step files include <code>reviewedAt</code> in their <code>updatedData</code> object passed to <code>commitStep</code>.</p>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">
+  Sport Wales — IIA Portal Internal Documentation &nbsp;·&nbsp; Backend API Reference &nbsp;·&nbsp; Last updated June 2026
+</div>
+
+</div><!-- end .wrap -->
+</body>
+</html>
