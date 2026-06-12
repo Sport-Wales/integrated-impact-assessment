@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
+import { apiService } from '../../services/api';
 import { form1Steps } from './constants';
 import ProgressBar from '../../components/ui/ProgressBar';
 import NextButton from "../../components/ui/NextButton";
@@ -9,7 +10,9 @@ import PrevButton from "../../components/ui/PrevButton";
 
 const Form1Step3 = () => {
 	const navigate = useNavigate();
-	const { formData, updateFormData, completeStep } = useFormContext();
+	const { formData, updateFormData, commitStep, confirmDbSave } = useFormContext();
+
+	const isReadOnly = formData.status === 'signed_off' || formData.userRole === 'view';
 
 	// Initialize form state with data from context or defaults
 	const [formState, setFormState] = useState({
@@ -45,31 +48,26 @@ const Form1Step3 = () => {
 		} else {
 			updatedImpact.push(value);
 		}
+		if (updatedImpact.length === 0) updatedImpact = ['neutral'];
 
-		setFormState(prev => ({
-			...prev,
-			impactOnProtectedCharacteristics: {
-				...prev.impactOnProtectedCharacteristics,
-				[characteristic]: {
-					...prev.impactOnProtectedCharacteristics[characteristic],
-					impact: updatedImpact,
-				}
-			}
-		}));
+		const updated = {
+			...formState.impactOnProtectedCharacteristics,
+			[characteristic]: { ...formState.impactOnProtectedCharacteristics[characteristic], impact: updatedImpact }
+		};
+		setFormState(prev => ({ ...prev, impactOnProtectedCharacteristics: updated }));
+		// Sync to FormContext immediately so SaveButton always has current data
+		updateFormData({ form1: { ...formData.form1, impactOnProtectedCharacteristics: updated } });
 	};
 
 	// Handle change for text inputs
 	const handleTextChange = (characteristic, field, value) => {
-		setFormState(prev => ({
-			...prev,
-			impactOnProtectedCharacteristics: {
-				...prev.impactOnProtectedCharacteristics,
-				[characteristic]: {
-					...prev.impactOnProtectedCharacteristics[characteristic],
-					[field]: value
-				}
-			}
-		}));
+		const updated = {
+			...formState.impactOnProtectedCharacteristics,
+			[characteristic]: { ...formState.impactOnProtectedCharacteristics[characteristic], [field]: value }
+		};
+		setFormState(prev => ({ ...prev, impactOnProtectedCharacteristics: updated }));
+		// Sync to FormContext immediately so SaveButton always has current data
+		updateFormData({ form1: { ...formData.form1, impactOnProtectedCharacteristics: updated } });
 	};
 
 	// Toggle visibility of a characteristic's details
@@ -81,16 +79,30 @@ const Form1Step3 = () => {
 		}
 	};
 
-	const handleNext = () => {
-		// Update the global form data
-		updateFormData({
+	const handleNext = async () => {
+		// Build updated data
+		const updatedData = {
 			form1: {
 				...formData.form1,
 				impactOnProtectedCharacteristics: formState.impactOnProtectedCharacteristics
 			}
-		});
+		};
 
-		completeStep(2);
+		const dataToSave = commitStep(2, updatedData);
+
+		try {
+			const result = await apiService.saveAssessment(dataToSave);
+			
+			// Store returned ID on first save
+			if (!formData.assessmentId && result?.id) {
+				confirmDbSave(result.id);
+			}
+		} catch (err) {
+			// Silent fail — data is safe in localStorage
+			console.warn('[AutoSave] Could not save to database:', err.message);
+		}
+
+		// Navigate to next step
 		navigate('/form1/step4');
 	};
 
@@ -107,53 +119,23 @@ const Form1Step3 = () => {
 		{ id: 'sexualOrientation', label: 'Sexual orientation' },
 	];
 
-	const handleStepClick = (stepIndex) => {
-		// Navigate to the appropriate step
-		switch (stepIndex) {
-			case 0:
-				navigate('/form1/step1');
-				break;
-			case 1:
-				navigate('/form1/step2');
-				break;
-			case 2:
-				navigate('/form1/step3');
-				break;
-			case 3:
-				navigate('/form1/step4');
-				break;
-			case 4:
-				navigate('/form1/step5');
-				break;
-			case 5:
-				navigate('/form1/step6');
-				break;
-			case 6:
-				navigate('/form1/step7');
-				break;
-			case 7:
-				navigate('/form1/step8');
-				break;
-			case 8:
-				navigate('/form1/step9');
-				break;
-			default:
-				break;
-		}
-	};
-
 	return (
 		<div className="max-w-4xl mx-auto px-4 py-12">
 			<ProgressBar
 				steps={form1Steps}
 				currentStep={2}
 				completedSteps={formData.completedSteps?.form1 || []}
-				onStepClick={handleStepClick}
+				formType={formData.formType}
 			/>
 
 			<h2 className="text-3xl font-bold mb-8">
 				People
 			</h2>
+			{isReadOnly && (
+				<p className="mb-6 text-sm text-gray-500">
+					{formData.status === 'signed_off' ? 'This assessment has been signed off and cannot be edited.' : 'You have view-only access to this assessment.'}
+				</p>
+			)}
 			{/* Resources */}
 			
 			<div className="bg-white rounded-lg shadow p-6 mb-8">
@@ -225,7 +207,7 @@ const Form1Step3 = () => {
 													value="positive"
 													checked={formState.impactOnProtectedCharacteristics[char.id].impact.includes('positive')}
 													onChange={() => handleImpactChange(char.id, 'positive')}
-													className="w-4 h-4 mr-2"
+													className={`w-4 h-4 mr-2${isReadOnly ? ' pointer-events-none' : ''}`}
 												/>
 												<span>Positive</span>
 											</label>
@@ -236,7 +218,7 @@ const Form1Step3 = () => {
 													value="negative"
 													checked={formState.impactOnProtectedCharacteristics[char.id].impact.includes('negative')}
 													onChange={() => handleImpactChange(char.id, 'negative')}
-													className="w-4 h-4 mr-2"
+													className={`w-4 h-4 mr-2${isReadOnly ? ' pointer-events-none' : ''}`}
 												/>
 												<span>Negative</span>
 											</label>
@@ -247,7 +229,7 @@ const Form1Step3 = () => {
 													value="neutral"
 													checked={formState.impactOnProtectedCharacteristics[char.id].impact.includes('neutral')}
 													onChange={() => handleImpactChange(char.id, 'neutral')}
-													className="w-4 h-4 mr-2"
+													className={`w-4 h-4 mr-2${isReadOnly ? ' pointer-events-none' : ''}`}
 												/>
 												<span>Neutral</span>
 											</label>
@@ -262,6 +244,7 @@ const Form1Step3 = () => {
 											id={`reason-${char.id}`}
 											value={formState.impactOnProtectedCharacteristics[char.id].reason}
 											onChange={(e) => handleTextChange(char.id, 'reason', e.target.value)}
+											readOnly={isReadOnly}
 											className="w-full px-4 py-2 border border-gray-300 rounded-lg"
 											rows={1}
 										/>
@@ -275,6 +258,7 @@ const Form1Step3 = () => {
 											id={`improvement-${char.id}`}
 											value={formState.impactOnProtectedCharacteristics[char.id].improvement}
 											onChange={(e) => handleTextChange(char.id, 'improvement', e.target.value)}
+											readOnly={isReadOnly}
 											className="w-full px-4 py-2 border border-gray-300 rounded-lg"
 											rows={1}
 										/>
@@ -288,7 +272,10 @@ const Form1Step3 = () => {
 
 			<div className="mt-12 flex justify-between">
 				<PrevButton backLink="/form1/step2" />
-				<NextButton label="Next: Wellbeing and future generations" onClick={handleNext} />
+				{!isReadOnly
+					? <NextButton label="Next: Wellbeing and future generations" onClick={handleNext} />
+					: <button onClick={() => navigate('/')} className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-[--color-sw-blue] text-white hover:bg-cyan-700">Back to My Assessments</button>
+				}
 			</div>
 		</div>
 	);

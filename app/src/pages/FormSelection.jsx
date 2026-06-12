@@ -4,7 +4,7 @@ import { useFormContext } from '../context/FormContext';
 
 const FormSelection = () => {
 	const navigate = useNavigate();
-	const { formData, updateFormData } = useFormContext();
+	const { formData, startAssessment } = useFormContext();
 	const [selectedForm, setSelectedForm] = useState(formData.formType || null);
 	const [showWhenSection, setShowWhenSection] = useState(false);
 	const [showFullIIADetails, setShowFullIIADetails] = useState(false);
@@ -12,7 +12,9 @@ const FormSelection = () => {
 
 	const handleFormSelect = (formType) => {
 		setSelectedForm(formType);
-		updateFormData({ formType });
+		// startAssessment guarantees a localId + active pointer exist before
+		// the form becomes active — so every entry path persists correctly.
+		startAssessment(formType);
 	};
 
 	const handleContinue = () => {

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
+import { apiService } from '../../services/api';
 import ProgressBar from '../../components/ui/ProgressBar';
 import { form1Steps } from './constants';
 import NextButton from "../../components/ui/NextButton";
@@ -9,7 +10,9 @@ import PrevButton from "../../components/ui/PrevButton";
 
 const Form1Step7 = () => {
 	const navigate = useNavigate();
-	const { formData, updateFormData, completeStep } = useFormContext();
+	const { formData, updateFormData, commitStep, confirmDbSave } = useFormContext();
+
+	const isReadOnly = formData.status === 'signed_off' || formData.userRole === 'view';
 
 	// Initialize form state with data from context or defaults
 	const [formState, setFormState] = useState({
@@ -29,72 +32,45 @@ const Form1Step7 = () => {
 	}, [formData.formType, navigate]);
 
 	const handleRadioChange = (field, value) => {
-		setFormState(prev => ({
-			...prev,
-			environmentalImpact: {
-				...prev.environmentalImpact,
-				[field]: value
-			}
-		}));
+		const updated = { ...formState.environmentalImpact, [field]: value };
+		setFormState(prev => ({ ...prev, environmentalImpact: updated }));
+		// Sync to FormContext immediately so SaveButton always has current data
+		updateFormData({ form1: { ...formData.form1, environmentalImpact: updated } });
 	};
 
 	const handleTextChange = (e) => {
 		const { name, value } = e.target;
-		setFormState(prev => ({
-			...prev,
-			environmentalImpact: {
-				...prev.environmentalImpact,
-				[name]: value
-			}
-		}));
+		const updated = { ...formState.environmentalImpact, [name]: value };
+		setFormState(prev => ({ ...prev, environmentalImpact: updated }));
+		// Sync to FormContext immediately so SaveButton always has current data
+		updateFormData({ form1: { ...formData.form1, environmentalImpact: updated } });
 	};
 
-	const handleNext = () => {
-		// Update the global form data
-		updateFormData({
+	const handleNext = async () => {
+		// Build updated data
+		const updatedData = {
 			form1: {
 				...formData.form1,
 				environmentalImpact: formState.environmentalImpact
 			}
-		});
+		};
 
-		completeStep(6);
-		navigate('/form1/step8');
-	};
+		const dataToSave = commitStep(6, updatedData);
 
-	const handleStepClick = (stepIndex) => {
-		// Navigate to the appropriate step
-		switch (stepIndex) {
-			case 0:
-				navigate('/form1/step1');
-				break;
-			case 1:
-				navigate('/form1/step2');
-				break;
-			case 2:
-				navigate('/form1/step3');
-				break;
-			case 3:
-				navigate('/form1/step4');
-				break;
-			case 4:
-				navigate('/form1/step5');
-				break;
-			case 5:
-				navigate('/form1/step6');
-				break;
-			case 6:
-				navigate('/form1/step7');
-				break;
-			case 7:
-				navigate('/form1/step8');
-				break;
-			case 8:
-				navigate('/form1/step9');
-				break;
-			default:
-				break;
+		try {
+			const result = await apiService.saveAssessment(dataToSave);
+			
+			// Store returned ID on first save
+			if (!formData.assessmentId && result?.id) {
+				confirmDbSave(result.id);
+			}
+		} catch (err) {
+			// Silent fail — data is safe in localStorage
+			console.warn('[AutoSave] Could not save to database:', err.message);
 		}
+
+		// Navigate to next step
+		navigate('/form1/step8');
 	};
 
 	return (
@@ -103,12 +79,17 @@ const Form1Step7 = () => {
 				steps={form1Steps}
 				currentStep={6}
 				completedSteps={formData.completedSteps?.form1 || []}
-				onStepClick={handleStepClick}
+				formType={formData.formType}
 			/>
 
 			<h2 className="text-3xl font-bold mb-8">
 				Environment and biodiversity
 			</h2>
+			{isReadOnly && (
+				<p className="mb-6 text-sm text-gray-500">
+					{formData.status === 'signed_off' ? 'This assessment has been signed off and cannot be edited.' : 'You have view-only access to this assessment.'}
+				</p>
+			)}
 
 			<div className="bg-white rounded-lg shadow p-6 mb-8">
 				<p className="text-lg mb-6">
@@ -129,7 +110,7 @@ const Form1Step7 = () => {
 								value="yes"
 								checked={formState.environmentalImpact.helpNatureAndEnvironment === 'yes'}
 								onChange={() => handleRadioChange('helpNatureAndEnvironment', 'yes')}
-								className="w-4 h-4 mr-2"
+								className={`w-4 h-4 mr-2${isReadOnly ? ' pointer-events-none' : ''}`}
 							/>
 							<label htmlFor="helpNatureYes" className="ml-2">Yes</label>
 						</div>
@@ -141,7 +122,7 @@ const Form1Step7 = () => {
 								value="no"
 								checked={formState.environmentalImpact.helpNatureAndEnvironment === 'no'}
 								onChange={() => handleRadioChange('helpNatureAndEnvironment', 'no')}
-								className="w-4 h-4 mr-2"
+								className={`w-4 h-4 mr-2${isReadOnly ? ' pointer-events-none' : ''}`}
 							/>
 							<label htmlFor="helpNatureNo" className="ml-2">No</label>
 						</div>
@@ -159,6 +140,7 @@ const Form1Step7 = () => {
 							name="howItHelps"
 							value={formState.environmentalImpact.howItHelps}
 							onChange={handleTextChange}
+							readOnly={isReadOnly}
 							className="w-full px-4 py-2 border border-gray-300 rounded-lg"
 							rows={3}
 							placeholder="Describe how your work positively impacts the environment or biodiversity"
@@ -181,7 +163,7 @@ const Form1Step7 = () => {
 									value="yes"
 									checked={formState.environmentalImpact.harmNature === 'yes'}
 									onChange={() => handleRadioChange('harmNature', 'yes')}
-									className="w-4 h-4 mr-2"
+									className={`w-4 h-4 mr-2${isReadOnly ? ' pointer-events-none' : ''}`}
 								/>
 								<label htmlFor="harmNatureYes" className="ml-2">Yes</label>
 							</div>
@@ -193,7 +175,7 @@ const Form1Step7 = () => {
 									value="no"
 									checked={formState.environmentalImpact.harmNature === 'no'}
 									onChange={() => handleRadioChange('harmNature', 'no')}
-									className="w-4 h-4 mr-2"
+									className={`w-4 h-4 mr-2${isReadOnly ? ' pointer-events-none' : ''}`}
 								/>
 								<label htmlFor="harmNatureNo" className="ml-2">No</label>
 							</div>
@@ -211,6 +193,7 @@ const Form1Step7 = () => {
 						name="improvements"
 						value={formState.environmentalImpact.improvements}
 						onChange={handleTextChange}
+						readOnly={isReadOnly}
 						className="w-full px-4 py-2 border border-gray-300 rounded-lg"
 						rows={3}
 						placeholder="Describe any changes that could reduce harm and increase environmental benefits"
@@ -220,7 +203,10 @@ const Form1Step7 = () => {
 
 			<div className="mt-12 flex justify-between">
 				<PrevButton backLink="/form1/step6" />
-				<NextButton label="Next: Submission" onClick={handleNext} />
+				{!isReadOnly
+					? <NextButton label="Next: Submission" onClick={handleNext} />
+					: <button onClick={() => navigate('/')} className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-[--color-sw-blue] text-white hover:bg-cyan-700">Back to My Assessments</button>
+				}
 			</div>
 		</div>
 	);

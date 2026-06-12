@@ -22,6 +22,16 @@ export const AuthProvider = ({ children }) => {
       // Use mock auth for pure local development
       if (useMockAuth) {
         console.log('[Auth] Using mock authentication');
+
+        // If user explicitly logged out, respect that — don't auto-login
+        const isLoggedOut = localStorage.getItem('iia_user_logged_out') === 'true';
+        if (isLoggedOut) {
+          console.log('[Auth] User has logged out — staying logged out');
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+
         setUser({
           userId: 'LOCAL_DEV_USER',
           userDetails: 'Dev User',
@@ -60,11 +70,29 @@ export const AuthProvider = ({ children }) => {
   }, [useMockAuth]);
 
   const login = () => {
-    window.location.href = '/.auth/login/aad';
+    if (useMockAuth) {
+      console.log('[Auth] Mock login triggered');
+      localStorage.removeItem('iia_user_logged_out');
+      setUser({
+        userId: 'LOCAL_DEV_USER',
+        userDetails: 'Dev User',
+        userRoles: ['authenticated', 'user']
+      });
+    } else {
+      // Real Azure login
+      window.location.href = '/.auth/login/aad';
+    }
   };
 
   const logout = () => {
-    window.location.href = '/.auth/logout';
+    if (useMockAuth) {
+      console.log('[Auth] Mock logout triggered');
+      localStorage.setItem('iia_user_logged_out', 'true');
+      setUser(null);
+    } else {
+      // Real Azure logout
+      window.location.href = '/.auth/logout';
+    }
   };
 
   const value = {

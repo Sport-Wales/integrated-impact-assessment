@@ -1,5 +1,6 @@
 export const form2Steps = [
-	{ id: 'about', title: 'About your project' },
+	{ id: 'about',      title: 'About your project' },
 	{ id: 'assessment', title: 'Your assessment' },
-	{ id: 'review', title: 'Final review' },
-  ];
+	{ id: 'document',   title: 'Sign Off' },
+	{ id: 'review',     title: 'Final review' },
+];

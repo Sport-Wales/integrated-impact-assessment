@@ -1,8 +1,11 @@
 // src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
+import LoginPage from './pages/LoginPage';
 import LandingPage from './pages/LandingPage';
+import IntroPage from './pages/IntroPage';
 import FormSelection from './pages/FormSelection';
+import AssessmentDocument from './pages/AssessmentDocument';
 import FormIntroduction from './pages/FormIntroduction';
 
 // Form 1 Components
@@ -14,29 +17,54 @@ import Form1Step5 from './pages/Form1/Step5';
 import Form1Step6 from './pages/Form1/Step6';
 import Form1Step7 from './pages/Form1/Step7';
 import Form1Step8 from './pages/Form1/Step8';
-import Form1Step9 from './pages/Form1/Step9';
+import Form1Step9  from './pages/Form1/Step9';
+import Form1Step10 from './pages/Form1/Step10';
 
 // Form 2 Components
 import Form2Step1 from './pages/Form2/Step1';
 import Form2Step2 from './pages/Form2/Step2';
 import Form2Step3 from './pages/Form2/Step3';
+import Form2Step4 from './pages/Form2/Step4';
 
 // Context Providers
 import { FormProvider } from './context/FormContext';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
+
+// Auth gate — sits inside AuthProvider so it can read auth state.
+// Shows loading spinner or login page before the app renders.
+const AuthGate = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-[--color-sw-blue]">
+        <p className="text-white text-lg">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
+
+  return children;
+};
 
 function App() {
   return (
     <AuthProvider>
-      <FormProvider>
-        <Router>
+      <AuthGate>
+        <FormProvider>
+          <Router>
           <div className="min-h-screen flex flex-col">
             <Header />
             <main className="flex-grow">
               <Routes>
                 <Route path="/" element={<LandingPage />} />
+                <Route path="/intro" element={<IntroPage />} />
                 <Route path="/form-selection" element={<FormSelection />} />
                 <Route path="/form-introduction" element={<FormIntroduction />} />
+                <Route path="/assessment/:id/document" element={<AssessmentDocument />} />
                 
                 {/* Form 1 Routes */}
                 <Route path="/form1/step1" element={<Form1Step1 />} />
@@ -47,17 +75,20 @@ function App() {
                 <Route path="/form1/step6" element={<Form1Step6 />} />
                 <Route path="/form1/step7" element={<Form1Step7 />} />
                 <Route path="/form1/step8" element={<Form1Step8 />} />
-                <Route path="/form1/step9" element={<Form1Step9 />} />
+                <Route path="/form1/step9"  element={<Form1Step9 />} />
+                <Route path="/form1/step10" element={<Form1Step10 />} />
                 
                 {/* Form 2 Routes */}
                 <Route path="/form2/step1" element={<Form2Step1 />} />
                 <Route path="/form2/step2" element={<Form2Step2 />} />
                 <Route path="/form2/step3" element={<Form2Step3 />} />
+                <Route path="/form2/step4" element={<Form2Step4 />} />
               </Routes>
             </main>
           </div>
-        </Router>
-      </FormProvider>
+          </Router>
+        </FormProvider>
+      </AuthGate>
     </AuthProvider>
   );
 }

@@ -1,14 +1,18 @@
 // src/pages/Form1/Step5.jsx
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
+import { apiService } from '../../services/api';
 import ProgressBar from '../../components/ui/ProgressBar';
 import { form1Steps } from './constants';
 import NextButton from "../../components/ui/NextButton";
+import PrevButton from "../../components/ui/PrevButton";
 
 const Form1Step5 = () => {
   const navigate = useNavigate();
-  const { formData, updateFormData, completeStep } = useFormContext();
+  const { formData, updateFormData, commitStep, confirmDbSave } = useFormContext();
+
+  const isReadOnly = formData.status === 'signed_off' || formData.userRole === 'view';
 
   // Initialize form state with data from context or defaults
   const [formState, setFormState] = useState({
@@ -35,72 +39,45 @@ const Form1Step5 = () => {
   }, [formData.formType, navigate]);
 
   const handleRadioChange = (field, value) => {
-    setFormState(prev => ({
-      ...prev,
-      welshLanguage: {
-        ...prev.welshLanguage,
-        [field]: value
-      }
-    }));
+    const updated = { ...formState.welshLanguage, [field]: value };
+    setFormState(prev => ({ ...prev, welshLanguage: updated }));
+    // Sync to FormContext immediately so SaveButton always has current data
+    updateFormData({ form1: { ...formData.form1, welshLanguage: updated } });
   };
 
   const handleTextChange = (e) => {
     const { name, value } = e.target;
-    setFormState(prev => ({
-      ...prev,
-      welshLanguage: {
-        ...prev.welshLanguage,
-        [name]: value
-      }
-    }));
+    const updated = { ...formState.welshLanguage, [name]: value };
+    setFormState(prev => ({ ...prev, welshLanguage: updated }));
+    // Sync to FormContext immediately so SaveButton always has current data
+    updateFormData({ form1: { ...formData.form1, welshLanguage: updated } });
   };
 
-  const handleNext = () => {
-    // Update the global form data
-    updateFormData({
+  const handleNext = async () => {
+    // Build updated data
+    const updatedData = {
       form1: {
         ...formData.form1,
         welshLanguage: formState.welshLanguage
       }
-    });
+    };
 
-    completeStep(4);
-    navigate('/form1/step6');
-  };
+    const dataToSave = commitStep(4, updatedData);
 
-  const handleStepClick = (stepIndex) => {
-    // Navigate to the appropriate step
-    switch(stepIndex) {
-      case 0:
-        navigate('/form1/step1');
-        break;
-      case 1:
-        navigate('/form1/step2');
-        break;
-      case 2:
-        navigate('/form1/step3');
-        break;
-      case 3:
-        navigate('/form1/step4');
-        break;
-      case 4:
-        navigate('/form1/step5');
-        break;
-      case 5:
-        navigate('/form1/step6');
-        break;
-      case 6:
-        navigate('/form1/step7');
-        break;
-      case 7:
-        navigate('/form1/step8');
-        break;
-      case 8:
-        navigate('/form1/step9');
-        break;
-      default:
-        break;
+    try {
+      const result = await apiService.saveAssessment(dataToSave);
+      
+      // Store returned ID on first save
+      if (!formData.assessmentId && result?.id) {
+        confirmDbSave(result.id);
+      }
+    } catch (err) {
+      // Silent fail — data is safe in localStorage
+      console.warn('[AutoSave] Could not save to database:', err.message);
     }
+
+    // Navigate to next step
+    navigate('/form1/step6');
   };
 
   return (
@@ -109,12 +86,17 @@ const Form1Step5 = () => {
         steps={form1Steps} 
         currentStep={4} 
         completedSteps={formData.completedSteps?.form1 || []} 
-        onStepClick={handleStepClick} 
+        formType={formData.formType}
       />
 
       <h2 className="text-3xl font-bold mb-8">
         Impacts on Welsh language
       </h2>
+      {isReadOnly && (
+        <p className="mb-6 text-sm text-gray-500">
+          {formData.status === 'signed_off' ? 'This assessment has been signed off and cannot be edited.' : 'You have view-only access to this assessment.'}
+        </p>
+      )}
 
       <div className="bg-white rounded-lg shadow p-6 mb-8">
         <p className="text-lg mb-6">
@@ -143,7 +125,7 @@ const Form1Step5 = () => {
                 value="yes"
                 checked={formState.welshLanguage.supportWelshLanguage === 'yes'}
                 onChange={() => handleRadioChange('supportWelshLanguage', 'yes')}
-                className="w-4 h-4 mr-2"
+                className={`w-4 h-4 mr-2${isReadOnly ? ' pointer-events-none' : ''}`}
               />
               <label htmlFor="supportWelshYes" className="ml-2">Yes</label>
             </div>
@@ -155,7 +137,7 @@ const Form1Step5 = () => {
                 value="no"
                 checked={formState.welshLanguage.supportWelshLanguage === 'no'}
                 onChange={() => handleRadioChange('supportWelshLanguage', 'no')}
-                className="w-4 h-4 mr-2"
+                className={`w-4 h-4 mr-2${isReadOnly ? ' pointer-events-none' : ''}`}
               />
               <label htmlFor="supportWelshNo" className="ml-2">No</label>
             </div>
@@ -176,7 +158,7 @@ const Form1Step5 = () => {
                 value="yes"
                 checked={formState.welshLanguage.hardForWelshSpeakers === 'yes'}
                 onChange={() => handleRadioChange('hardForWelshSpeakers', 'yes')}
-                className="w-4 h-4 mr-2"
+                className={`w-4 h-4 mr-2${isReadOnly ? ' pointer-events-none' : ''}`}
               />
               <label htmlFor="hardForWelshYes" className="ml-2">Yes</label>
             </div>
@@ -188,7 +170,7 @@ const Form1Step5 = () => {
                 value="no"
                 checked={formState.welshLanguage.hardForWelshSpeakers === 'no'}
                 onChange={() => handleRadioChange('hardForWelshSpeakers', 'no')}
-                className="w-4 h-4 mr-2"
+                className={`w-4 h-4 mr-2${isReadOnly ? ' pointer-events-none' : ''}`}
               />
               <label htmlFor="hardForWelshNo" className="ml-2">No</label>
             </div>
@@ -205,6 +187,7 @@ const Form1Step5 = () => {
             name="improvements"
             value={formState.welshLanguage.improvements}
             onChange={handleTextChange}
+            readOnly={isReadOnly}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg"
             rows={3}
             placeholder="Describe how your work could better support or promote the Welsh language"
@@ -269,6 +252,7 @@ const Form1Step5 = () => {
                   name="positiveImpact"
                   value={formState.welshLanguage.positiveImpact}
                   onChange={handleTextChange}
+                  readOnly={isReadOnly}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                   rows={3}
                   placeholder="Describe positive impacts on Welsh language"
@@ -285,6 +269,7 @@ const Form1Step5 = () => {
                   name="negativeImpact"
                   value={formState.welshLanguage.negativeImpact}
                   onChange={handleTextChange}
+                  readOnly={isReadOnly}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                   rows={3}
                   placeholder="Describe negative impacts on Welsh language"
@@ -301,6 +286,7 @@ const Form1Step5 = () => {
                   name="neutralImpact"
                   value={formState.welshLanguage.neutralImpact}
                   onChange={handleTextChange}
+                  readOnly={isReadOnly}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                   rows={3}
                   placeholder="Describe neutral impacts on Welsh language"
@@ -317,6 +303,7 @@ const Form1Step5 = () => {
                   name="increasePositiveEffects"
                   value={formState.welshLanguage.increasePositiveEffects}
                   onChange={handleTextChange}
+                  readOnly={isReadOnly}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                   rows={3}
                   placeholder="Describe how to increase positive effects"
@@ -333,6 +320,7 @@ const Form1Step5 = () => {
                   name="decreaseAdverseEffects"
                   value={formState.welshLanguage.decreaseAdverseEffects}
                   onChange={handleTextChange}
+                  readOnly={isReadOnly}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                   rows={3}
                   placeholder="Describe how to decrease adverse effects"
@@ -344,10 +332,11 @@ const Form1Step5 = () => {
       </div>
 
       <div className="mt-12 flex justify-between">
-        <Link to="/form1/step4" className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">
-          Prev
-        </Link>
-		<NextButton label="Next: Socio-economic impact" onClick={handleNext} />
+        <PrevButton backLink="/form1/step4" />
+        {!isReadOnly
+          ? <NextButton label="Next: Socio-economic impact" onClick={handleNext} />
+          : <button onClick={() => navigate('/')} className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-[--color-sw-blue] text-white hover:bg-cyan-700">Back to My Assessments</button>
+        }
       </div>
     </div>
   );

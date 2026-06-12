@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
+import { apiService } from '../../services/api';
 import ProgressBar from '../../components/ui/ProgressBar';
 import { form1Steps } from './constants';
 import NextButton from "../../components/ui/NextButton";
@@ -9,7 +10,9 @@ import PrevButton from "../../components/ui/PrevButton";
 
 const Form1Step4 = () => {
 	const navigate = useNavigate();
-	const { formData, updateFormData, completeStep } = useFormContext();
+	const { formData, updateFormData, commitStep, confirmDbSave } = useFormContext();
+
+	const isReadOnly = formData.status === 'signed_off' || formData.userRole === 'view';
 
 	// Single text field for well-being response
 	const [wellBeingResponse, setWellBeingResponse] = useState(
@@ -27,50 +30,31 @@ const Form1Step4 = () => {
 		}
 	}, [formData.formType, navigate]);
 
-	const handleNext = () => {
-		// Update the global form data
-		updateFormData({
+	const handleNext = async () => {
+		// Build updated data
+		const updatedData = {
 			form1: {
 				...formData.form1,
 				wellBeingResponse: wellBeingResponse
 			}
-		});
-		completeStep(3);
-		navigate('/form1/step5');
-	};
+		};
 
-	const handleStepClick = (stepIndex) => {
-		switch (stepIndex) {
-			case 0:
-				navigate('/form1/step1');
-				break;
-			case 1:
-				navigate('/form1/step2');
-				break;
-			case 2:
-				navigate('/form1/step3');
-				break;
-			case 3:
-				navigate('/form1/step4');
-				break;
-			case 4:
-				navigate('/form1/step5');
-				break;
-			case 5:
-				navigate('/form1/step6');
-				break;
-			case 6:
-				navigate('/form1/step7');
-				break;
-			case 7:
-				navigate('/form1/step8');
-				break;
-			case 8:
-				navigate('/form1/step9');
-				break;
-			default:
-				break;
+		const dataToSave = commitStep(3, updatedData);
+
+		try {
+			const result = await apiService.saveAssessment(dataToSave);
+			
+			// Store returned ID on first save
+			if (!formData.assessmentId && result?.id) {
+				confirmDbSave(result.id);
+			}
+		} catch (err) {
+			// Silent fail — data is safe in localStorage
+			console.warn('[AutoSave] Could not save to database:', err.message);
 		}
+
+		// Navigate to next step
+		navigate('/form1/step5');
 	};
 
 	const wellBeingGoals = [
@@ -108,12 +92,17 @@ const Form1Step4 = () => {
 				steps={form1Steps}
 				currentStep={3}
 				completedSteps={formData.completedSteps?.form1 || []}
-				onStepClick={handleStepClick}
+				formType={formData.formType}
 			/>
 
 			<h2 className="text-3xl font-bold mb-8">
 				Well-being for future generations
 			</h2>
+			{isReadOnly && (
+				<p className="mb-6 text-sm text-gray-500">
+					{formData.status === 'signed_off' ? 'This assessment has been signed off and cannot be edited.' : 'You have view-only access to this assessment.'}
+				</p>
+			)}
 
 			<div className="bg-white rounded-lg shadow p-6 mb-6">
 				<p className="text-lg mb-4">
@@ -221,7 +210,12 @@ const Form1Step4 = () => {
 					<textarea
 						id="wellBeingResponse"
 						value={wellBeingResponse}
-						onChange={(e) => setWellBeingResponse(e.target.value)}
+						onChange={(e) => {
+							setWellBeingResponse(e.target.value);
+							// Sync to FormContext immediately so SaveButton always has current data
+							updateFormData({ form1: { ...formData.form1, wellBeingResponse: e.target.value } });
+						}}
+						readOnly={isReadOnly}
 						className="w-full px-4 py-2 border border-gray-300 rounded-lg"
 						rows={10}
 						placeholder="Describe how your work relates to the well-being goals and the ways of working you'll use. Include whether it will help achieve the goals, how it will help, and what can be done to improve its contribution."
@@ -230,8 +224,11 @@ const Form1Step4 = () => {
 			</div>
 
 			<div className="mt-12 flex justify-between">
-				<PrevButton backLink="/form1/step6" />
-				<NextButton label="Next: Welsh language" onClick={handleNext} />
+				<PrevButton backLink="/form1/step3" />
+				{!isReadOnly
+					? <NextButton label="Next: Welsh language" onClick={handleNext} />
+					: <button onClick={() => navigate('/')} className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-[--color-sw-blue] text-white hover:bg-cyan-700">Back to My Assessments</button>
+				}
 			</div>
 		</div>
 	);
