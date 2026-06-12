@@ -16,11 +16,9 @@
 --
 -- =============================================================
 
--- Required for gen_random_uuid() — generates UUID primary keys automatically.
--- Both extensions included for compatibility across Azure PostgreSQL configurations.
--- IF NOT EXISTS means this is safe to run multiple times.
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- NOTE: pgcrypto is pre-installed on Azure PostgreSQL Flexible Server.
+-- CREATE EXTENSION is not permitted via the portal query tool on Azure.
+-- gen_random_uuid() is available by default — no extension needed.
 
 -- =============================================================
 -- TABLE 1: assessments
