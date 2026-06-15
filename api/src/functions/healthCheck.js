@@ -50,8 +50,8 @@ app.http('healthCheck', {
         const health = {
             status: 'healthy',
             timestamp: new Date().toISOString(),
-            database: 'unknown',
-            environment: process.env.NODE_ENV || 'development'
+            database: 'dev db',
+            environment: 'development'
         };
 
         // Test database connection
