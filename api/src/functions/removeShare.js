@@ -25,7 +25,8 @@ app.http('removeShare', {
 
     let body;
     try {
-      body = await request.json();
+      const raw = await request.text();
+      body = JSON.parse(raw);
     } catch {
       return { status: 400, jsonBody: { error: 'Invalid JSON body' } };
     }

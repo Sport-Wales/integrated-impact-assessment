@@ -34,9 +34,13 @@ app.http('saveAssessment', {
     }
 
     // 2. Parse request body
+    //    Using request.text() + JSON.parse() instead of request.json()
+    //    because Azure SWA proxy can deliver the body in a format that
+    //    request.json() cannot read reliably.
     let body;
     try {
-      body = await request.json();
+      const raw = await request.text();
+      body = JSON.parse(raw);
     } catch {
       return { status: 400, jsonBody: { error: 'Invalid JSON body' } };
     }
