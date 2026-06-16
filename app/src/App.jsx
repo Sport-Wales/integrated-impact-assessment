@@ -31,16 +31,24 @@ import { FormProvider } from './context/FormContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Auth gate — sits inside AuthProvider so it can read auth state.
-// Shows loading spinner or login page before the app renders.
+// Local mock auth: shows spinner while resolving, then LoginPage card if not authenticated.
+// Azure real auth: shows background image immediately (via LoginPage), redirects to Microsoft login.
 const AuthGate = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
+  const useMockAuth = import.meta.env.VITE_USE_MOCK_AUTH === 'true';
 
   if (loading) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-[--color-sw-blue]">
-        <p className="text-white text-lg">Loading...</p>
-      </div>
-    );
+    // Local mock — show SW Blue spinner (resolves instantly in practice)
+    if (useMockAuth) {
+      return (
+        <div className="fixed inset-0 flex items-center justify-center bg-[--color-sw-blue]">
+          <p className="text-white text-lg">Loading...</p>
+        </div>
+      );
+    }
+    // Azure — show background image immediately while /.auth/me resolves.
+    // If user is not authenticated, LoginPage's useEffect fires the Microsoft redirect.
+    return <LoginPage />;
   }
 
   if (!isAuthenticated) {
