@@ -32,13 +32,14 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Auth gate — sits inside AuthProvider so it can read auth state.
 // Local mock auth: shows spinner while resolving, then LoginPage card if not authenticated.
-// Azure real auth: shows background image immediately (via LoginPage), redirects to Microsoft login.
+// Azure real auth: shows background image while checking auth, redirects to Microsoft if not logged in.
+// IMPORTANT: During loading on Azure, we render the background image directly — NOT LoginPage.
+// Mounting LoginPage during loading would fire its useEffect redirect and cause a redirect loop.
 const AuthGate = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   const useMockAuth = import.meta.env.VITE_USE_MOCK_AUTH === 'true';
 
   if (loading) {
-    // Local mock — show SW Blue spinner (resolves instantly in practice)
     if (useMockAuth) {
       return (
         <div className="fixed inset-0 flex items-center justify-center bg-[--color-sw-blue]">
@@ -46,13 +47,26 @@ const AuthGate = ({ children }) => {
         </div>
       );
     }
-    // Azure — show background image immediately while /.auth/me resolves.
-    // If user is not authenticated, LoginPage's useEffect fires the Microsoft redirect.
-    return <LoginPage />;
+    // Azure — show ONLY the background image while /.auth/me resolves.
+    // Do NOT mount LoginPage here — its useEffect would trigger a redirect loop.
+    return (
+      <div className="fixed inset-0 z-50">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: "url('/images/login_image.webp')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
+      </div>
+    );
   }
 
+  // Only reaches here when loading = false — we KNOW the auth state.
   if (!isAuthenticated) {
-    return <LoginPage />;
+    return <LoginPage />;  // Safe — useEffect redirect fires only when confirmed not logged in
   }
 
   return children;
