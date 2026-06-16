@@ -1,11 +1,22 @@
 // src/pages/LoginPage.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
   const { login } = useAuth();
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
+
+  const useMockAuth = import.meta.env.VITE_USE_MOCK_AUTH === 'true';
+
+  // Real auth (Azure) — redirect immediately to Microsoft login.
+  // Background image shows briefly while the redirect happens.
+  // Local mock auth — this effect does nothing, card renders below.
+  useEffect(() => {
+    if (!useMockAuth) {
+      window.location.href = '/.auth/login/aad';
+    }
+  }, [useMockAuth]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -20,8 +31,9 @@ const LoginPage = () => {
         }}
       />
 
-      {/* Login card */}
-      <div className="relative z-10 bg-white px-10 py-10 w-full max-w-md mx-4">
+      {/* Login card — local mock auth only */}
+      {useMockAuth && (
+      <div className="relative z-10 bg-white px-10 py-10 w-full max-w-md mx-4 rounded">
         {/* Sport Wales Logo */}
         <div className="flex justify-center mb-6">
           <img
@@ -65,9 +77,8 @@ const LoginPage = () => {
         >
           Sign in
         </button>
-
-
       </div>
+      )}
     </div>
   );
 };

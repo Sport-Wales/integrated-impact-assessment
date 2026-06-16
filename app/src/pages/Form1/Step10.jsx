@@ -36,7 +36,8 @@ const Form1Step10 = () => {
 				...formData.form1,
 				unexpectedHappened:   formState.unexpectedHappened,
 				needToChangeAnything: formState.needToChangeAnything,
-			}
+			},
+			reviewedAt: new Date().toISOString(), // triggers reviewed_at column update in DB
 		};
 
 		const dataToSave = commitStep(9, updatedData);

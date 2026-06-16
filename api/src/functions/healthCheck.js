@@ -50,18 +50,24 @@ app.http('healthCheck', {
         const health = {
             status: 'healthy',
             timestamp: new Date().toISOString(),
-            database: 'unknown',
-            environment: process.env.NODE_ENV || 'development'
+            database: 'dev db',
+            environment: 'development'
         };
 
         // Test database connection
         try {
-            // Run a simple query (works with both PostgreSQL and SQL Server)
+            // Test basic connectivity
             await db.query('SELECT 1', []);
-            
-            // Success!
             health.database = 'connected';
             health.dbType = process.env.DB_TYPE || 'postgres';
+
+            // Test that the assessments table exists and has the right columns
+            const tableCheck = await db.query(
+              `SELECT column_name FROM information_schema.columns 
+               WHERE table_name = 'assessments' ORDER BY ordinal_position`, []
+            );
+            health.tableExists = tableCheck.length > 0;
+            health.columns = tableCheck.map(r => r.column_name);
             
         } catch (error) {
             // Database connection failed

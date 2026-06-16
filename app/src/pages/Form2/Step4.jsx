@@ -38,7 +38,8 @@ const Form2Step4 = () => {
       form2: {
         ...formData.form2,
         review: formState.review,
-      }
+      },
+      reviewedAt: new Date().toISOString(), // triggers reviewed_at column update in DB
     };
 
     const dataToSave = commitStep(3, updatedData);

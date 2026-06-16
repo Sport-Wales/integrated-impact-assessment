@@ -66,6 +66,7 @@ async function getConnection() {
       // - connectionTimeoutMillis: Give up if connection takes > 10 seconds
       pool = new dbClient({
         connectionString,
+        ssl: { rejectUnauthorized: false }, // Required for Azure PostgreSQL Flexible Server
         max: 10,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 10000,

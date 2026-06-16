@@ -31,20 +31,42 @@ import { FormProvider } from './context/FormContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Auth gate — sits inside AuthProvider so it can read auth state.
-// Shows loading spinner or login page before the app renders.
+// Local mock auth: shows spinner while resolving, then LoginPage card if not authenticated.
+// Azure real auth: shows background image while checking auth, redirects to Microsoft if not logged in.
+// IMPORTANT: During loading on Azure, we render the background image directly — NOT LoginPage.
+// Mounting LoginPage during loading would fire its useEffect redirect and cause a redirect loop.
 const AuthGate = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
+  const useMockAuth = import.meta.env.VITE_USE_MOCK_AUTH === 'true';
 
   if (loading) {
+    if (useMockAuth) {
+      return (
+        <div className="fixed inset-0 flex items-center justify-center bg-[--color-sw-blue]">
+          <p className="text-white text-lg">Loading...</p>
+        </div>
+      );
+    }
+    // Azure — show ONLY the background image while /.auth/me resolves.
+    // Do NOT mount LoginPage here — its useEffect would trigger a redirect loop.
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-[--color-sw-blue]">
-        <p className="text-white text-lg">Loading...</p>
+      <div className="fixed inset-0 z-50">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: "url('/images/login_image.webp')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
       </div>
     );
   }
 
+  // Only reaches here when loading = false — we KNOW the auth state.
   if (!isAuthenticated) {
-    return <LoginPage />;
+    return <LoginPage />;  // Safe — useEffect redirect fires only when confirmed not logged in
   }
 
   return children;
