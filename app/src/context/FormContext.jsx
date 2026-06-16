@@ -299,6 +299,8 @@ export const FormProvider = ({ children }) => {
     const loaded = {
       ...getInitialState(),
       ...dbResponse.form_data,
+      title:      dbResponse.title || '',         // stored as column, not in form_data
+      leadName:   dbResponse.lead_name || '',     // stored as column (snake_case), not in form_data
       assessmentId: realAssessmentId,
       localId:      activeLocalId,
       status:       dbResponse.status,
