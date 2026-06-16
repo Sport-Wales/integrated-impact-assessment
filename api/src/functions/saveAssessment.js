@@ -151,12 +151,12 @@ app.http('saveAssessment', {
            form_data       = $3,
            completed_steps = $4,
            status          = CASE
-                               WHEN $5 IS NULL THEN status
+                               WHEN $5::TEXT IS NULL THEN status
                                WHEN status = 'signed_off' THEN status
-                               WHEN status = 'complete' AND $5 = 'draft' THEN status
-                               ELSE $5
+                               WHEN status = 'complete' AND $5::TEXT = 'draft' THEN status
+                               ELSE $5::TEXT
                              END,
-           reviewed_at     = COALESCE($6, reviewed_at)
+           reviewed_at     = COALESCE($6::TIMESTAMPTZ, reviewed_at)
          WHERE id = $7`,
         [
           title.trim(),
