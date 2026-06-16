@@ -170,7 +170,7 @@ app.http('saveAssessment', {
 
     } catch (error) {
       logger.error('saveAssessment error:', error.message);
-      return { status: 500, jsonBody: { error: 'Failed to save assessment' } };
+      return { status: 500, jsonBody: { error: 'Failed to save assessment', detail: error.message } };
     }
   }
 });
