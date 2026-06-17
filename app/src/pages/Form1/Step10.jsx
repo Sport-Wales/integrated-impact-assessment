@@ -30,26 +30,17 @@ const Form1Step10 = () => {
 	};
 
 	// Save this step's data to localStorage + DB in background, then return to workspace
-	const handleDone = async () => {
+	const handleDone = () => {
 		const updatedData = {
 			form1: {
 				...formData.form1,
 				unexpectedHappened:   formState.unexpectedHappened,
 				needToChangeAnything: formState.needToChangeAnything,
 			},
-			reviewedAt: new Date().toISOString(), // triggers reviewed_at column update in DB
+			reviewedAt: new Date().toISOString(),
 		};
 
 		const dataToSave = commitStep(9, updatedData);
-
-		try {
-			const result = await apiService.saveAssessment(dataToSave);
-			if (!formData.assessmentId && result?.id) {
-				confirmDbSave(result.id);
-			}
-		} catch (err) {
-			console.warn('[AutoSave] Step10 DB save failed. Data is safe in localStorage.', err.message);
-		}
 
 		// Write reviewedAt directly to localStorage before navigating —
 		// same pattern as sign-off in AssessmentDocument to avoid race condition.
@@ -65,7 +56,20 @@ const Form1Step10 = () => {
 			} catch { /* safe to ignore */ }
 		}
 
+		// Navigate immediately
 		navigate('/');
+
+		// Background save — fire and forget
+		apiService.saveAssessment(dataToSave)
+			.then(result => {
+				if (!formData.assessmentId && result?.id) {
+					confirmDbSave(result.id);
+				}
+			})
+			.catch(err => {
+				console.warn('[AutoSave] Step10 DB save failed. Data is safe in localStorage.', err.message);
+			});
+	};
 	};
 
 	return (

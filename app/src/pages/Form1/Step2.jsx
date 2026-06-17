@@ -34,8 +34,7 @@ const Form1Step2 = () => {
 		updateFormData({ form1: { ...formData.form1, [name]: value } });
 	};
 
-	const handleNext = async () => {
-		// Build updated data
+	const handleNext = () => {
 		const updatedData = {
 			form1: {
 				...formData.form1,
@@ -47,20 +46,17 @@ const Form1Step2 = () => {
 
 		const dataToSave = commitStep(1, updatedData);
 
-		try {
-			const result = await apiService.saveAssessment(dataToSave);
-			
-			// Store returned ID on first save
-			if (!formData.assessmentId && result?.id) {
-				confirmDbSave(result.id);
-			}
-		} catch (err) {
-			// Silent fail — data is safe in localStorage
-			console.warn('[AutoSave] Could not save to database:', err.message);
-		}
-
-		// Navigate to next step
 		navigate('/form1/step3');
+
+		apiService.saveAssessment(dataToSave)
+			.then(result => {
+				if (!formData.assessmentId && result?.id) {
+					confirmDbSave(result.id);
+				}
+			})
+			.catch(err => {
+				console.warn('[AutoSave] Could not save to database:', err.message);
+			});
 	};
 
 	return (

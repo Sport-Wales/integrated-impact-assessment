@@ -37,11 +37,10 @@ const Form1Step8 = () => {
     updateFormData({ form1: { ...formData.form1, [name]: value } });
   };
 
-  const handleComplete = async () => {
+  const handleComplete = () => {
     setIsCompleting(true);
     setCompleteError(null);
 
-    // Build this step's data + completed status in one object.
     const updatedData = {
       form1: {
         ...formData.form1,
@@ -52,39 +51,30 @@ const Form1Step8 = () => {
       status: ASSESSMENT_STATUS.COMPLETE,
     };
 
-    // Merge data + status + mark step complete in one pass.
-    // dataToSave is the exact merged snapshot — no staleness.
     const dataToSave = commitStep(7, updatedData);
-
-    // Id used for navigation. Prefer real DB id; fall back to localId.
-    // The document page handles BOTH — local_ ids load from localStorage.
     let idToUse = formData.assessmentId || formData.localId;
 
-    // 1. Background DB save — silent fail (data already safe in localStorage).
-    try {
-      const saveResult = await apiService.saveAssessment(dataToSave);
-      if (saveResult?.id) {
-        idToUse = saveResult.id;
-        if (!formData.assessmentId) {
-          confirmDbSave(saveResult.id);
-        }
-      }
-    } catch (err) {
-      console.warn('[Complete] DB save failed. Continuing with local id.', err.message);
-    }
-
-    // 2. Mark complete on DB — ONLY with a real UUID, never a local_ id.
-    if (idToUse && !idToUse.startsWith('local_')) {
-      try {
-        await apiService.completeAssessment(idToUse);
-      } catch (err) {
-        console.warn('[Complete] DB completeAssessment failed. Status saved locally.', err.message);
-      }
-    }
-
-    // 3. Navigate. local_ ids are fine — the document page reads localStorage.
+    // Navigate immediately — never block the user
     setIsCompleting(false);
     navigate('/form1/step9');
+
+    // Background save + complete — fire and forget
+    apiService.saveAssessment(dataToSave)
+      .then(saveResult => {
+        if (saveResult?.id) {
+          idToUse = saveResult.id;
+          if (!formData.assessmentId) {
+            confirmDbSave(saveResult.id);
+          }
+        }
+        // Chain completeAssessment only with a real UUID
+        if (idToUse && !idToUse.startsWith('local_')) {
+          return apiService.completeAssessment(idToUse);
+        }
+      })
+      .catch(err => {
+        console.warn('[Complete] Background save/complete failed:', err.message);
+      });
   };
 
   return (

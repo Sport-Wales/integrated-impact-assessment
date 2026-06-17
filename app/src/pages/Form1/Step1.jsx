@@ -65,8 +65,7 @@ const Form1Step1 = () => {
 		}
 	};
 
-	const handleNext = async () => {
-		// Build updated data
+	const handleNext = () => {
 		const updatedData = {
 			title: formState.title,
 			leadName: formState.leadName,
@@ -79,26 +78,21 @@ const Form1Step1 = () => {
 			}
 		};
 
-		// Merge data + mark step complete in one pass; returns the exact
-		// merged snapshot so the DB save payload is never stale.
 		const dataToSave = commitStep(0, updatedData);
 
-		// Save the accurate snapshot to the database in background (non-blocking).
-		try {
-			const result = await apiService.saveAssessment(dataToSave);
-			
-			// Use dataToSave.assessmentId (committed snapshot) not formData.assessmentId
-			// (stale closure) — prevents duplicate INSERT if blur save already ran.
-			if (!dataToSave.assessmentId && result?.id) {
-				confirmDbSave(result.id);
-			}
-		} catch (err) {
-			// Silent fail — data is safe in localStorage
-			console.warn('[AutoSave] Could not save to database:', err.message);
-		}
-
-		// Navigate to next step
+		// Navigate immediately — never block the user
 		navigate('/form1/step2');
+
+		// Background save — fire and forget, does not block navigation
+		apiService.saveAssessment(dataToSave)
+			.then(result => {
+				if (!dataToSave.assessmentId && result?.id) {
+					confirmDbSave(result.id);
+				}
+			})
+			.catch(err => {
+				console.warn('[AutoSave] Could not save to database:', err.message);
+			});
 	};
 
 	return (
