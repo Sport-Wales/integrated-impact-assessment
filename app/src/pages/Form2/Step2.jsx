@@ -32,7 +32,7 @@ const Form2Step2 = () => {
     updateFormData({ form2: { ...formData.form2, [name]: value } });
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     setIsCompleting(true);
     setCompleteError(null);
 
@@ -44,29 +44,33 @@ const Form2Step2 = () => {
       status: ASSESSMENT_STATUS.COMPLETE,
     };
 
-    const dataToSave = commitStep(1, updatedData);
+    commitStep(1, updatedData);
+
+    const ft = formData.formType;
+    const cs = formData.completedSteps?.[ft] || [];
+    const savePayload = {
+      ...formData,
+      ...updatedData,
+      completedSteps: { ...formData.completedSteps, [ft]: cs.includes(1) ? cs : [...cs, 1].sort((a, b) => a - b) },
+    };
+
     let idToUse = formData.assessmentId || formData.localId;
 
-    // Navigate immediately
+    try {
+      const saveResult = await apiService.saveAssessment(savePayload);
+      if (saveResult?.id) {
+        idToUse = saveResult.id;
+        if (!formData.assessmentId) confirmDbSave(saveResult.id);
+      }
+      if (idToUse && !idToUse.startsWith('local_')) {
+        await apiService.completeAssessment(idToUse);
+      }
+    } catch (err) {
+      console.warn('[Complete] Background save/complete failed:', err.message);
+    }
+
     setIsCompleting(false);
     navigate('/form2/step3');
-
-    // Background save + complete — fire and forget
-    apiService.saveAssessment(dataToSave)
-      .then(saveResult => {
-        if (saveResult?.id) {
-          idToUse = saveResult.id;
-          if (!formData.assessmentId) {
-            confirmDbSave(saveResult.id);
-          }
-        }
-        if (idToUse && !idToUse.startsWith('local_')) {
-          return apiService.completeAssessment(idToUse);
-        }
-      })
-      .catch(err => {
-        console.warn('[Complete] Background save/complete failed:', err.message);
-      });
   };
 
   return (

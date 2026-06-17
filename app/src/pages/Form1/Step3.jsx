@@ -79,7 +79,7 @@ const Form1Step3 = () => {
 		}
 	};
 
-	const handleNext = () => {
+	const handleNext = async () => {
 		const updatedData = {
 			form1: {
 				...formData.form1,
@@ -87,19 +87,24 @@ const Form1Step3 = () => {
 			}
 		};
 
-		const dataToSave = commitStep(2, updatedData);
+		commitStep(2, updatedData);
+
+		const ft = formData.formType;
+		const cs = formData.completedSteps?.[ft] || [];
+		const savePayload = {
+			...formData,
+			...updatedData,
+			completedSteps: { ...formData.completedSteps, [ft]: cs.includes(2) ? cs : [...cs, 2].sort((a, b) => a - b) },
+		};
+
+		try {
+			const result = await apiService.saveAssessment(savePayload);
+			if (!formData.assessmentId && result?.id) confirmDbSave(result.id);
+		} catch (err) {
+			console.warn('[AutoSave] Could not save to database:', err.message);
+		}
 
 		navigate('/form1/step4');
-
-		apiService.saveAssessment(dataToSave)
-			.then(result => {
-				if (!formData.assessmentId && result?.id) {
-					confirmDbSave(result.id);
-				}
-			})
-			.catch(err => {
-				console.warn('[AutoSave] Could not save to database:', err.message);
-			});
 	};
 
 	// Define the characteristics

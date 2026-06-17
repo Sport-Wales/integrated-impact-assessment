@@ -65,7 +65,7 @@ const Form1Step1 = () => {
 		}
 	};
 
-	const handleNext = () => {
+	const handleNext = async () => {
 		const updatedData = {
 			title: formState.title,
 			leadName: formState.leadName,
@@ -78,21 +78,26 @@ const Form1Step1 = () => {
 			}
 		};
 
-		const dataToSave = commitStep(0, updatedData);
+		// Update state + localStorage (don't rely on return value — React 19 may defer the updater)
+		commitStep(0, updatedData);
 
-		// Navigate immediately — never block the user
+		// Build save payload independently with correct completedSteps
+		const ft = formData.formType;
+		const cs = formData.completedSteps?.[ft] || [];
+		const savePayload = {
+			...formData,
+			...updatedData,
+			completedSteps: { ...formData.completedSteps, [ft]: cs.includes(0) ? cs : [...cs, 0].sort((a, b) => a - b) },
+		};
+
+		try {
+			const result = await apiService.saveAssessment(savePayload);
+			if (!formData.assessmentId && result?.id) confirmDbSave(result.id);
+		} catch (err) {
+			console.warn('[AutoSave] Could not save to database:', err.message);
+		}
+
 		navigate('/form1/step2');
-
-		// Background save — fire and forget, does not block navigation
-		apiService.saveAssessment(dataToSave)
-			.then(result => {
-				if (!dataToSave.assessmentId && result?.id) {
-					confirmDbSave(result.id);
-				}
-			})
-			.catch(err => {
-				console.warn('[AutoSave] Could not save to database:', err.message);
-			});
 	};
 
 	return (

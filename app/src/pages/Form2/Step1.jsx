@@ -57,7 +57,7 @@ const Form2Step1 = () => {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const updatedData = {
       title: formState.title,
       leadName: formState.leadName,
@@ -66,19 +66,24 @@ const Form2Step1 = () => {
       workDetails: formState.workDetails
     };
 
-    const dataToSave = commitStep(0, updatedData);
+    commitStep(0, updatedData);
+
+    const ft = formData.formType;
+    const cs = formData.completedSteps?.[ft] || [];
+    const savePayload = {
+      ...formData,
+      ...updatedData,
+      completedSteps: { ...formData.completedSteps, [ft]: cs.includes(0) ? cs : [...cs, 0].sort((a, b) => a - b) },
+    };
+
+    try {
+      const result = await apiService.saveAssessment(savePayload);
+      if (!formData.assessmentId && result?.id) confirmDbSave(result.id);
+    } catch (err) {
+      console.warn('[AutoSave] Could not save to database:', err.message);
+    }
 
     navigate('/form2/step2');
-
-    apiService.saveAssessment(dataToSave)
-      .then(result => {
-        if (!dataToSave.assessmentId && result?.id) {
-          confirmDbSave(result.id);
-        }
-      })
-      .catch(err => {
-        console.warn('[AutoSave] Could not save to database:', err.message);
-      });
   };
 
   return (

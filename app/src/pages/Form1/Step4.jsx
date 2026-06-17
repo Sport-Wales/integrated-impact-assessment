@@ -30,7 +30,7 @@ const Form1Step4 = () => {
 		}
 	}, [formData.formType, navigate]);
 
-	const handleNext = () => {
+	const handleNext = async () => {
 		const updatedData = {
 			form1: {
 				...formData.form1,
@@ -38,19 +38,24 @@ const Form1Step4 = () => {
 			}
 		};
 
-		const dataToSave = commitStep(3, updatedData);
+		commitStep(3, updatedData);
+
+		const ft = formData.formType;
+		const cs = formData.completedSteps?.[ft] || [];
+		const savePayload = {
+			...formData,
+			...updatedData,
+			completedSteps: { ...formData.completedSteps, [ft]: cs.includes(3) ? cs : [...cs, 3].sort((a, b) => a - b) },
+		};
+
+		try {
+			const result = await apiService.saveAssessment(savePayload);
+			if (!formData.assessmentId && result?.id) confirmDbSave(result.id);
+		} catch (err) {
+			console.warn('[AutoSave] Could not save to database:', err.message);
+		}
 
 		navigate('/form1/step5');
-
-		apiService.saveAssessment(dataToSave)
-			.then(result => {
-				if (!formData.assessmentId && result?.id) {
-					confirmDbSave(result.id);
-				}
-			})
-			.catch(err => {
-				console.warn('[AutoSave] Could not save to database:', err.message);
-			});
 	};
 
 	const wellBeingGoals = [
