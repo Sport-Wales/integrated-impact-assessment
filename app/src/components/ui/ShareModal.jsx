@@ -144,7 +144,6 @@ const ShareModal = ({ assessmentId, onClose, shareUrl = null }) => {
     /* Backdrop — only closes if no unsaved pending changes */
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-      onClick={() => { if (!hasChanges) onClose(); }}
     >
       {/* Modal panel — stop propagation so clicks inside don't close it */}
       <div
@@ -155,7 +154,7 @@ const ShareModal = ({ assessmentId, onClose, shareUrl = null }) => {
         <div className="flex justify-between items-center mb-5">
           <h3 className="text-lg font-bold text-gray-900">Share Assessment</h3>
           <button
-            onClick={() => { if (!hasChanges && !submitting) onClose(); }}
+            onClick={() => { if (!submitting) onClose(); }}
             disabled={submitting}
             className="text-gray-400 hover:text-gray-600 text-xl leading-none disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Close"
