@@ -226,11 +226,11 @@ Azure Static Web App (SWA)
 
     <div class="section">
       <div class="section-title">The x-ms-client-principal Header</div>
-      <p>On every authenticated request, SWA adds a header called <code>x-ms-client-principal</code>. It contains a base64-encoded JSON object with the user's identity from Azure AD. The <code>getUser.js</code> utility decodes this header and returns a simple object:</p>
-      <pre><code>// What getUser() returns
+      <p>On every authenticated request, SWA adds a header called <code>x-ms-client-principal</code>. It contains a base64-encoded JSON object with the user's identity from Azure AD. The <code>getUser.js</code> utility (located at <span class="file-path">api/src/utils/getUser.js</span>, lines 15–43) decodes this header and returns a simple object:</p>
+      <pre><code>// What getUser() returns (api/src/utils/getUser.js, line 15)
 {
   userId:    "abc123def456...",          // Azure AD Object ID — stable, never changes
-  userEmail: "anselm.powell@sport.wales" // always lowercased
+  userEmail: "anselm.powell@sport.wales" // always lowercased (line 35)
 }</code></pre>
       <p><code>userId</code> is used as <code>owner_id</code> in the database — it uniquely identifies a user even if their email changes. <code>userEmail</code> is used for sharing, display, and the <code>@sport.wales</code> validation.</p>
     </div>
@@ -252,8 +252,9 @@ Azure Static Web App (SWA)
 
     <div class="section">
       <div class="section-title">Local Development Fallback</div>
-      <p>When running locally with <code>swa start</code>, SWA's auth header is not present. <code>getUser.js</code> detects this and returns a dummy user when <code>NODE_ENV=development</code>:</p>
+      <p>When running locally with <code>swa start</code>, SWA's auth header is not present. <code>getUser.js</code> (at <span class="file-path">api/src/utils/getUser.js</span>, lines 20–26) detects this and returns a dummy user when <code>NODE_ENV=development</code>:</p>
       <pre><code>// Only when NODE_ENV=development (set in local.settings.json)
+// api/src/utils/getUser.js, lines 20–26
 { userId: 'LOCAL_DEV_USER', userEmail: 'dev.user@sport.wales' }</code></pre>
       <div class="callout security">
         <div class="callout-label">Security</div>
@@ -276,9 +277,10 @@ Azure Static Web App (SWA)
 
     <div class="section">
       <div class="section-title">How to Use It</div>
-      <pre><code>const db = require('../db');
+      <pre><code>// From any function file
+const db = require('../db');
 
-// SELECT — returns array of row objects
+// SELECT — returns array of row objects (db/index.js, query() function, line 150)
 const rows = await db.query(
   'SELECT id, title FROM assessments WHERE owner_id = $1',
   [user.userId]
@@ -299,15 +301,15 @@ await db.query(
 );</code></pre>
       <div class="callout info">
         <div class="callout-label">Always use parameters</div>
-        <p>Never build SQL strings with template literals (e.g. <code>`WHERE id = '${id}'`</code>). Always use <code>$1, $2, $3</code> placeholders with a params array. This prevents SQL injection attacks and is enforced across every existing function.</p>
+        <p>Never build SQL strings with template literals (e.g. <code>`WHERE id = '${id}'`</code>). Always use <code>$1, $2, $3</code> placeholders with a params array. This prevents SQL injection attacks and is enforced across every existing function in <span class="file-path">api/src/functions/</span>.</p>
       </div>
     </div>
 
     <div class="section">
       <div class="section-title">Connection Pooling</div>
-      <p>The database connection pool is created once and reused across all function invocations on the same Azure Functions instance. This prevents the serverless function from opening a new database connection on every single request, which would quickly exhaust the database's connection limit.</p>
-      <p>The pool is configured with a maximum of 10 connections, a 30-second idle timeout, and a 10-second connection timeout. If the connection fails, the pool is cleared so the next call reconnects from scratch.</p>
-      <p>SSL is required for Azure PostgreSQL: <code>ssl: { rejectUnauthorized: false }</code> is set in the pool config. This encrypts the connection without requiring a CA certificate bundle to be bundled with the code.</p>
+      <p>The database connection pool is created once and reused across all function invocations on the same Azure Functions instance. This pattern prevents the serverless function from opening a new database connection on every single request. Located at <span class="file-path">api/src/db/index.js</span>, the `getConnection()` function (lines 23–114) manages this automatically.</p>
+      <p>The pool is configured with a maximum of 10 connections (line 98), a 30-second idle timeout (line 99), and a 10-second connection timeout (line 100). If the connection fails, the pool is cleared so the next call reconnects from scratch.</p>
+      <p>SSL is required for Azure PostgreSQL: <code>ssl: { rejectUnauthorized: false }</code> is set in the pool config (line 97). This encrypts the connection without requiring a CA certificate bundle to be bundled with the code.</p>
     </div>
   </div>
 </div>
