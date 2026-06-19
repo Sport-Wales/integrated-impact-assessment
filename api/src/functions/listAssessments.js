@@ -17,10 +17,11 @@
 //
 // Results ordered by updated_at DESC — most recently edited first.
 
-const { app }     = require('@azure/functions');
-const db          = require('../db');
-const { getUser } = require('../utils/getUser');
-const logger      = require('../utils/logger');
+const { app }          = require('@azure/functions');
+const db               = require('../db');
+const { getUser }      = require('../utils/getUser');
+const { isSuperUser }  = require('../utils/superusers');
+const logger           = require('../utils/logger');
 
 app.http('listAssessments', {
   methods: ['GET'],
@@ -34,7 +35,31 @@ app.http('listAssessments', {
     }
 
     try {
-      const rows = await db.query(
+      let rows;
+
+      if (isSuperUser(user.userEmail)) {
+        // Superuser — see ALL assessments in the system (view-only for ones they don't own).
+        // CASE gives the most privileged role available:
+        //   'owner' if they own it, explicit permission role if shared, otherwise 'view'.
+        rows = await db.query(
+          `SELECT
+               a.id, a.title, a.lead_name, a.form_type, a.status,
+               a.created_at, a.updated_at, a.completed_at,
+               a.signed_off_at, a.reviewed_at,
+               CASE
+                 WHEN a.owner_id = $1 THEN 'owner'
+                 WHEN p.role IS NOT NULL THEN p.role
+                 ELSE 'view'
+               END AS user_role
+             FROM assessments a
+             LEFT JOIN assessment_permissions p
+               ON p.assessment_id = a.id AND p.user_email = $2
+             ORDER BY a.updated_at DESC`,
+          [user.userId, user.userEmail]
+        );
+      } else {
+        // Normal user — owned assessments + assessments explicitly shared with them.
+        rows = await db.query(
         `SELECT
              id, title, lead_name, form_type, status,
              created_at, updated_at, completed_at,
@@ -58,7 +83,8 @@ app.http('listAssessments', {
 
          ORDER BY updated_at DESC`,
         [user.userId, user.userEmail]
-      );
+        );
+      } // end superuser/normal branch
 
       return { status: 200, jsonBody: rows };
 

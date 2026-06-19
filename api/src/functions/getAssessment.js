@@ -14,10 +14,11 @@
 // frontend can show "you don't have access to X"). Returns 404 only when
 // the assessment genuinely doesn't exist.
 
-const { app }     = require('@azure/functions');
-const db          = require('../db');
-const { getUser } = require('../utils/getUser');
-const logger      = require('../utils/logger');
+const { app }          = require('@azure/functions');
+const db               = require('../db');
+const { getUser }      = require('../utils/getUser');
+const { isSuperUser }  = require('../utils/superusers');
+const logger           = require('../utils/logger');
 
 app.http('getAssessment', {
   methods: ['GET'],
@@ -66,7 +67,30 @@ app.http('getAssessment', {
       );
 
       if (rows.length === 0) {
-        // Assessment exists but this user has no access
+        // No ownership or permission row — check superuser before denying.
+        if (isSuperUser(user.userEmail)) {
+          // Superuser gets full read access with 'view' role.
+          // Re-fetch without permission filter — assessment existence already confirmed above.
+          const superRows = await db.query(
+            `SELECT
+               a.id, a.form_type, a.title, a.lead_name, a.status,
+               a.form_data, a.completed_steps,
+               a.created_at, a.updated_at, a.completed_at,
+               a.signed_off_at, a.signed_off_by, a.reviewed_at,
+               'view' AS user_role
+             FROM assessments a
+             WHERE a.id = $1`,
+            [assessmentId]
+          );
+          const row = superRows[0];
+          row.form_data = {
+            ...row.form_data,
+            completedSteps: row.completed_steps || { form1: [], form2: [] },
+          };
+          return { status: 200, jsonBody: row };
+        }
+
+        // Not a superuser — access denied with title for the frontend popup.
         return { status: 403, jsonBody: {
           error: 'You do not have access to this assessment',
           title: exists[0].title || 'this assessment'
