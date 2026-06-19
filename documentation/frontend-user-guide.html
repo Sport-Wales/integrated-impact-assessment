@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frontend User & Developer Guide — IIA Portal</title>
+<style>
+  :root {
+    --sw-red:        #e32434;
+    --sw-blue:       #164b64;
+    --sw-green:      #299d91;
+    --sw-yellow:     #f6b207;
+    --sw-blue-dark:  #001830;
+    --sw-blue-light: #e8f4f8;
+    --sw-light:      #f4f5f7;
+    --sw-white:      #ffffff;
+    --font:          "Montserrat", Arial, sans-serif;
+    --radius:        8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); font-size: 15px; line-height: 1.65; color: #1a1a1a; background: #f9f9f9; }
+  .hdr { background: var(--sw-blue); color: white; padding: 2rem 2.5rem; border-bottom: 4px solid var(--sw-red); }
+  .hdr .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 0.4rem; }
+  .hdr h1 { font-size: 1.75rem; font-weight: 800; line-height: 1.15; margin-bottom: 0.5rem; }
+  .hdr .sub { font-size: 0.875rem; color: rgba(255,255,255,0.7); margin-bottom: 1rem; }
+  .badge { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--sw-green); color: white; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 0.3rem 0.75rem; border-radius: 20px; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 2.5rem 2rem 5rem; }
+  .block { background: white; border: 1px solid #e2e2e8; border-radius: var(--radius); margin-bottom: 2.5rem; overflow: hidden; }
+  .block-hdr { display: flex; align-items: center; gap: 1rem; padding: 1.1rem 1.5rem; background: var(--sw-blue); color: white; }
+  .block-tag { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.65; white-space: nowrap; }
+  .block-title { font-size: 1rem; font-weight: 800; flex: 1; }
+  .block-body { padding: 1.5rem; }
+  .section { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid #eee; }
+  .section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .section-title { font-size: 0.95rem; font-weight: 700; color: var(--sw-blue); margin-bottom: 0.75rem; }
+  p { margin-bottom: 0.75rem; color: #333; font-size: 0.9rem; }
+  p:last-child { margin-bottom: 0; }
+  ul.bullets { margin: 0.5rem 0 0.75rem 1.4rem; }
+  ul.bullets li { margin-bottom: 0.35rem; color: #333; font-size: 0.9rem; list-style: disc; }
+  pre { background: #1e1e2e; color: #cdd6f4; font-family: "Courier New", Courier, monospace; font-size: 0.8rem; line-height: 1.6; border-radius: var(--radius); padding: 1.1rem 1.25rem; overflow-x: auto; margin: 0.75rem 0; border-left: 3px solid var(--sw-blue); }
+  code { font-family: "Courier New", Courier, monospace; font-size: 0.82rem; background: #eef2f7; color: var(--sw-blue); padding: 0.1rem 0.35rem; border-radius: 3px; }
+  pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+  .callout { border-radius: var(--radius); padding: 0.85rem 1.1rem; margin: 0.75rem 0; font-size: 0.875rem; }
+  .callout-label { font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 0.3rem; }
+  .callout.info { background: var(--sw-blue-light); border-left: 4px solid var(--sw-blue); }
+  .callout.info .callout-label { color: var(--sw-blue); }
+  .callout.key { background: #f0fdf4; border-left: 4px solid var(--sw-green); }
+  .callout.key .callout-label { color: var(--sw-green); }
+  table.t { width: 100%; border-collapse: collapse; font-size: 0.875rem; margin: 0.75rem 0; }
+  table.t th { background: var(--sw-light); font-weight: 700; text-align: left; padding: 0.5rem 0.75rem; border-bottom: 2px solid #ddd; font-size: 0.8rem; color: #444; }
+  table.t td { padding: 0.45rem 0.75rem; border-bottom: 1px solid #eee; vertical-align: top; font-size: 0.875rem; }
+  table.t tr:last-child td { border-bottom: none; }
+  table.t td code { font-size: 0.78rem; }
+  .arch { background: #1e1e2e; color: #cdd6f4; font-family: "Courier New", monospace; font-size: 0.8rem; line-height: 1.7; border-radius: var(--radius); padding: 1.1rem 1.25rem; margin: 0.75rem 0; border-left: 3px solid var(--sw-green); overflow-x: auto; white-space: pre; }
+  .file-path { background: #eef2f7; color: var(--sw-blue); font-family: "Courier New", monospace; font-size: 0.85rem; padding: 0.2rem 0.4rem; border-radius: 3px; }
+  .contents { max-width: 940px; margin: 0 auto; padding: 1.25rem 2rem 0; }
+  .contents-inner { background: white; border: 1px solid #e2e2e8; border-radius: 8px; padding: 0.9rem 1.5rem; }
+  .contents-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #888; display: block; margin-bottom: 0.5rem; }
+  .contents-inner ul { list-style: none; padding: 0; margin: 0; columns: 2; column-gap: 1.5rem; }
+  .contents-inner ul li { margin-bottom: 0.2rem; break-inside: avoid; }
+  .contents-inner ul li a { font-size: 0.72rem; color: var(--sw-blue); text-decoration: none; }
+  .contents-inner ul li a:hover { text-decoration: underline; }
+  .footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 2px solid var(--sw-red); font-size: 0.8rem; color: #888; text-align: center; }
+  .flow-box { background: var(--sw-light); border-left: 4px solid var(--sw-blue); padding: 1rem 1.1rem; border-radius: var(--radius); margin: 0.75rem 0; }
+  .flow-num { display: inline-block; background: var(--sw-blue); color: white; width: 24px; height: 24px; border-radius: 50%; text-align: center; line-height: 24px; font-weight: 700; font-size: 0.85rem; margin-right: 0.5rem; }
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="eyebrow">Sport Wales — Internal Developer Documentation</div>
+  <h1>Frontend User & Developer Guide</h1>
+  <p class="sub">IIA Portal — React App, User Flow, Save & Share Functionality</p>
+  <span class="badge">&#10003; Complete</span>
+</header>
+
+<nav class="contents">
+  <div class="contents-inner">
+    <span class="contents-label">Contents</span>
+    <ul>
+      <li><a href="#what-is-iia">What is the IIA?</a></li>
+      <li><a href="#user-journey">User Journey</a></li>
+      <li><a href="#create-assessment">Creating an Assessment</a></li>
+      <li><a href="#workspace">The Workspace</a></li>
+      <li><a href="#save-functionality">Save Functionality</a></li>
+      <li><a href="#share-functionality">Share Functionality</a></li>
+      <li><a href="#file-locations">Key File Locations</a></li>
+      <li><a href="#local-storage">Local Storage & DB Sync</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- WHAT IS THE IIA -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="what-is-iia">
+  <div class="block-hdr">
+    <span class="block-tag">Context</span>
+    <span class="block-title">What is the Integrated Impact Assessment (IIA)?</span>
+  </div>
+  <div class="block-body">
+    <p>The <strong>Integrated Impact Assessment</strong> is a framework used by Sport Wales to evaluate the impact of policies and programmes on society. It assesses how a new initiative or change affects different groups, identifies risks and opportunities, and ensures informed decision-making.</p>
+    <p>This portal provides a digital tool for completing and managing IIAs. Users fill out detailed forms (Form 1 for full assessments, Form 2 for shorter ones), save their work, collaborate with colleagues by sharing assessments, and generate professional reports for review and sign-off.</p>
+    <div class="callout key">
+      <div class="callout-label">Key User Roles</div>
+      <p><strong>Owner:</strong> Person who created the assessment — can edit, share, complete, and sign off. <strong>Editor:</strong> Person with edit access — can save changes and complete but cannot sign off or share. <strong>Viewer:</strong> Person with view-only access — can read but cannot make changes.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- USER JOURNEY -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="user-journey">
+  <div class="block-hdr">
+    <span class="block-tag">Overview</span>
+    <span class="block-title">Complete User Flow</span>
+  </div>
+  <div class="block-body">
+    <div class="section">
+      <div class="section-title">Start: The Landing Page (Workspace)</div>
+      <p>When a user logs in, they land on the workspace — a table showing all assessments they own or have been shared with them. Located at <span class="file-path">app/src/pages/LandingPage.jsx</span> (lines 1–361), this page fetches assessments using <code>apiService.listAssessments()</code> at line 23 and displays them in a React table component.</p>
+      <ul class="bullets">
+        <li>Owned assessments show with your role as "Owner"</li>
+        <li>Shared assessments show your access level ("Edit" or "View")</li>
+        <li>You can create a new assessment, open an existing one, delete one, or share one from here</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Create or Open an Assessment</div>
+      <p>Two paths: <strong>New</strong> — click "Start New Assessment," choose Form Type (Full or Short), answer pre-form questions. <strong>Existing</strong> — click a row to open it (if you have access).</p>
+      <p>Opening an existing assessment calls <code>apiService.getAssessment(id)</code> which fetches the full assessment from the database. The form loads into FormContext (the app's central state manager at <span class="file-path">app/src/context/FormContext.jsx</span>, lines 1–450) and renders the first step of the form.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Fill Out the Form Step by Step</div>
+      <p>The user navigates through 10 steps in Form 1 or 4 steps in Form 2 (files located in <span class="file-path">app/src/pages/Form1/Step1.jsx</span> through <span class="file-path">Step10.jsx</span>, and <span class="file-path">app/src/pages/Form2/Step1.jsx</span> through <span class="file-path">Step4.jsx</span>). Each step captures form field answers, stores them in React state via FormContext's <code>updateFormData()</code> function (FormContext.jsx line 162), and automatically writes to localStorage via a useEffect hook (FormContext.jsx lines 86–91).</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Save & Move Forward</div>
+      <p>When the user clicks "Next" or the "Save" button (SaveButton.jsx at <span class="file-path">app/src/components/ui/SaveButton.jsx</span> line 1), two things happen: (1) localStorage is already up-to-date from keystroke-by-keystroke syncing, and (2) the app calls <code>apiService.saveAssessment(formData)</code> to push the data to the database. If it's the first save, the backend returns a UUID which becomes the assessment's permanent ID. On subsequent saves, it's an UPDATE.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Complete & Sign Off</div>
+      <p>After all steps are filled, the user clicks "Mark as Complete" (Form1 Step 8, Form 2 Step 2) which calls <code>apiService.completeAssessment(id)</code>. Later, in the Assessment Document view (AssessmentDocument.jsx at <span class="file-path">app/src/pages/AssessmentDocument.jsx</span> line 1), the owner can click "Sign Off" which calls <code>apiService.signOffAssessment(id)</code>, permanently locking the assessment as read-only.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Share & Collaborate</div>
+      <p>The owner can click the "Share" button (on any form step or the workspace) to open ShareModal (ShareModal.jsx at <span class="file-path">app/src/components/ui/ShareModal.jsx</span> line 1). They type a colleague's email, choose "View" or "Edit" access, and click "Save permissions." This calls <code>apiService.shareAssessment(id, email, role)</code> which adds a row to the database's <code>assessment_permissions</code> table and generates a shareable link.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CREATE ASSESSMENT -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="create-assessment">
+  <div class="block-hdr">
+    <span class="block-tag">User Flow</span>
+    <span class="block-title">Creating a New Assessment</span>
+  </div>
+  <div class="block-body">
+    <p>When a user clicks "Start New Assessment" from the workspace, they see a form asking which type of assessment to create (Form 1 or Form 2). This is the FormSelection component at <span class="file-path">app/src/pages/FormSelection.jsx</span> (lines 1–80).</p>
+    <p>After selecting, they answer pre-form questions on FormIntroduction.jsx (<span class="file-path">app/src/pages/FormIntroduction.jsx</span>, lines 1–120) — these capture basic info like the assessment title and lead person's name. When they click "Start Form," the app initializes a new assessment in FormContext (starting with <code>startAssessment(formType)</code> at FormContext.jsx line 189) and navigates to Form 1 Step 1 or Form 2 Step 1.</p>
+    <p>At Step 1, the user enters the title and lead name. The app automatically calls <code>saveAssessment()</code> when the title field loses focus (handleTitleBlur), ensuring the assessment is persisted to the database even before the user clicks "Next." This happens in Step1.jsx at the onBlur event handler.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- WORKSPACE -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="workspace">
+  <div class="block-hdr">
+    <span class="block-tag">Hub</span>
+    <span class="block-title">The Workspace Table</span>
+  </div>
+  <div class="block-body">
+    <p>The workspace (LandingPage.jsx, lines 1–361) shows a table of assessments with columns: Title, Lead Person, Form Type, Status (Draft / Complete / Signed Off), Created, Last Updated, and Review. All assessments shown here have been retrieved from the database via <code>apiService.listAssessments()</code>.</p>
+    <p>For each row, users can: <strong>Click to open</strong> — loads the full assessment into FormContext. <strong>Share</strong> (DB-backed assessments only) — opens ShareModal. <strong>Delete</strong> — removes the assessment permanently after confirmation.</p>
+    <div class="callout info">
+      <div class="callout-label">Why Two Tables?</div>
+      <p>The database query for listAssessments uses UNION to return both owned assessments and shared ones in a single table. The computed <code>user_role</code> field tells the UI whether the user is owner, editor, or viewer, so permission-sensitive buttons can hide themselves accordingly.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SAVE FUNCTIONALITY -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="save-functionality">
+  <div class="block-hdr">
+    <span class="block-tag">Critical Feature</span>
+    <span class="block-title">How Save Works — Three-Layer Safety</span>
+  </div>
+  <div class="block-body">
+    <p>The save system is designed so users never lose data, even if the network fails or they close the browser mid-session. It has three layers: localStorage (instant), FormContext state (in-memory), and the database (persistent).</p>
+
+    <div class="section">
+      <div class="section-title">Layer 1: Keystroke-by-Keystroke to localStorage</div>
+      <p>Every time a user types in a form field, the input handler in the step file calls <code>updateFormData(section, newValue)</code> (FormContext.jsx line 162). This updates FormContext state immediately. A useEffect hook (FormContext.jsx lines 86–91) watches FormContext and automatically writes the entire state to localStorage whenever it changes.</p>
+      <p>This means: type 5 characters → localStorage updates 5 times with all 5 keystroke states. If the user closes the browser without clicking "Next" or "Save," all their typed data is safe in localStorage.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Layer 2: On Navigation or Save Button</div>
+      <p>When the user clicks "Next" (in a step file) or "Save" (SaveButton.jsx), the app calls <code>apiService.saveAssessment(formData)</code> which sends the full FormContext state to the backend. The backend INSERT or UPDATE the assessment in the database.</p>
+      <p>This is NOT synchronous; it's fire-and-forget. The app navigates immediately (user sees the next step), and the database save happens in the background. If the save fails silently, localStorage already has the data, so it's not lost.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Layer 3: Reconciliation on Page Refresh</div>
+      <p>When the user returns to their workspace and reopens an assessment, UrlAssessmentLoader (App.jsx lines 39–75) fetches the data from the database. FormContext's <code>loadAssessment()</code> function (FormContext.jsx lines 102–171) compares timestamps: if localStorage has a newer <code>lastSavedAt</code> than the database's <code>updated_at</code>, it means the user typed unsaved changes. The function keeps localStorage data and fires a background sync to push it to the database.</p>
+      <p>Result: even if a background save failed before, this reconciliation ensures the database catches up.</p>
+    </div>
+
+    <div class="callout key">
+      <div class="callout-label">Why This Design?</div>
+      <p>Most save failures are transient (network blip, cold-start delay). By using localStorage as the source of truth, the app is resilient — the user sees instant feedback (data is safe), while the database sync happens asynchronously. This is why we never block navigation waiting for the backend to respond.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SHARE FUNCTIONALITY -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="share-functionality">
+  <div class="block-hdr">
+    <span class="block-tag">Collaboration</span>
+    <span class="block-title">How Share Works — Permissions & Shareable Links</span>
+  </div>
+  <div class="block-body">
+    <p>Only the <strong>owner</strong> of an assessment can share it. Editors and viewers cannot share, even if they have edit access. The share button appears in two places: in the header on any form step (ShareButton.jsx at <span class="file-path">app/src/components/ui/ShareButton.jsx</span>, line 1) and in the workspace table for each assessment row (LandingPage.jsx, line 302).</p>
+
+    <div class="section">
+      <div class="section-title">Step 1: Opening the Share Modal</div>
+      <p>When the owner clicks "Share," ShareButton checks if the assessment is already saved to the database. If yes, it opens ShareModal immediately with the assessment ID. If not (brand new assessment), it calls <code>saveAssessment()</code> first (ShareButton.jsx lines 21–34) to get the assessment ID, then opens the modal.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Step 2: The Share Modal Interface</div>
+      <p>ShareModal (at <span class="file-path">app/src/components/ui/ShareModal.jsx</span>, lines 1–285) shows: a text field to enter a colleague's email, a dropdown to choose "View only" or "Can edit" access level, and an "Add" button. Below that is a table of everyone who already has access. At the bottom are two buttons: "Copy link" and "Save permissions."</p>
+      <div class="callout info">
+        <div class="callout-label">Email Validation</div>
+        <p>Only <code>@sport.wales</code> email addresses are accepted. ShareModal validates this at line 79 with <code>isValidSwEmail()</code>. If someone enters an external email, ShareModal shows "Only Sport Wales accounts can have access."</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Step 3: Staging & Submitting</div>
+      <p>When you add a colleague, ShareModal doesn't immediately call the backend. Instead, it "stages" the change in local state (setPendingAdds, line 82). You can add multiple people, remove them from the list, or change their access level — all without calling the backend. When you click "Save permissions," all staged changes are submitted at once via <code>apiService.shareAssessment()</code> (ShareModal.jsx line 107).</p>
+      <p>This two-phase approach lets you make bulk changes efficiently instead of making individual API calls per person.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Step 4: The Shareable Link</div>
+      <p>When the owner clicks "Copy link," the link is built dynamically at ShareButton.jsx line 76 using the assessment ID and form type: <code>${origin}/${formType}/step1?id=${assessmentId}</code>. For example: <code>https://ashy-desert-065fb6403.7.azurestaticapps.net/form1/step1?id=abc123-def456...</code></p>
+      <p>The link always points to step 1 of the correct form, and includes the assessment UUID as a query parameter so the recipient's browser knows which assessment to load.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Step 5: What Happens When a Colleague Opens the Link</div>
+      <p>When the colleague clicks the shareable link (e.g., from an email), their browser navigates to that URL. UrlAssessmentLoader (App.jsx lines 39–75) detects the <code>?id=</code> query parameter and fetches the assessment from the database using <code>fetch('/api/getAssessment?id=...')</code> at line 52.</p>
+      <p>If they have permission (owner, editor, or viewer), the assessment loads and the form renders. If they don't have permission, the backend returns a 403 status code. UrlAssessmentLoader catches this at line 55, redirects to the workspace, and passes the assessment title via React Router state. LandingPage (line 372) displays a friendly popup: "You don't have access to <strong>Community Cycling Programme</strong>. Please contact the assessment owner to be granted access."</p>
+    </div>
+
+    <div class="callout key">
+      <div class="callout-label">Permission Levels</div>
+      <p><strong>Owner:</strong> Full control — can edit, complete, sign off, delete, and share. <strong>Editor:</strong> Can edit and complete, but cannot sign off or re-share. <strong>Viewer:</strong> Read-only — cannot make any changes.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- FILE LOCATIONS -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="file-locations">
+  <div class="block-hdr">
+    <span class="block-tag">Developer Reference</span>
+    <span class="block-title">Key File Locations & Functions</span>
+  </div>
+  <div class="block-body">
+    <p>New team members should become familiar with these files. File paths are relative to the project root.</p>
+    <table class="t">
+      <tr>
+        <th>File</th>
+        <th>Purpose</th>
+        <th>Key Functions / Lines</th>
+      </tr>
+      <tr>
+        <td><code>app/src/pages/LandingPage.jsx</code></td>
+        <td>Workspace — shows all assessments, handles open/delete/share</td>
+        <td><code>listAssessments()</code> at line 23; share button at line 302</td>
+      </tr>
+      <tr>
+        <td><code>app/src/context/FormContext.jsx</code></td>
+        <td>Central state manager — holds form data, handles save/load</td>
+        <td><code>updateFormData()</code> at line 162; <code>loadAssessment()</code> at line 102; localStorage sync at line 86</td>
+      </tr>
+      <tr>
+        <td><code>app/src/pages/Form1/Step1.jsx</code> (and Step2–10)</td>
+        <td>Form pages — user fills data, calls <code>updateFormData()</code> on every keystroke</td>
+        <td><code>handleChange()</code> and <code>handleTitleBlur()</code> trigger saves</td>
+      </tr>
+      <tr>
+        <td><code>app/src/components/ui/SaveButton.jsx</code></td>
+        <td>Save button — manually triggers <code>saveAssessment()</code></td>
+        <td>Save call at line 22</td>
+      </tr>
+      <tr>
+        <td><code>app/src/components/ui/ShareButton.jsx</code></td>
+        <td>Share button in header — opens ShareModal, pre-saves if needed</td>
+        <td>Pre-save logic at lines 21–34; URL build at line 76</td>
+      </tr>
+      <tr>
+        <td><code>app/src/components/ui/ShareModal.jsx</code></td>
+        <td>Modal for managing permissions — add/remove colleagues, copy link</td>
+        <td>Staging at line 82; submit at line 107; URL copy at line 131</td>
+      </tr>
+      <tr>
+        <td><code>app/src/App.jsx</code></td>
+        <td>Main app component — router, UrlAssessmentLoader for shared links</td>
+        <td><code>UrlAssessmentLoader</code> component at lines 39–75; 403 handling at line 55</td>
+      </tr>
+      <tr>
+        <td><code>app/src/services/api.js</code></td>
+        <td>API client — all backend calls (save, load, list, share, etc.)</td>
+        <td><code>saveAssessment()</code> at line 135; <code>getAssessment()</code> at line 147</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- LOCAL STORAGE & DB SYNC -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="block" id="local-storage">
+  <div class="block-hdr">
+    <span class="block-tag">Deep Dive</span>
+    <span class="block-title">How localStorage Keeps Data Safe During Network Issues</span>
+  </div>
+  <div class="block-body">
+    <p>The app uses localStorage as a local copy of the assessment. Every keystroke updates localStorage so the user never loses typed data, even if the network is down or the page closes. The database is a secondary backup that syncs whenever possible.</p>
+
+    <div class="section">
+      <div class="section-title">The Auto-Sync Cycle</div>
+      <p>FormContext has a useEffect hook (lines 86–91) that watches the <code>formData</code> state. Every time formData changes, it calls <code>writeAssessmentToStore()</code> which writes the entire form state to localStorage with a timestamp <code>lastSavedAt</code>. This happens ~every keystroke.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Database Sync on Navigation</div>
+      <p>When the user clicks "Next" or "Save," the step file calls <code>apiService.saveAssessment(formData)</code>. This sends localStorage data to the backend, which performs an INSERT (new assessment) or UPDATE (existing). If the save succeeds, the database now has the latest data. If it fails silently, localStorage still has it.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Reconciliation on Reopen</div>
+      <p>When the user closes the browser and later opens the assessment again, <code>loadAssessment()</code> (FormContext.jsx lines 102–171) compares <code>localStorage.lastSavedAt</code> vs <code>database.updated_at</code>. If localStorage is newer, it means the user made unsaved changes. The function keeps the localStorage data and fires a background sync (lines 165–170) to push it to the database silently. The user sees their data immediately and the database catches up.</p>
+    </div>
+
+    <div class="callout key">
+      <div class="callout-label">Why Two Sources of Truth?</div>
+      <p>localStorage is fast (instant writes), survives network failures, and works offline. The database is persistent and shared. By syncing both, we get resilience (localStorage) + collaboration (database). If the backend is temporarily unavailable, users can still work and their data is safe. When they reconnect, the data syncs automatically.</p>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <p>For questions about this documentation or to report issues, contact the Sport Wales Development Team.</p>
+  <p>Last updated: June 2026 | IIA Portal v1.0</p>
+</div>
+
+</div>
+
+</body>
+</html>
