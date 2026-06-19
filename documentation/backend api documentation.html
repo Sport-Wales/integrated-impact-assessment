@@ -122,6 +122,7 @@
       <li><a href="#frontend-connection">Frontend Connection</a></li>
       <li><a href="#data-flow">Data Flow — Save to DB</a></li>
       <li><a href="#azure-infrastructure">Azure Infrastructure</a></li>
+      <li><a href="#Super-user">Super User Access</a></li>
       <li><a href="#env-vars">Environment Variables</a></li>
       <li><a href="#adding-new-function">Adding a New Function</a></li>
       <li><a href="#troubleshooting">Troubleshooting</a></li>
@@ -355,7 +356,7 @@ await db.query(
         <tr><th>Column</th><th>Type</th><th>Description</th></tr>
         <tr><td>id</td><td>UUID</td><td>Primary key.</td></tr>
         <tr><td>assessment_id</td><td>UUID</td><td>Foreign key → assessments.id. ON DELETE CASCADE.</td></tr>
-        <tr><td>user_email</td><td>TEXT</td><td>Email of the person granted access e.g. <code>tara.rhoseyn@sport.wales</code>. Always stored lowercase.</td></tr>
+        <tr><td>user_email</td><td>TEXT</td><td>Email of the person granted access e.g. <code>Joe.Bloggs@sport.wales</code>. Always stored lowercase.</td></tr>
         <tr><td>role</td><td>TEXT</td><td><code>view</code> = read-only, <code>edit</code> = can save changes. CHECK constraint enforces these two values only.</td></tr>
         <tr><td>granted_at</td><td>TIMESTAMPTZ</td><td>When this permission was created. Audit trail.</td></tr>
       </table>
@@ -389,7 +390,7 @@ await db.query(
     <span class="block-title">What the Database Actually Looks Like</span>
   </div>
   <div class="block-body">
-    <p>Two assessments created by Anselm. Assessment 1 is half-complete and shared with Paul (view access). Assessment 2 is signed off and shared with Tara (edit access), awaiting review.</p>
+    <p>Two assessments created by user. Assessment 1 is half-complete and shared with coworker (view access). Assessment 2 is signed off and shared with other coworker (edit access), awaiting review.</p>
 
     <div class="section">
       <div class="section-title">assessments table</div>
@@ -399,9 +400,9 @@ await db.query(
  e5f6g7h8-0002-0002-0002-000000000002 | anselm.powell@sport.wales      | form1     | Active Travel Strategy      | signed_off   | 2026-06-15 09:30:00 | 2026-06-15 10:00:00 | NULL</code></pre>
       <p>The <code>form_data</code> column for Assessment 1 contains only actual form answers — no internal frontend fields:</p>
       <pre><code>{
-  "leadName": "Anselm Powell",
+  "leadName": "Joe Bloggs",
   "leadRole": "Development Officer",
-  "otherPeople": "Tara Rhoseyn",
+  "otherPeople": "Sarah Jones",
   "workDetails": "A programme to increase cycling participation...",
   "form1": {
     "affectedGroups": "All age groups, particularly 18-35",
@@ -424,14 +425,14 @@ await db.query(
       <div class="section-title">assessment_permissions table</div>
       <pre><code> id       | assessment_id                        | user_email                  | role | granted_at
 ----------+--------------------------------------+-----------------------------+------+---------------------
- perm-001 | a1b2c3d4-0001-0001-0001-000000000001 | paul.batcup@sport.wales     | view | 2026-06-15 08:45:00
- perm-002 | e5f6g7h8-0002-0002-0002-000000000002 | tara.rhoseyn@sport.wales    | edit | 2026-06-15 09:00:00</code></pre>
-      <p>Assessment 1 links to Paul with <code>view</code>. Assessment 2 links to Tara with <code>edit</code>. Both emails are lowercase. If Assessment 1 is deleted, perm-001 is automatically deleted by CASCADE — no orphaned rows.</p>
+ perm-001 | a1b2c3d4-0001-0001-0001-000000000001 | Sarah.Jones@sport.wales     | view | 2026-06-15 08:45:00
+ perm-002 | e5f6g7h8-0002-0002-0002-000000000002 | Joe.Bloggs@sport.wales    | edit | 2026-06-15 09:00:00</code></pre>
+      <p>Assessment 1 links to coworker with <code>view</code>. Assessment 2 links to other coworker with <code>edit</code>. Both emails are lowercase. If Assessment 1 is deleted, perm-001 is automatically deleted by CASCADE — no orphaned rows.</p>
     </div>
 
     <div class="section">
       <div class="section-title">What the workspace table reads from these rows</div>
-      <p>When Anselm's workspace loads, <code>listAssessments</code> returns both rows because he owns them. Paul's workspace returns Assessment 1 with <code>user_role: 'view'</code>. Tara's workspace returns Assessment 2 with <code>user_role: 'edit'</code>. The workspace table shows:</p>
+      <p>When user's workspace loads, <code>listAssessments</code> returns both rows because he owns them. User's workspace returns Assessment 1 with <code>user_role: 'view'</code>. The other users workspace returns Assessment 2 with <code>user_role: 'edit'</code>. The workspace table shows:</p>
       <table class="t">
         <tr><th>Title</th><th>Status</th><th>Role</th><th>Complete ✓</th><th>Sign Off ✓</th><th>Review</th></tr>
         <tr><td>Community Cycling Programme</td><td>draft</td><td>Owner</td><td>—</td><td>—</td><td>—</td></tr>
@@ -807,11 +808,63 @@ output_location: "dist"   # Where Vite puts the built frontend</code></pre>
       <tr><td><code>AAD_CLIENT_SECRET</code></td><td>staticwebapp.config.json (clientSecretSettingName)</td><td>Client secret value from the App Registration.</td></tr>
       <tr><td><code>TENANT_ID</code></td><td>Reference only — value used in staticwebapp.config.json</td><td>Directory (tenant) ID from the App Registration.</td></tr>
       <tr><td><code>NODE_ENV</code></td><td>getUser.js</td><td>Set to <code>development</code> in local.settings.json only. Enables the local dev auth fallback. Never set in production.</td></tr>
+      <tr><td><code>SUPER_USER</code></td><td>api/src/utils/superusers.js</td><td>Comma-separated list of Sport Wales email addresses who have view-all access (e.g., <code>firstName1.LastName1@sport.wales,firstName2.LastName2@sport.wales</code>). Optional — if not set, falls back to hardcoded local array.</td></tr>
     </table>
 
     <div class="callout security">
       <div class="callout-label">Never commit secrets</div>
       <p><code>api/local.settings.json</code> is in <code>.gitignore</code>. It must never be committed to GitHub. If you accidentally commit it, rotate the database password and client secret immediately through the Azure Portal.</p>
+    </div>
+
+    <div class="section" id="Super-user">
+      <div class="section-title">Superuser Configuration — SUPER_USER</div>
+      <p>The <code>SUPER_USER</code> environment variable enables view-all access for specified Sport Wales staff (typically the project owner and developers). Superusers can view every assessment in the system but cannot edit, delete, or sign off assessments they don't own.</p>
+
+      <div class="subsection" style="margin-top: 1rem;">
+        <strong>Local Development Setup</strong>
+        <p>In local development, <code>SUPER_USER</code> is not set. Instead, a hardcoded array in <code>api/src/utils/superusers.js</code> is used:</p>
+        <pre><code>// api/src/utils/superusers.js — lines 1-7
+const LOCAL_SUPERUSERS = [
+  'firstName1.LastName1@sport.wales',
+  'firstName2.LastName2@sport.wales',
+  'firstName3.LastName3@sport.wales',
+];
+</code></pre>
+        <p>To add or remove superusers locally, update this array. No restart needed.</p>
+      </div>
+
+      <div class="subsection" style="margin-top: 1rem;">
+        <strong>Azure Deployment Setup (Dev and Production)</strong>
+        <p>In Azure, set the environment variable in the SWA configuration:</p>
+        <ol class="bullets" style="margin-top: 0.5rem;">
+          <li>Log into <a href="https://portal.azure.com" target="_blank">portal.azure.com</a></li>
+          <li>Go to <strong>Static Web Apps</strong> → select the SWA resource (e.g., <code>sw-iia-dev</code>)</li>
+          <li>Click <strong>Configuration</strong> (left menu)</li>
+          <li>Click <strong>Application settings</strong></li>
+          <li>Click <strong>+ Add</strong></li>
+          <li>Enter:<br/>
+            <code style="background: #eef2f7; padding: 0.2rem 0.4rem;">Name: SUPER_USER</code><br/>
+            <code style="background: #eef2f7; padding: 0.2rem 0.4rem;">Value: userFirstName1.LastName1@sport.wales, userFirstName2.LastName2@sport.wales, userFirstName3.LastName3@sport.wales</code>
+          </li>
+          <li>Click <strong>Save</strong></li>
+        </ol>
+      </div>
+
+      <div class="subsection" style="margin-top: 1rem;">
+        <strong>How It Works</strong>
+        <p>When a superuser logs in:</p>
+        <ol class="bullets">
+          <li><code>listAssessments</code> returns ALL assessments in the system, not just owned + shared ones</li>
+          <li>For each assessment, <code>user_role</code> is computed: <code>'owner'</code> if they own it, their explicit permission role if shared, otherwise <code>'view'</code></li>
+          <li>When they open an assessment they don't own, it loads with <code>user_role: 'view'</code> — all form fields become read-only</li>
+          <li>All write endpoints (save, delete, sign-off, complete) independently verify ownership and reject non-owners with 403</li>
+        </ol>
+      </div>
+
+      <div class="callout info">
+        <div class="callout-label">Implementation Detail</div>
+        <p>The superuser check happens in <code>api/src/utils/superusers.js</code> (line 36). The function <code>isSuperUser(email)</code> normalizes the email to lowercase and compares against the configured list. No other files need modification — the existing permission model automatically enforces read-only for superusers viewing shared assessments.</p>
+      </div>
     </div>
   </div>
 </div>
