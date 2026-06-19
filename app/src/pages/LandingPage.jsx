@@ -383,9 +383,8 @@ const LandingPage = () => {
               aria-label="Close"
             >✕</button>
             <div className="text-center pt-2">
-              <p className="text-lg font-semibold text-gray-900 mb-2">Access Denied</p>
-              <p className="text-gray-600">
-                Sorry, you don't have access to <strong>{deniedTitle}</strong>.
+              <p className="text-gray-700">
+                You don't have access to <strong>{deniedTitle}</strong>. 
                 Please contact the assessment owner to be granted access.
               </p>
             </div>
