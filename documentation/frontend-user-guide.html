@@ -137,7 +137,7 @@
 
     <div class="section">
       <div class="section-title">Fill Out the Form Step by Step</div>
-      <p>The user navigates through 10 steps in Form 1 or 4 steps in Form 2 (files located in <span class="file-path">app/src/pages/Form1/Step1.jsx</span> through <span class="file-path">Step10.jsx</span>, and <span class="file-path">app/src/pages/Form2/Step1.jsx</span> through <span class="file-path">Step4.jsx</span>). Each step captures form field answers, stores them in React state via FormContext's <code>updateFormData()</code> function (FormContext.jsx line 162), and automatically writes to localStorage via a useEffect hook (FormContext.jsx lines 86–91).</p>
+      <p>The user navigates through 10 steps in Form 1 or 4 steps in Form 2 (files located in <span class="file-path">app/src/pages/Form1/Step1.jsx</span> through <span class="file-path">app/src/pages/Form1/Step10.jsx</span>, and <span class="file-path">app/src/pages/Form2/Step1.jsx</span> through <span class="file-path">app/src/pages/Form2/Step4.jsx</span>). Each step captures form field answers, stores them in React state via FormContext's <code>updateFormData()</code> function (FormContext.jsx line 162), and automatically writes to localStorage via a useEffect hook (FormContext.jsx lines 86–91).</p>
     </div>
 
     <div class="section">
@@ -181,7 +181,8 @@
     <span class="block-title">The Workspace Table</span>
   </div>
   <div class="block-body">
-    <p>The workspace (LandingPage.jsx, lines 1–361) shows a table of assessments with columns: Title, Lead Person, Form Type, Status (Draft / Complete / Signed Off), Created, Last Updated, and Review. All assessments shown here have been retrieved from the database via <code>apiService.listAssessments()</code>.</p>
+      <div class="section-title">Access Denied popup — Read state, show modal:</div>
+      <p>The workspace (LandingPage.jsx, lines 1–361) shows a table of assessments with columns: Title, Lead Person, Form Type, Status (Draft / Complete / Signed Off), Created, Last Updated, and Review. All assessments shown here have been retrieved from the database via <code>apiService.listAssessments()</code>.</p>
     <p>For each row, users can: <strong>Click to open</strong> — loads the full assessment into FormContext. <strong>Share</strong> (DB-backed assessments only) — opens ShareModal. <strong>Delete</strong> — removes the assessment permanently after confirmation.</p>
     <div class="callout info">
       <div class="callout-label">Why Two Tables?</div>
@@ -203,7 +204,7 @@
 
     <div class="section">
       <div class="section-title">Layer 1: Keystroke-by-Keystroke to localStorage</div>
-      <p>Every time a user types in a form field, the input handler in the step file calls <code>updateFormData(section, newValue)</code> (FormContext.jsx line 162). This updates FormContext state immediately. A useEffect hook (FormContext.jsx lines 86–91) watches FormContext and automatically writes the entire state to localStorage whenever it changes.</p>
+      <p>Every time a user types in a form field, the input handler in the step file calls <code>updateFormData(section, newValue)</code> (FormContext.jsx line 162). This updates FormContext state immediately. A useEffect hook (FormContext.jsx lines 86–91) watches FormContext and automatically writes the entire state to localStorage whenever it changes. The `writeAssessmentToStore()` function handles the write (FormContext.jsx, around line 88).</p>
       <p>This means: type 5 characters → localStorage updates 5 times with all 5 keystroke states. If the user closes the browser without clicking "Next" or "Save," all their typed data is safe in localStorage.</p>
     </div>
 
@@ -215,7 +216,7 @@
 
     <div class="section">
       <div class="section-title">Layer 3: Reconciliation on Page Refresh</div>
-      <p>When the user returns to their workspace and reopens an assessment, UrlAssessmentLoader (App.jsx lines 39–75) fetches the data from the database. FormContext's <code>loadAssessment()</code> function (FormContext.jsx lines 102–171) compares timestamps: if localStorage has a newer <code>lastSavedAt</code> than the database's <code>updated_at</code>, it means the user typed unsaved changes. The function keeps localStorage data and fires a background sync to push it to the database.</p>
+      <p>When the user returns to their workspace and reopens an assessment, UrlAssessmentLoader (App.jsx lines 39–75) fetches the data from the database. FormContext's <code>loadAssessment()</code> function (FormContext.jsx lines 102–171) compares timestamps: if localStorage has a newer <code>lastSavedAt</code> than the database's <code>updated_at</code>, it means the user typed unsaved changes. The function keeps localStorage data and fires a background sync (lines 165–170) to push it to the database silently using `apiService.saveAssessment(syncPayload)`.</p>
       <p>Result: even if a background save failed before, this reconciliation ensures the database catches up.</p>
     </div>
 
@@ -358,8 +359,8 @@
     </div>
 
     <div class="section">
-      <div class="section-title">Reconciliation on Reopen</div>
-      <p>When the user closes the browser and later opens the assessment again, <code>loadAssessment()</code> (FormContext.jsx lines 102–171) compares <code>localStorage.lastSavedAt</code> vs <code>database.updated_at</code>. If localStorage is newer, it means the user made unsaved changes. The function keeps the localStorage data and fires a background sync (lines 165–170) to push it to the database silently. The user sees their data immediately and the database catches up.</p>
+      <div class="section-title">The Reconciliation Process on Reopen</div>
+      <p>When the user closes the browser and later opens the assessment again, `loadAssessment()` (FormContext.jsx lines 102–171) compares `localStorage.lastSavedAt` vs `database.updated_at`. If localStorage is newer, it means the user made unsaved changes. The function keeps the localStorage data and fires a background sync (lines 165–170) to push it to the database silently. The user sees their data immediately and the database catches up.</p>
     </div>
 
     <div class="callout key">
