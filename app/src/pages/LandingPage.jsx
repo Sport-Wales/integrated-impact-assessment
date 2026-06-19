@@ -124,7 +124,16 @@ const LandingPage = () => {
     setOpeningId(id);
     try {
       const data = await apiService.getAssessment(id);
-      loadAssessment(data);
+      const { shouldSync, syncPayload } = loadAssessment(data);
+
+      // If localStorage had newer unsaved data, sync it to DB in the background.
+      // Fire-and-forget — user sees their data immediately, DB catches up silently.
+      if (shouldSync && syncPayload) {
+        apiService.saveAssessment(syncPayload).catch(err =>
+          console.warn('[Reconciliation] Background sync failed:', err.message)
+        );
+      }
+
       navigate(target);
     } catch (err) {
       setError('Could not open that assessment. Please try again.');

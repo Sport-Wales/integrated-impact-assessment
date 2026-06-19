@@ -288,29 +288,71 @@ export const FormProvider = ({ children }) => {
   // Used by LandingPage when a user opens any assessment row.
   // For DB-backed rows: dbResponse.id is the real UUID.
   // For local-only rows: dbResponse.id is the localId (e.g. 'local_abc123'), assessmentId is null.
-  // Spread order is critical: DB column values always override stale form_data values.
+  //
+  // Reconciliation: if localStorage has unsaved changes newer than the DB
+  // (user typed but closed the browser before clicking Next/Save), we keep
+  // the localStorage form answers but refresh metadata from the DB.
+  // Returns { shouldSync, syncPayload } so the caller can push to the DB.
   const loadAssessment = (dbResponse) => {
-    // For DB-backed rows: dbResponse.id is the real UUID — use it directly as assessmentId.
-    // For local-only rows: dbResponse.id is the local_ prefixed key — assessmentId stays null.
-    // We can't rely on form_data.assessmentId because saveAssessment strips it before storage.
     const isDbBacked = dbResponse.id && !String(dbResponse.id).startsWith('local_');
     const realAssessmentId = isDbBacked ? dbResponse.id : null;
     const activeLocalId = dbResponse.id;
-    const loaded = {
-      ...getInitialState(),
-      ...dbResponse.form_data,
-      title:      dbResponse.title || '',         // stored as column, not in form_data
-      leadName:   dbResponse.lead_name || '',     // stored as column (snake_case), not in form_data
-      assessmentId: realAssessmentId,
-      localId:      activeLocalId,
-      status:       dbResponse.status,
-      formType:     dbResponse.form_type,
-      userRole:     dbResponse.user_role || 'owner',
-      completedSteps: dbResponse.form_data?.completedSteps || { form1: [], form2: [] },
-    };
+
+    // Check if localStorage has newer unsaved data than the DB
+    let useLocalData = false;
+    let localSnapshot = null;
+
+    if (isDbBacked && dbResponse.updated_at) {
+      const store = readAssessmentsStore();
+      const existing = store[activeLocalId];
+      if (existing?.lastSavedAt) {
+        const localTime = new Date(existing.lastSavedAt).getTime();
+        const dbTime    = new Date(dbResponse.updated_at).getTime();
+        if (localTime > dbTime) {
+          useLocalData  = true;
+          localSnapshot = existing;
+        }
+      }
+    }
+
+    let loaded;
+
+    if (useLocalData && localSnapshot) {
+      // localStorage is newer — keep its form answers but refresh
+      // metadata from DB (status, user_role are always DB-authoritative)
+      loaded = {
+        ...getInitialState(),
+        ...localSnapshot,
+        assessmentId:   realAssessmentId,
+        localId:        activeLocalId,
+        status:         dbResponse.status,
+        formType:       dbResponse.form_type,
+        userRole:       dbResponse.user_role || 'owner',
+      };
+    } else {
+      // DB is authoritative — existing behaviour, unchanged
+      loaded = {
+        ...getInitialState(),
+        ...dbResponse.form_data,
+        title:          dbResponse.title || '',
+        leadName:       dbResponse.lead_name || '',
+        assessmentId:   realAssessmentId,
+        localId:        activeLocalId,
+        status:         dbResponse.status,
+        formType:       dbResponse.form_type,
+        userRole:       dbResponse.user_role || 'owner',
+        completedSteps: dbResponse.form_data?.completedSteps || { form1: [], form2: [] },
+      };
+    }
+
     writeAssessmentToStore(activeLocalId, loaded);
     writeActiveId(activeLocalId);
     setFormData(loaded);
+
+    // Return sync info so caller can push localStorage data to DB.
+    // Only safe when assessmentId exists (prevents accidental INSERT).
+    const shouldSync = useLocalData && !!localSnapshot?.assessmentId;
+    return { shouldSync, syncPayload: shouldSync ? loaded : null };
   };
 
   // Start a brand-new blank assessment.
