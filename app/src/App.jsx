@@ -1,5 +1,6 @@
 // src/App.jsx
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useSearchParams, useNavigate } from 'react-router-dom';
 import Header from './components/layout/Header';
 import LoginPage from './pages/LoginPage';
 import LandingPage from './pages/LandingPage';
@@ -7,6 +8,7 @@ import IntroPage from './pages/IntroPage';
 import FormSelection from './pages/FormSelection';
 import AssessmentDocument from './pages/AssessmentDocument';
 import FormIntroduction from './pages/FormIntroduction';
+import { apiService } from './services/api';
 
 // Form 1 Components
 import Form1Step1 from './pages/Form1/Step1';
@@ -27,8 +29,45 @@ import Form2Step3 from './pages/Form2/Step3';
 import Form2Step4 from './pages/Form2/Step4';
 
 // Context Providers
-import { FormProvider } from './context/FormContext';
+import { FormProvider, useFormContext } from './context/FormContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+
+// URL Assessment Loader — handles shared URLs with ?id= query parameter.
+// When someone receives a link like /form1/step4?id=abc123, this component
+// fetches the assessment from the DB and loads it into FormContext before
+// the step component mounts. Without this, the step would see no active
+// assessment and redirect to form-selection.
+// Renders a loading screen while fetching. Redirects to workspace on error.
+const UrlAssessmentLoader = ({ children }) => {
+  const [searchParams] = useSearchParams();
+  const { formData, loadAssessment } = useFormContext();
+  const navigate = useNavigate();
+
+  const urlId = searchParams.get('id');
+  const needsLoad = urlId && formData.assessmentId !== urlId;
+  const [loading, setLoading] = useState(!!needsLoad);
+
+  useEffect(() => {
+    if (!urlId || formData.assessmentId === urlId) return;
+
+    setLoading(true);
+    apiService.getAssessment(urlId)
+      .then(data => loadAssessment(data))
+      .catch(() => navigate('/'))
+      .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlId]);
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white">
+        <p className="text-gray-500 text-lg">Loading assessment...</p>
+      </div>
+    );
+  }
+
+  return children;
+};
 
 // Auth gate — sits inside AuthProvider so it can read auth state.
 // Local mock auth: shows spinner while resolving, then LoginPage card if not authenticated.
@@ -78,6 +117,7 @@ function App() {
       <AuthGate>
         <FormProvider>
           <Router>
+          <UrlAssessmentLoader>
           <div className="min-h-screen flex flex-col">
             <Header />
             <main className="flex-grow">
@@ -108,6 +148,7 @@ function App() {
               </Routes>
             </main>
           </div>
+          </UrlAssessmentLoader>
           </Router>
         </FormProvider>
       </AuthGate>

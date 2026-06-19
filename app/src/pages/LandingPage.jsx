@@ -16,7 +16,7 @@ const LandingPage = () => {
   const [error, setError] = useState(null);
   const [openingId, setOpeningId] = useState(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
-  const [shareModalId, setShareModalId] = useState(null); // assessment id currently open in share modal
+  const [shareModalData, setShareModalData] = useState(null); // { id, formType } for the assessment open in share modal
 
   // Fetch all assessments for this user on mount
   useEffect(() => {
@@ -300,7 +300,7 @@ const LandingPage = () => {
                         {/* Share button — only shown for DB-backed assessments (real UUID) */}
                         {!assessment.id?.startsWith('local_') && (
                           <button
-                            onClick={() => setShareModalId(assessment.id)}
+                            onClick={() => setShareModalData({ id: assessment.id, formType: assessment.form_type })}
                             className="text-xs text-[--color-sw-blue] hover:text-cyan-700 font-medium transition-colors"
                           >
                             Share
@@ -346,10 +346,11 @@ const LandingPage = () => {
       )}
 
       {/* Share modal — rendered at page level so it sits above the table */}
-      {shareModalId && (
+      {shareModalData && (
         <ShareModal
-          assessmentId={shareModalId}
-          onClose={() => setShareModalId(null)}
+          assessmentId={shareModalData.id}
+          shareUrl={`${window.location.origin}/${shareModalData.formType}/step1?id=${shareModalData.id}`}
+          onClose={() => setShareModalData(null)}
         />
       )}
     </div>

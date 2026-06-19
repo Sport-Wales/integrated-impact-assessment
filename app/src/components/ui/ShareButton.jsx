@@ -74,7 +74,7 @@ const ShareButton = ({ isOwner }) => {
         <ShareModal
           assessmentId={resolvedId}
           onClose={() => { setShowModal(false); setResolvedId(null); }}
-          shareUrl={window.location.href}
+          shareUrl={resolvedId ? `${window.location.origin}/${formData.formType}/step1?id=${resolvedId}` : null}
         />
       )}
     </>
