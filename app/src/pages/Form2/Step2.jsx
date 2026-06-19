@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
+import { usePreserveId } from '../../hooks/usePreserveId';
 import { apiService, ASSESSMENT_STATUS } from '../../services/api';
 import { form2Steps } from './constants';
 import ProgressBar from '../../components/ui/ProgressBar';
@@ -8,6 +9,7 @@ import PrevButton from "../../components/ui/PrevButton";
 
 const Form2Step2 = () => {
   const navigate = useNavigate();
+  const { navigateWithId } = usePreserveId();
   const { formData, updateFormData, commitStep, confirmDbSave } = useFormContext();
 
   const isReadOnly = formData.status === 'signed_off' || formData.userRole === 'view';
@@ -70,7 +72,7 @@ const Form2Step2 = () => {
     }
 
     setIsCompleting(false);
-    navigate('/form2/step3');
+    navigateWithId('/form2/step3');
   };
 
   return (
@@ -117,7 +119,7 @@ const Form2Step2 = () => {
         </div>
 
         <div className="mt-12 flex justify-between">
-          	<PrevButton backLink="/form2/step1" />
+          	<PrevButton onPrev={() => navigateWithId('/form2/step1')} />
           	{!isReadOnly && (
               <div className="flex flex-col items-end gap-2">
                 {completeError && (

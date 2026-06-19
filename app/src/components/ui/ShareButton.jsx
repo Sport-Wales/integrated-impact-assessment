@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
 import { apiService } from '../../services/api';
+import { buildShareUrl } from '../../utils/urlHelpers';
 import ShareModal from './ShareModal';
 
 const ShareButton = ({ isOwner }) => {
   const { formData, updateFormData } = useFormContext();
+  const location = useLocation();
   const [showModal, setShowModal]   = useState(false);
   const [saving, setSaving]         = useState(false);
   const [resolvedId, setResolvedId] = useState(null);
@@ -74,7 +77,7 @@ const ShareButton = ({ isOwner }) => {
         <ShareModal
           assessmentId={resolvedId}
           onClose={() => { setShowModal(false); setResolvedId(null); }}
-          shareUrl={resolvedId ? `${window.location.origin}/${formData.formType}/step1?id=${resolvedId}` : null}
+          shareUrl={buildShareUrl(location.pathname, resolvedId)}
         />
       )}
     </>

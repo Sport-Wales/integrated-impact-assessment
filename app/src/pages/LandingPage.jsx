@@ -147,7 +147,7 @@ const LandingPage = () => {
         );
       }
 
-      navigate(target);
+      navigate(`${target}?id=${id}`);
     } catch (err) {
       setError('Could not open that assessment. Please try again.');
     } finally {

@@ -1,11 +1,14 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const ProgressBar = ({ steps, currentStep, completedSteps = [], formType }) => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const handleStepClick = (index) => {
-    navigate(`/${formType}/step${index + 1}`);
+    const id = searchParams.get('id');
+    const path = `/${formType}/step${index + 1}`;
+    navigate(id ? `${path}?id=${id}` : path);
   };
 
   return (

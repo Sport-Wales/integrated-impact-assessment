@@ -2,12 +2,14 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
+import { usePreserveId } from '../../hooks/usePreserveId';
 import { apiService } from '../../services/api';
 import ProgressBar from '../../components/ui/ProgressBar';
 import { form1Steps } from './constants';
 
 const Form1Step10 = () => {
 	const navigate = useNavigate();
+	const { navigateWithId } = usePreserveId();
 	const { formData, updateFormData, commitStep, confirmDbSave } = useFormContext();
 
 	const isReadOnly = formData.status === 'signed_off' || formData.userRole === 'view';
@@ -130,12 +132,15 @@ const Form1Step10 = () => {
 			</div>
 
 			<div className="mt-12 flex justify-between">
-				<Link to="/form1/step9" className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">
-					<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-					</svg>
-					Prev
-				</Link>
+				<button
+				onClick={() => navigateWithId('/form1/step9')}
+				className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+				</svg>
+				Prev
+			</button>
 				{!isReadOnly && (
 					<button
 						onClick={handleDone}

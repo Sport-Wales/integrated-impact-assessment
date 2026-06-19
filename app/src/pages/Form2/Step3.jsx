@@ -3,12 +3,14 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
+import { usePreserveId } from '../../hooks/usePreserveId';
 import ProgressBar from '../../components/ui/ProgressBar';
 import AssessmentDocument from '../AssessmentDocument';
 import { form2Steps } from './constants';
 
 const Form2Step3 = () => {
   const navigate = useNavigate();
+  const { navigateWithId } = usePreserveId();
   const { formData } = useFormContext();
 
   // Redirect if no form type is set (direct URL access without an active form)
@@ -35,7 +37,7 @@ const Form2Step3 = () => {
       {formData.status !== 'draft' && (
         <div className="max-w-4xl mx-auto px-4 pb-12 flex justify-end">
           <button
-            onClick={() => navigate('/form2/step4')}
+            onClick={() => navigateWithId('/form2/step4')}
             className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium
               bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 transition-colors duration-200"
           >

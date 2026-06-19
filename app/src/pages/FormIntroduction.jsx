@@ -144,7 +144,7 @@ const FormIntroduction = () => {
 
 				{/* Navigation buttons */}
 				<div className="mt-12 flex justify-between">
-					<PrevButton backLink="/form-selection" />
+					<PrevButton onPrev={() => navigate('/form-selection')} />
 					<button
 						className="inline-flex items-center px-6 py-2 rounded-md hover:bg-cyan-700 text-sm bg-[--color-sw-blue] text-white font-medium transition-colors duration-200 hover:bg-opacity-90"
 						onClick={handleStart}

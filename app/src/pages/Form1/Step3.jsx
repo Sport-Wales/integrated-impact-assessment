@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
+import { usePreserveId } from '../../hooks/usePreserveId';
 import { apiService } from '../../services/api';
 import { form1Steps } from './constants';
 import ProgressBar from '../../components/ui/ProgressBar';
@@ -10,6 +11,7 @@ import PrevButton from "../../components/ui/PrevButton";
 
 const Form1Step3 = () => {
 	const navigate = useNavigate();
+	const { navigateWithId } = usePreserveId();
 	const { formData, updateFormData, commitStep, confirmDbSave } = useFormContext();
 
 	const isReadOnly = formData.status === 'signed_off' || formData.userRole === 'view';
@@ -104,7 +106,7 @@ const Form1Step3 = () => {
 			console.warn('[AutoSave] Could not save to database:', err.message);
 		}
 
-		navigate('/form1/step4');
+		navigateWithId('/form1/step4');
 	};
 
 	// Define the characteristics
@@ -272,7 +274,7 @@ const Form1Step3 = () => {
 			</div>
 
 			<div className="mt-12 flex justify-between">
-				<PrevButton backLink="/form1/step2" />
+				<PrevButton onPrev={() => navigateWithId('/form1/step2')} />
 				{!isReadOnly
 					? <NextButton label="Next: Wellbeing and future generations" onClick={handleNext} />
 					: <button onClick={() => navigate('/')} className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-[--color-sw-blue] text-white hover:bg-cyan-700">Back to My Assessments</button>
