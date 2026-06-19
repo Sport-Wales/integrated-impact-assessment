@@ -1,10 +1,12 @@
 // page 3
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useFormContext } from '../context/FormContext';
+import { usePreserveId } from '../hooks/usePreserveId';
 import PrevButton from "../components/ui/PrevButton";
 
 const FormIntroduction = () => {
 	const navigate = useNavigate();
+	const { navigateWithId } = usePreserveId();
 	const { formData } = useFormContext();
 
 	// Check if Full IIA is selected
@@ -13,9 +15,9 @@ const FormIntroduction = () => {
 	const handleStart = () => {
 		// Direct to the appropriate first step based on form type
 		if (formData.formType === 'form1') {
-			navigate('/form1/step1');
+			navigateWithId('/form1/step1');
 		} else if (formData.formType === 'form2') {
-			navigate('/form2/step1');
+			navigateWithId('/form2/step1');
 		} else {
 			// If no form type selected, go back to selection
 			navigate('/form-selection');
