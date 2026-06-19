@@ -2,13 +2,14 @@
 // The main home page — shows all of the user's assessments in a simple table.
 // Users start new assessments or open existing ones from here.
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useFormContext } from '../context/FormContext';
 import { apiService, ASSESSMENT_STATUS } from '../services/api';
 import ShareModal from '../components/ui/ShareModal';
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { formData, resetFormData, loadAssessment, deleteLocalAssessment } = useFormContext();
 
   const [assessments, setAssessments] = useState([]);
@@ -17,6 +18,18 @@ const LandingPage = () => {
   const [openingId, setOpeningId] = useState(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [shareModalData, setShareModalData] = useState(null); // { id, formType } for the assessment open in share modal
+
+  // Access denied popup — shown when user opens a shared URL without permission.
+  // UrlAssessmentLoader passes the title via navigate state.
+  const [accessDenied, setAccessDenied] = useState(location.state?.accessDenied || false);
+  const [deniedTitle] = useState(location.state?.assessmentTitle || '');
+
+  // Clear the navigate state so refresh doesn't re-show the popup
+  useEffect(() => {
+    if (location.state?.accessDenied) {
+      window.history.replaceState({}, '');
+    }
+  }, []);
 
   // Fetch all assessments for this user on mount
   useEffect(() => {
@@ -352,6 +365,32 @@ const LandingPage = () => {
           shareUrl={`${window.location.origin}/${shareModalData.formType}/step1?id=${shareModalData.id}`}
           onClose={() => setShareModalData(null)}
         />
+      )}
+
+      {/* Access denied popup — shown when user opens a shared URL without permission */}
+      {accessDenied && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={() => setAccessDenied(false)}
+        >
+          <div
+            className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-6 relative"
+            onClick={e => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setAccessDenied(false)}
+              className="absolute top-3 right-4 text-gray-400 hover:text-gray-600 text-xl leading-none"
+              aria-label="Close"
+            >✕</button>
+            <div className="text-center pt-2">
+              <p className="text-lg font-semibold text-gray-900 mb-2">Access Denied</p>
+              <p className="text-gray-600">
+                Sorry, you don't have access to <strong>{deniedTitle}</strong>.
+                Please contact the assessment owner to be granted access.
+              </p>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

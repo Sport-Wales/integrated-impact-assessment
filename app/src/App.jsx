@@ -8,7 +8,6 @@ import IntroPage from './pages/IntroPage';
 import FormSelection from './pages/FormSelection';
 import AssessmentDocument from './pages/AssessmentDocument';
 import FormIntroduction from './pages/FormIntroduction';
-import { apiService } from './services/api';
 
 // Form 1 Components
 import Form1Step1 from './pages/Form1/Step1';
@@ -50,11 +49,36 @@ const UrlAssessmentLoader = ({ children }) => {
   useEffect(() => {
     if (!urlId || formData.assessmentId === urlId) return;
 
-    setLoading(true);
-    apiService.getAssessment(urlId)
-      .then(data => loadAssessment(data))
-      .catch(() => navigate('/'))
-      .finally(() => setLoading(false));
+    const loadFromUrl = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`/api/getAssessment?id=${urlId}`);
+
+        // 403 = assessment exists but user has no access — redirect with title for popup
+        if (response.status === 403) {
+          const data = await response.json().catch(() => ({}));
+          navigate('/', {
+            state: { accessDenied: true, assessmentTitle: data.title || 'this assessment' }
+          });
+          return;
+        }
+
+        // Any other error — silent redirect to workspace
+        if (!response.ok) {
+          navigate('/');
+          return;
+        }
+
+        const data = await response.json();
+        loadAssessment(data);
+      } catch {
+        navigate('/');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadFromUrl();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlId]);
 

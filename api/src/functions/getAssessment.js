@@ -10,7 +10,9 @@
 //   'view'  → requesting user has view permission in assessment_permissions
 //
 // Access control: only the owner or a user with a permission row can fetch.
-// Anyone else receives 404 (not 403) to avoid leaking assessment existence.
+// Returns 403 with the assessment title if the user has no access (so the
+// frontend can show "you don't have access to X"). Returns 404 only when
+// the assessment genuinely doesn't exist.
 
 const { app }     = require('@azure/functions');
 const db          = require('../db');
@@ -34,6 +36,17 @@ app.http('getAssessment', {
     }
 
     try {
+      // Step 1: Does this assessment exist at all? (PK index lookup, ~1ms)
+      const exists = await db.query(
+        'SELECT title FROM assessments WHERE id = $1',
+        [assessmentId]
+      );
+
+      if (exists.length === 0) {
+        return { status: 404, jsonBody: { error: 'Assessment not found' } };
+      }
+
+      // Step 2: Does this user have access? (full permission-checked query)
       const rows = await db.query(
         `SELECT
            a.id, a.form_type, a.title, a.lead_name, a.status,
@@ -53,7 +66,11 @@ app.http('getAssessment', {
       );
 
       if (rows.length === 0) {
-        return { status: 404, jsonBody: { error: 'Assessment not found' } };
+        // Assessment exists but this user has no access
+        return { status: 403, jsonBody: {
+          error: 'You do not have access to this assessment',
+          title: exists[0].title || 'this assessment'
+        }};
       }
 
       // Merge completed_steps into form_data before returning.
