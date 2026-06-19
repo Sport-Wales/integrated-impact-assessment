@@ -174,41 +174,41 @@ Browser (React App)
         ▼
 Azure Static Web App (SWA)
         │
-        ├── /api/*  →  Routes to Azure Functions (backend)
+        ├── /api/*  →  Routes to Azure Functions (backend) — api/src/functions/
         └── /*      →  Serves React frontend from CDN
                 │
                 ▼
         Azure Functions Runtime
                 │
-                ├── getUser(request)        ← reads x-ms-client-principal header
-                ├── db.query(sql, params)   ← sends parameterised SQL
+                ├── getUser(request)        ← api/src/utils/getUser.js, line 15
+                ├── db.query(sql, params)   ← api/src/db/index.js, line 150
                 │
                 ▼
         Azure PostgreSQL Flexible Server
                 │
-                ├── assessments             ← one row per assessment
-                └── assessment_permissions  ← one row per shared access</div>
+                ├── assessments             ← api/src/db/schema.sql, line 27
+                └── assessment_permissions  ← api/src/db/schema.sql, line 98</div>
 
     <div class="file-tree"><span class="ft-dir">api/</span>
 ├── <span class="ft-dir">src/</span>
 │   ├── <span class="ft-dir">functions/</span>          <span class="ft-label">← one file per API endpoint</span>
-│   │   ├── saveAssessment.js
-│   │   ├── getAssessment.js
-│   │   ├── listAssessments.js
-│   │   ├── completeAssessment.js
-│   │   ├── signOffAssessment.js
-│   │   ├── deleteAssessment.js
-│   │   ├── shareAssessment.js
-│   │   ├── getPermissions.js
-│   │   ├── removeShare.js
+│   │   ├── saveAssessment.js          <span class="ft-label">181 lines</span>
+│   │   ├── getAssessment.js           <span class="ft-label">95 lines</span>
+│   │   ├── listAssessments.js         <span class="ft-label">lines</span>
+│   │   ├── completeAssessment.js      <span class="ft-label">lines</span>
+│   │   ├── signOffAssessment.js       <span class="ft-label">lines</span>
+│   │   ├── deleteAssessment.js        <span class="ft-label">lines</span>
+│   │   ├── shareAssessment.js         <span class="ft-label">lines</span>
+│   │   ├── getPermissions.js          <span class="ft-label">lines</span>
+│   │   ├── removeShare.js             <span class="ft-label">lines</span>
 │   │   └── healthCheck.js
 │   ├── <span class="ft-dir">db/</span>
-│   │   ├── index.js                <span class="ft-label">← connection pool + db.query()</span>
-│   │   └── schema.sql              <span class="ft-label">← creates all tables and indexes</span>
+│   │   ├── index.js                   <span class="ft-label">connection pool + query(), 197 lines</span>
+│   │   └── schema.sql                 <span class="ft-label">tables, indexes, triggers, 193 lines</span>
 │   └── <span class="ft-dir">utils/</span>
-│       ├── getUser.js              <span class="ft-label">← extracts auth identity from SWA header</span>
-│       └── logger.js               <span class="ft-label">← context-aware logging</span>
-├── local.settings.json             <span class="ft-label">← local secrets — git-ignored, never committed</span>
+│       ├── getUser.js                 <span class="ft-label">extracts auth identity, 44 lines</span>
+│       └── logger.js
+├── local.settings.json                <span class="ft-label">← local secrets — git-ignored, never committed</span>
 └── package.json</div>
   </div>
 </div>
@@ -323,11 +323,11 @@ await db.query(
     <span class="block-title">Tables, Columns, and Indexes</span>
   </div>
   <div class="block-body">
-    <p>The schema is defined in <code>api/src/db/schema.sql</code>. There are two tables. The schema uses <code>CREATE TABLE IF NOT EXISTS</code> so it is safe to re-run — it will not destroy existing data.</p>
+    <p>The schema is defined in <span class="file-path">api/src/db/schema.sql</span>. There are two tables. The schema uses <code>CREATE TABLE IF NOT EXISTS</code> so it is safe to re-run — it will not destroy existing data.</p>
 
     <div class="section">
       <div class="section-title">Table 1 — assessments</div>
-      <p>One row per assessment. All form field answers are stored as a single JSONB column (<code>form_data</code>) rather than individual columns, because form questions evolve over time and JSONB is flexible without requiring schema migrations.</p>
+      <p>One row per assessment. All form field answers are stored as a single JSONB column (<code>form_data</code>) rather than individual columns, because form questions evolve over time and JSONB is flexible without requiring schema migrations. Located at <span class="file-path">api/src/db/schema.sql</span>, lines 27–94.</p>
       <table class="db-table">
         <tr><th>Column</th><th>Type</th><th>Description</th></tr>
         <tr><td>id</td><td>UUID</td><td>Primary key — generated automatically by the database using <code>gen_random_uuid()</code>. Never set by the frontend.</td></tr>
@@ -350,7 +350,7 @@ await db.query(
 
     <div class="section">
       <div class="section-title">Table 2 — assessment_permissions</div>
-      <p>One row per colleague who has been granted access to an assessment. The owner is not stored here — ownership is tracked on the <code>assessments</code> table. If an assessment is deleted, all its permission rows are automatically deleted by <code>CASCADE DELETE</code>.</p>
+      <p>One row per colleague who has been granted access to an assessment. The owner is not stored here — ownership is tracked on the <code>assessments</code> table. If an assessment is deleted, all its permission rows are automatically deleted by <code>CASCADE DELETE</code>. Located at <span class="file-path">api/src/db/schema.sql</span>, lines 98–133.</p>
       <table class="db-table">
         <tr><th>Column</th><th>Type</th><th>Description</th></tr>
         <tr><td>id</td><td>UUID</td><td>Primary key.</td></tr>
@@ -367,6 +367,7 @@ await db.query(
 
     <div class="section">
       <div class="section-title">Indexes</div>
+      <p>All indexes defined at <span class="file-path">api/src/db/schema.sql</span>, lines 135–162:</p>
       <table class="t">
         <tr><th>Index</th><th>Why it exists</th></tr>
         <tr><td><code>idx_assessments_owner_id</code></td><td>listAssessments runs on every workspace load — this makes it instant</td></tr>
@@ -458,6 +459,7 @@ await db.query(
         <span class="fn-desc">Insert new or update existing assessment</span>
       </div>
       <div class="fn-body">
+        <div class="fn-row"><span class="fn-row-label">File</span><span class="fn-row-val"><span class="file-path">api/src/functions/saveAssessment.js</span> (181 lines)</span></div>
         <div class="fn-row"><span class="fn-row-label">Called by</span><span class="fn-row-val">Every form step on Next, SaveButton, ShareButton (pre-save), handleTitleBlur in Step 1</span></div>
         <div class="fn-row"><span class="fn-row-label">Returns</span><span class="fn-row-val"><code>{ id: "uuid..." }</code> — frontend stores this as assessmentId in FormContext</span></div>
         <div class="fn-row"><span class="fn-row-label">INSERT path</span><span class="fn-row-val">When <code>assessmentId</code> is null — creates a new row, returns the generated UUID</span></div>
@@ -473,10 +475,11 @@ await db.query(
         <span class="fn-desc">Fetch one full assessment including all form answers</span>
       </div>
       <div class="fn-body">
+        <div class="fn-row"><span class="fn-row-label">File</span><span class="fn-row-val"><span class="file-path">api/src/functions/getAssessment.js</span> (95 lines)</span></div>
         <div class="fn-row"><span class="fn-row-label">Called by</span><span class="fn-row-val">LandingPage when user clicks to open a DB-backed assessment row</span></div>
         <div class="fn-row"><span class="fn-row-label">Returns</span><span class="fn-row-val">Full assessment row including <code>form_data</code> JSONB and a computed <code>user_role</code> field</span></div>
         <div class="fn-row"><span class="fn-row-label">user_role</span><span class="fn-row-val">Computed in the SQL query: <code>'owner'</code> if requester is the owner, otherwise the role from assessment_permissions</span></div>
-        <div class="fn-row"><span class="fn-row-label">Key logic</span><span class="fn-row-val">Returns 404 (not 403) for unauthorised access — avoids leaking that the assessment exists. Injects completedSteps back into form_data so FormContext loads the progress bar correctly.</span></div>
+        <div class="fn-row"><span class="fn-row-label">Key logic</span><span class="fn-row-val">Returns 403 (not 404) for unauthorised access — avoids leaking that the assessment exists. Injects completedSteps back into form_data so FormContext loads the progress bar correctly.</span></div>
       </div>
     </div>
 
@@ -487,6 +490,7 @@ await db.query(
         <span class="fn-desc">List all assessments for the workspace table</span>
       </div>
       <div class="fn-body">
+        <div class="fn-row"><span class="fn-row-label">File</span><span class="fn-row-val"><span class="file-path">api/src/functions/listAssessments.js</span></span></div>
         <div class="fn-row"><span class="fn-row-label">Called by</span><span class="fn-row-val">LandingPage on every page load</span></div>
         <div class="fn-row"><span class="fn-row-label">Returns</span><span class="fn-row-val">Lightweight array — metadata only, no form_data. Ordered by updated_at DESC.</span></div>
         <div class="fn-row"><span class="fn-row-label">Query</span><span class="fn-row-val">UNION ALL — first SELECT fetches owned assessments, second fetches shared ones. <code>AND a.owner_id != $1</code> prevents duplicates if the owner was accidentally added to permissions.</span></div>
@@ -632,8 +636,8 @@ if (!isOwner) {
     <p>The frontend never calls backend functions directly — all API calls go through <code>app/src/services/api.js</code>. This is the single layer between the React components and the backend. Every function in <code>api.js</code> maps to exactly one backend function.</p>
 
     <div class="section">
-      <div class="section-title">The API Service Pattern</div>
-      <pre><code>// app/src/services/api.js
+      <div class="section-title">The Frontend API Service Pattern</div>
+      <pre><code>// Located at: app/src/services/api.js
 export const apiService = {
 
   saveAssessment: async (formData) => {
