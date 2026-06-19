@@ -386,8 +386,8 @@ const handleSavePermissions = async () => {
 
     <div class="section">
       <div class="section-title">Step 4: The Shareable Link</div>
-      <p>When the owner clicks "Copy link," the link is built dynamically at ShareButton.jsx line 76 using the assessment ID and form type: <code>${origin}/${formType}/step1?id=${assessmentId}</code>. For example: <code>https://ashy-desert-065fb6403.7.azurestaticapps.net/form1/step1?id=abc123-def456...</code></p>
-      <p>The link always points to step 1 of the correct form, and includes the assessment UUID as a query parameter so the recipient's browser knows which assessment to load.</p>
+      <p>When the owner clicks "Copy link," the link is built dynamically using the assessment ID and the current step they're on. The URL uses <code>buildShareUrl()</code> from <span class="file-path">app/src/utils/urlHelpers.js</span> to combine the current pathname with the assessment UUID. For example: if the owner is on step 5, the share link is <code>https://ashy-desert-065fb6403.7.azurestaticapps.net/form1/step5?id=abc123-def456...</code>. If they're on step 2, the link points to step 2. This ensures the recipient lands on the exact step the owner was reviewing when they shared.</p>
+      <p>The link includes the assessment UUID as a <code>?id=</code> query parameter so the recipient's browser loads the correct assessment. The `?id=` parameter is always present in form URLs to maintain clear ownership of which assessment is being edited.</p>
     </div>
 
     <div class="section">
