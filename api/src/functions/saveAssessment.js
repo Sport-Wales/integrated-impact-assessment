@@ -11,7 +11,10 @@
 //   owner → always allowed to update
 //   edit  → allowed to update (checked via assessment_permissions)
 //   view  → blocked (returns 403)
-//   signed_off → all writes blocked regardless of role (returns 403)
+//   signed_off → all writes blocked, EXCEPT the owner submitting the Review step
+//                (identified by the presence of reviewedAt in the payload).
+//                This is the one deliberate exception: review happens after
+//                sign-off, and only the owner may complete it.
 //
 // form_data stored clean — internal frontend fields (localId, userRole, etc.)
 // are stripped before storage so stale state never pollutes the database.
@@ -60,7 +63,9 @@ app.http('saveAssessment', {
       leadName    = '',
       status,
       completedSteps,
-      reviewedAt,         // set by Step10/Form2Step4 — maps to reviewed_at column
+      reviewedAt,         // set by Step10/Form2Step4 — maps to reviewed_at column.
+                          // Presence of this field is also what identifies a
+                          // "review save" — the one write allowed post-sign-off.
       // Strip these extra fields that come from DB responses — never store back into form_data
       id:           _id,
       form_type:    _ftype,
@@ -121,15 +126,24 @@ app.http('saveAssessment', {
         return { status: 404, jsonBody: { error: 'Assessment not found' } };
       }
 
+      const isOwner     = existing[0].owner_id === user.userId;
+      const isSignedOff = existing[0].status === 'signed_off';
 
-      // Block all writes to signed-off assessments — permanently locked
-      if (existing[0].status === 'signed_off') {
+      // A "review save" is the one write allowed on a signed-off assessment:
+      // the owner completing the Review step (Step 10 / Form2 Step 4).
+      // Both conditions are required — non-owners can never trigger this,
+      // and reviewedAt is only ever sent by the Review step itself.
+      const isReviewSave = isSignedOff && isOwner && !!reviewedAt;
+
+      // Block all other writes to signed-off assessments — permanently locked,
+      // except for the review save carved out above.
+      if (isSignedOff && !isReviewSave) {
         return { status: 403, jsonBody: { error: 'Assessment is signed off and cannot be edited' } };
       }
 
       // Check permission: owner bypasses permissions table,
-      // edit role is allowed, view role is blocked
-      const isOwner = existing[0].owner_id === user.userId;
+      // edit role is allowed, view role is blocked.
+      // (Skipped when isReviewSave is true — that path is already owner-only.)
       if (!isOwner) {
         const perm = await db.query(
           `SELECT role FROM assessment_permissions
@@ -141,9 +155,14 @@ app.http('saveAssessment', {
         }
       }
 
+      // Only persist reviewedAt when this is a genuine review save.
+      // This stops reviewedAt being written by mistake (or maliciously)
+      // outside the signed_off + owner path, even if the frontend sends it.
+      const reviewedAtToSave = isReviewSave ? reviewedAt : null;
+
       // Status forward-only guard — prevents accidental downgrade (e.g. complete → draft).
-      // COALESCE handles null (no status sent). CASE handles forward-only logic.
-      // reviewed_at only updates when Step10/Form2Step4 include reviewedAt.
+      // The signed_off branch of the CASE also means a review save can never
+      // accidentally change status away from signed_off.
       await db.query(
         `UPDATE assessments SET
            title           = $1,
@@ -163,13 +182,17 @@ app.http('saveAssessment', {
           leadName.trim(),
           JSON.stringify(cleanFormData),
           JSON.stringify(completedSteps || {}),
-          status     || null,
-          reviewedAt || null,
+          status              || null,
+          reviewedAtToSave    || null,
           assessmentId,
         ]
       );
 
-      logger.info(`Assessment updated: ${assessmentId} by ${user.userEmail}`);
+      logger.info(
+        isReviewSave
+          ? `Review completed: ${assessmentId} by ${user.userEmail}`
+          : `Assessment updated: ${assessmentId} by ${user.userEmail}`
+      );
       return { status: 200, jsonBody: { id: assessmentId } };
 
     } catch (error) {

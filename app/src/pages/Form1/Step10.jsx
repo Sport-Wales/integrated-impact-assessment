@@ -12,12 +12,25 @@ const Form1Step10 = () => {
 	const { navigateWithId } = usePreserveId();
 	const { formData, updateFormData, commitStep, confirmDbSave } = useFormContext();
 
+	const canAccessReview = formData.status === 'signed_off' && formData.userRole === 'owner';
+
 	const isReadOnly = formData.status === 'signed_off' || formData.userRole === 'view';
 
 	const [formState, setFormState] = useState({
 		unexpectedHappened:   formData.form1?.unexpectedHappened   || '',
 		needToChangeAnything: formData.form1?.needToChangeAnything || '',
 	});
+
+	useEffect(() => {
+		if (!canAccessReview) {
+		// Send them back to the Sign Off / Assessment Document page instead
+		navigate(formData.formType === 'form1' ? '/form1/step9' : '/form2/step3', {
+			replace: true,
+		});
+		}
+	}, [canAccessReview]);
+
+	if (!canAccessReview) return null;
 
 	useEffect(() => {
 		if (!formData.formType) {
