@@ -11,8 +11,7 @@ const Form2Step4 = () => {
   const { navigateWithId } = usePreserveId();
   const { formData, updateFormData, commitStep, confirmDbSave } = useFormContext();
 
-  const canAccessReview = formData.status === 'signed_off' && formData.userRole === 'owner';
-
+  const isReadOnly = formData.status === 'signed_off' || formData.userRole === 'view';
 
   const [formState, setFormState] = useState({
     review: formData.form2?.review || '',
@@ -20,18 +19,6 @@ const Form2Step4 = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (!canAccessReview) {
-      // Send them back to the Sign Off / Assessment Document page instead
-      navigate(formData.formType === 'form1' ? '/form1/step9' : '/form2/step3', {
-        replace: true,
-      });
-    }
-  }, [canAccessReview]);
-
-  if (!canAccessReview) return null;
-
-  
   useEffect(() => {
     if (!formData.formType) {
       navigate('/form-selection');

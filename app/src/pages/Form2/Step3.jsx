@@ -13,9 +13,6 @@ const Form2Step3 = () => {
   const { navigateWithId } = usePreserveId();
   const { formData } = useFormContext();
 
- const canAccessReview = formData.status === 'signed_off' && formData.userRole === 'owner';
-
-
   // Redirect if no form type is set (direct URL access without an active form)
   useEffect(() => {
     if (!formData.formType) navigate('/form-selection');
