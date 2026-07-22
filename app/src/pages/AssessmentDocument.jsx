@@ -338,7 +338,7 @@ const AssessmentDocument = ({ embedded = false }) => {
                 bg-green-600 text-white hover:bg-green-700
                 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
             >
-              {signingOff ? 'Signing off...' : 'Sign Off'}
+              {signingOff ? 'Submitting...' : 'Submit completed assessment'}
             </button>
           ) : null}
         </div>

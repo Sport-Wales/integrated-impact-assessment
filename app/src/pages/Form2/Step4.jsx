@@ -11,7 +11,7 @@ const Form2Step4 = () => {
   const { navigateWithId } = usePreserveId();
   const { formData, updateFormData, commitStep, confirmDbSave } = useFormContext();
 
-  const isReadOnly = formData.status === 'signed_off' || formData.userRole === 'view';
+  const isReadOnly = formData.userRole === 'view';
 
   const [formState, setFormState] = useState({
     review: formData.form2?.review || '',
@@ -91,13 +91,11 @@ const Form2Step4 = () => {
         Final Review
       </h2>
 
-      {/* {isReadOnly && (
+      {isReadOnly && (
         <p className="mb-6 text-sm text-gray-500">
-          {formData.status === 'signed_off'
-            ? 'This assessment has been signed off and cannot be edited.'
-            : 'You have view-only access to this assessment.'}
+           'You have view-only access to this assessment.'
         </p>
-      )} */}
+      )}
 
       <div className="bg-white rounded-lg shadow p-6 space-y-6">
         <div>
@@ -136,14 +134,6 @@ const Form2Step4 = () => {
             {isSubmitting ? 'Saving...' : 'Save & Back to My Assessments'}
           </button>
         )}
-        {/* {isReadOnly && (
-          <button
-            onClick={() => navigate('/')}
-            className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-[--color-sw-blue] text-white hover:bg-cyan-700"
-          >
-            Back to My Assessments
-          </button>
-        )} */}
       </div>
     </div>
   );
