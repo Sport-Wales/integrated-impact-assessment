@@ -16,9 +16,10 @@
 // Fallback list — used only when SUPER_USER env var is absent (local dev).
 // Update this array to match the Azure env var when adding/removing people.
 const LOCAL_SUPERUSERS = [
-  'anselm.powell@sport.wales',
+  'emma.wilkins@sport.wales',
   'tara.rhoseyn@sport.wales',
   'ian.blackburn@sport.wales',
+  'paul.batcup@sport.wales',
 ];
 
 /**
