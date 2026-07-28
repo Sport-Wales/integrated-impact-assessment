@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useSearchParams, useNavigate } from 'react-router-dom';
 import Header from './components/layout/Header';
+import ScrollToTop from './components/ui/ScrollToTop';
 import LoginPage from './pages/LoginPage';
 import LandingPage from './pages/LandingPage';
 import IntroPage from './pages/IntroPage';
@@ -141,6 +142,7 @@ function App() {
       <AuthGate>
         <FormProvider>
           <Router>
+          <ScrollToTop />
           <UrlAssessmentLoader>
           <div className="min-h-screen flex flex-col">
             <Header />
