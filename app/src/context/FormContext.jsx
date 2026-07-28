@@ -106,6 +106,8 @@ export const FormProvider = ({ children }) => {
     userRole:     'owner',// 'owner' | 'edit' | 'view'
     createdAt:    null,   // ISO string — set once when assessment is first created locally.
     lastSavedAt:  null,   // ISO string — updated every time the snapshot is written to localStorage.
+    signedOffAt:  null,   // ISO string — stamped once when the assessment is submitted. Drives the review-availability gate.
+    reviewedAt:   null,   // ISO string — stamped once the Final Review step has been completed.
 
     completedSteps: { form1: [], form2: [] },
 
@@ -167,6 +169,7 @@ export const FormProvider = ({ children }) => {
     // ===== FORM 2 SPECIFIC FIELDS =====
     form2: {
       assessment: '',
+      reviewDate: '',
       review:     '',
     },
   });
@@ -328,6 +331,8 @@ export const FormProvider = ({ children }) => {
         status:         dbResponse.status,
         formType:       dbResponse.form_type,
         userRole:       dbResponse.user_role || 'owner',
+        signedOffAt:    dbResponse.signed_off_at || localSnapshot.signedOffAt || null,
+        reviewedAt:     dbResponse.reviewed_at || localSnapshot.reviewedAt || null,
       };
     } else {
       // DB is authoritative — existing behaviour, unchanged
@@ -341,6 +346,8 @@ export const FormProvider = ({ children }) => {
         status:         dbResponse.status,
         formType:       dbResponse.form_type,
         userRole:       dbResponse.user_role || 'owner',
+        signedOffAt:    dbResponse.signed_off_at || null,
+        reviewedAt:     dbResponse.reviewed_at || null,
         completedSteps: dbResponse.form_data?.completedSteps || { form1: [], form2: [] },
       };
     }

@@ -122,8 +122,13 @@ app.http('saveAssessment', {
       }
 
 
-      // Block all writes to signed-off assessments — permanently locked
-      if (existing[0].status === 'signed_off') {
+      // Block writes to signed-off assessments — permanently locked, with one
+      // exception: the Final Review step still needs to save after submission
+      // (that's the whole point of it — it happens once the work has actually
+      // taken place, months after sign-off). Only requests carrying reviewedAt
+      // are let through; every other field stays frontend-enforced read-only
+      // once signed off, so this can't be used to edit the original content.
+      if (existing[0].status === 'signed_off' && !reviewedAt) {
         return { status: 403, jsonBody: { error: 'Assessment is signed off and cannot be edited' } };
       }
 

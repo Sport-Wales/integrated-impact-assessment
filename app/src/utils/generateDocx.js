@@ -172,6 +172,7 @@ const buildForm2Sections = (formData) => {
     ]),
     ...buildSection('2. Your Assessment', [
       ['Impacts and actions', f.assessment],
+      ['Review date', f.reviewDate || null],
     ]),
   ];
 };

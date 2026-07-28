@@ -16,6 +16,7 @@ const Form2Step2 = () => {
 
   const [formState, setFormState] = useState({
     assessment: formData.form2?.assessment || '',
+    reviewDate: formData.form2?.reviewDate || '',
   });
 
   const [isCompleting, setIsCompleting] = useState(false);
@@ -42,6 +43,7 @@ const Form2Step2 = () => {
       form2: {
         ...formData.form2,
         assessment: formState.assessment,
+        reviewDate: formState.reviewDate,
       },
       status: ASSESSMENT_STATUS.COMPLETE,
     };
@@ -83,6 +85,7 @@ const Form2Step2 = () => {
         currentStep={1} 
         completedSteps={formData.completedSteps?.form2 || []} 
         formType={formData.formType}
+        formData={formData}
       />
 
       <h2 className="text-3xl font-bold mb-8">
@@ -115,6 +118,23 @@ const Form2Step2 = () => {
             className="w-full px-4 py-2 border border-gray-300 rounded-lg"
             rows={10}
             placeholder="Describe the positive and negative impacts of your work and any actions you plan to take"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="reviewDate" className="block text-lg font-semibold mb-2">
+            When will you check progress?
+          </label>
+          <p className="text-sm text-gray-600 mb-2">Set a review date</p>
+          <input
+            type="date"
+            id="reviewDate"
+            name="reviewDate"
+            min="2025-01-01"
+            value={formState.reviewDate}
+            onChange={handleChange}
+            readOnly={isReadOnly}
+            className={`w-full px-4 py-2 border border-gray-300 rounded-lg${isReadOnly ? ' pointer-events-none' : ''}`}
           />
         </div>
 

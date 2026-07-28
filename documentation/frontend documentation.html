@@ -102,10 +102,14 @@
   </div>
   <div class="block-body">
     <p>The <strong>Integrated Impact Assessment</strong> is a framework used by Sport Wales to evaluate the impact of policies and programmes on society. It assesses how a new initiative or change affects different groups, identifies risks and opportunities, and ensures informed decision-making.</p>
-    <p>This portal provides a digital tool for completing and managing IIAs. Users fill out detailed forms (Form 1 for full assessments, Form 2 for shorter ones), save their work, collaborate with colleagues by sharing assessments, and generate professional reports for review and sign-off.</p>
+    <p>This portal provides a digital tool for completing and managing IIAs. Users fill out detailed forms (Form 1 for full assessments, Form 2 for shorter ones), save their work, collaborate with colleagues by sharing assessments, and generate professional reports for submission and later review.</p>
     <div class="callout key">
       <div class="callout-label">Key User Roles</div>
-      <p><strong>Owner:</strong> Person who created the assessment — can edit, share, complete, and sign off. <strong>Editor:</strong> Person with edit access — can save changes and complete but cannot sign off or share. <strong>Viewer:</strong> Person with view-only access — can read but cannot make changes.</p>
+      <p><strong>Owner:</strong> Person who created the assessment — can edit, share, complete, and submit. <strong>Editor:</strong> Person with edit access — can save changes and complete but cannot submit or share. <strong>Viewer:</strong> Person with view-only access — can read but cannot make changes.</p>
+    </div>
+    <div class="callout info">
+      <div class="callout-label">Submit, not "Sign Off"</div>
+      <p>The workflow used to be described as the assessment owner "signing off" their own work. It's since been reframed as <strong>Submit</strong>: before submitting, the owner ticks a checkbox confirming they've received sign-off from the project's Sponsor elsewhere (a conversation, an email — this app doesn't route that approval itself). Under the hood the status value is still <code>signed_off</code> and the API endpoint is still <code>signOffAssessment</code> — only the on-screen wording and the added checkbox changed, so no database changes were needed.</p>
     </div>
   </div>
 </div>
@@ -148,18 +152,19 @@
         <span class="flow-num">5</span> Welsh language impacts<br/>
         <span class="flow-num">6</span> Socio-economic impact<br/>
         <span class="flow-num">7</span> Environment and biodiversity<br/>
-        <span class="flow-num">8</span> Actions and next steps → <strong>Mark as Complete</strong><br/>
-        <span class="flow-num">9</span> Assessment Document (read-only summary)<br/>
-        <span class="flow-num">10</span> Unexpected outcomes and changes
+        <span class="flow-num">8</span> Actions and next steps, incl. a Review date → <strong>Mark as Complete</strong><br/>
+        <span class="flow-num">9</span> Assessment Document — tick the Sponsor sign-off checkbox → <strong>Submit</strong> (owner only)<br/>
+        <span class="flow-num">10</span> Final Review — unexpected outcomes and changes. Locked until the Review date (or 6 months after submission if left blank)
       </div>
 
       <div class="flow-box" style="margin-top: 0.75rem;">
         <strong>Form 2 Steps:</strong> <br/>
         <span class="flow-num">1</span> About your project (title, lead person)<br/>
-        <span class="flow-num">2</span> Your assessment → <strong>Mark as Complete</strong><br/>
-        <span class="flow-num">3</span> Assessment Document (read-only summary)<br/>
-        <span class="flow-num">4</span> Sign Off (owner only)
+        <span class="flow-num">2</span> Your assessment, incl. a Review date → <strong>Mark as Complete</strong><br/>
+        <span class="flow-num">3</span> Assessment Document — tick the Sponsor sign-off checkbox → <strong>Submit</strong> (owner only)<br/>
+        <span class="flow-num">4</span> Final Review — outcomes and impacts. Locked until the Review date (or 6 months after submission if left blank)
       </div>
+      <p style="margin-top:0.5rem;">Both forms' Final Review step is greyed out and unclickable on the progress bar until it's actually due — see <code>getReviewAvailability()</code> in <span class="file-path">app/src/utils/reviewGate.js</span>.</p>
 
       <p style="margin-top: 1rem;">Each step file (e.g., <span class="file-path">Form1/Step1.jsx</span>) has an <code>onChange</code> handler that calls <code>updateFormData()</code> whenever the user types:</p>
       <pre><code>// Example from Form1/Step1.jsx (lines 37–42)
@@ -203,8 +208,9 @@ const handleNext = async () => {
     </div>
 
     <div class="section">
-      <div class="section-title">Complete & Sign Off</div>
-      <p>After all steps are filled, the user clicks "Mark as Complete" (Form1 Step 8, Form 2 Step 2) which calls <code>apiService.completeAssessment(id)</code>. Later, in the Assessment Document view (AssessmentDocument.jsx at <span class="file-path">app/src/pages/AssessmentDocument.jsx</span> line 1), the owner can click "Sign Off" which calls <code>apiService.signOffAssessment(id)</code>, permanently locking the assessment as read-only.</p>
+      <div class="section-title">Complete & Submit</div>
+      <p>After all steps are filled, the user clicks "Mark as Complete" (Form1 Step 8, Form 2 Step 2) which calls <code>apiService.completeAssessment(id)</code>. Later, in the Assessment Document view (AssessmentDocument.jsx at <span class="file-path">app/src/pages/AssessmentDocument.jsx</span>), the owner ticks a checkbox confirming "I have received sign off from the project's Sponsor to submit this assessment," which enables the "Submit completed assessment" button. Clicking it calls <code>apiService.signOffAssessment(id)</code>, permanently locking the assessment's content as read-only (status becomes <code>signed_off</code> — the internal name wasn't changed, only the on-screen wording).</p>
+      <p>Submission isn't the end of the process. Each form has a Review date field (Form1 Step 8 / Form2 Step 2) — the lead can set a date to check back in on the work later, or leave it blank to default to 6 months after submission. Once that date arrives, the Final Review step (Form1 Step 10 / Form2 Step 4) unlocks, and the assessment moves from "signed off" to fully "reviewed" once that step is saved. Before the review date arrives, that step is greyed out on the progress bar and shows as an upcoming date (not a link) in the workspace table.</p>
     </div>
 
     <div class="section">
@@ -239,7 +245,7 @@ const handleNext = async () => {
   </div>
   <div class="block-body">
       <div class="section-title">Access Denied popup — Read state, show modal:</div>
-      <p>The workspace (LandingPage.jsx, lines 1–361) shows a table of assessments with columns: Title, Lead Person, Form Type, Status (Draft / Complete / Signed Off), Created, Last Updated, and Review. All assessments shown here have been retrieved from the database via <code>apiService.listAssessments()</code>.</p>
+      <p>The workspace (LandingPage.jsx) shows a table of assessments with columns: Title, Type, Created, Last Edited, Role, Complete, Submitted, Review, and Actions. All assessments shown here have been retrieved from the database via <code>apiService.listAssessments()</code>. The Review column shows an em dash until submitted, then either "From DD/MM/YYYY" (review not yet due) or a clickable "Review" link (due now) or "Reviewed" (already completed) — computed by <code>getReviewAvailability()</code> using the row's <code>signed_off_at</code> and <code>review_date</code>.</p>
     <p>For each row, users can: <strong>Click to open</strong> — loads the full assessment into FormContext. <strong>Share</strong> (DB-backed assessments only) — opens ShareModal. <strong>Delete</strong> — removes the assessment permanently after confirmation.</p>
     <div class="callout info">
       <div class="callout-label">Why Two Tables?</div>
@@ -398,7 +404,7 @@ const handleSavePermissions = async () => {
 
     <div class="callout key">
       <div class="callout-label">Permission Levels</div>
-      <p><strong>Owner:</strong> Full control — can edit, complete, sign off, delete, and share. <strong>Editor:</strong> Can edit and complete, but cannot sign off or re-share. <strong>Viewer:</strong> Read-only — cannot make any changes.</p>
+      <p><strong>Owner:</strong> Full control — can edit, complete, submit, delete, and share. <strong>Editor:</strong> Can edit and complete, but cannot submit or re-share. <strong>Viewer:</strong> Read-only — cannot make any changes.</p>
     </div>
   </div>
 </div>
@@ -458,6 +464,21 @@ const handleSavePermissions = async () => {
         <td><code>app/src/services/api.js</code></td>
         <td>API client — all backend calls (save, load, list, share, etc.)</td>
         <td><code>saveAssessment()</code> at line 135; <code>getAssessment()</code> at line 147</td>
+      </tr>
+      <tr>
+        <td><code>app/src/pages/AssessmentDocument.jsx</code></td>
+        <td>Read-only report of all form answers, embedded in Form1 Step 9 / Form2 Step 3. Renders the Sponsor sign-off checkbox and "Submit completed assessment" button, and calls <code>signOffAssessment()</code></td>
+        <td><code>handleSignOff()</code>; <code>sponsorConfirmed</code> checkbox state gates the submit button</td>
+      </tr>
+      <tr>
+        <td><code>app/src/utils/reviewGate.js</code></td>
+        <td>Single source of truth for whether the Final Review step is due — used by Step10/Step4, ProgressBar, and LandingPage so all three agree</td>
+        <td><code>getReviewAvailability(data)</code> — returns <code>{ isSubmitted, availableFrom, isAvailable }</code></td>
+      </tr>
+      <tr>
+        <td><code>app/src/components/ui/ProgressBar.jsx</code></td>
+        <td>Step indicator shown on every form page. Greys out and disables the "Review" step until <code>reviewGate.js</code> says it's due</td>
+        <td><code>handleStepClick()</code> is a no-op while a step is locked</td>
       </tr>
     </table>
   </div>

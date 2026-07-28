@@ -344,8 +344,8 @@ await db.query(
         <tr><td>updated_at</td><td>TIMESTAMPTZ</td><td>Updated automatically by a database trigger on every UPDATE. No code needed in functions.</td></tr>
         <tr><td>completed_at</td><td>TIMESTAMPTZ</td><td>Set by completeAssessment when the user marks the form done. Null until then.</td></tr>
         <tr><td>signed_off_at</td><td>TIMESTAMPTZ</td><td>Set by signOffAssessment. Null until signed off.</td></tr>
-        <tr><td>signed_off_by</td><td>TEXT</td><td>The owner_id of whoever clicked Sign Off. Audit trail.</td></tr>
-        <tr><td>reviewed_at</td><td>TIMESTAMPTZ</td><td>Set by saveAssessment when Step 10 / Form2 Step 4 sends a <code>reviewedAt</code> value. Drives the Review column in the workspace.</td></tr>
+        <tr><td>signed_off_by</td><td>TEXT</td><td>The owner_id of whoever clicked "Submit completed assessment" (internally still called sign-off). Audit trail.</td></tr>
+        <tr><td>reviewed_at</td><td>TIMESTAMPTZ</td><td>Set by saveAssessment when Step 10 / Form2 Step 4 sends a <code>reviewedAt</code> value. Drives the Review column in the workspace and marks the Review step complete on the progress bar.</td></tr>
       </table>
     </div>
 
@@ -390,7 +390,7 @@ await db.query(
     <span class="block-title">What the Database Actually Looks Like</span>
   </div>
   <div class="block-body">
-    <p>Two assessments created by user. Assessment 1 is half-complete and shared with coworker (view access). Assessment 2 is signed off and shared with other coworker (edit access), awaiting review.</p>
+    <p>Two assessments created by user. Assessment 1 is half-complete and shared with coworker (view access). Assessment 2 has been submitted and shared with other coworker (edit access); its review isn't due until 6 months after submission since no reviewDate was set.</p>
 
     <div class="section">
       <div class="section-title">assessments table</div>
@@ -434,10 +434,11 @@ await db.query(
       <div class="section-title">What the workspace table reads from these rows</div>
       <p>When user's workspace loads, <code>listAssessments</code> returns both rows because he owns them. User's workspace returns Assessment 1 with <code>user_role: 'view'</code>. The other users workspace returns Assessment 2 with <code>user_role: 'edit'</code>. The workspace table shows:</p>
       <table class="t">
-        <tr><th>Title</th><th>Status</th><th>Role</th><th>Complete ✓</th><th>Sign Off ✓</th><th>Review</th></tr>
+        <tr><th>Title</th><th>Status</th><th>Role</th><th>Complete ✓</th><th>Submitted ✓</th><th>Review</th></tr>
         <tr><td>Community Cycling Programme</td><td>draft</td><td>Owner</td><td>—</td><td>—</td><td>—</td></tr>
-        <tr><td>Active Travel Strategy</td><td>signed_off</td><td>Owner</td><td>✓</td><td>✓</td><td>Review (clickable)</td></tr>
+        <tr><td>Active Travel Strategy</td><td>signed_off</td><td>Owner</td><td>✓</td><td>✓</td><td>From 15/12/2026 (not yet due)</td></tr>
       </table>
+      <p>Once 15/12/2026 arrives (or sooner, if the lead had set an earlier <code>reviewDate</code> in the form itself), that cell becomes a clickable "Review" link, then "Reviewed" once completed.</p>
     </div>
   </div>
 </div>
@@ -466,6 +467,7 @@ await db.query(
         <div class="fn-row"><span class="fn-row-label">INSERT path</span><span class="fn-row-val">When <code>assessmentId</code> is null — creates a new row, returns the generated UUID</span></div>
         <div class="fn-row"><span class="fn-row-label">UPDATE path</span><span class="fn-row-val">When <code>assessmentId</code> is a UUID — updates the existing row after permission check</span></div>
         <div class="fn-row"><span class="fn-row-label">Key logic</span><span class="fn-row-val">Strips all internal frontend fields before storing. Status is forward-only (can't go from complete → draft). reviewed_at only updates when the frontend sends a reviewedAt value.</span></div>
+        <div class="fn-row"><span class="fn-row-label">Signed-off exception</span><span class="fn-row-val">Once <code>status = 'signed_off'</code> the assessment is normally locked, but a request that carries a <code>reviewedAt</code> value is still let through — this is the one save the Final Review step (Form1 Step 10 / Form2 Step 4) makes after submission. Every other field on a signed-off assessment stays frontend-enforced read-only, so this can't be used to edit the original content.</span></div>
       </div>
     </div>
 
@@ -493,8 +495,9 @@ await db.query(
       <div class="fn-body">
         <div class="fn-row"><span class="fn-row-label">File</span><span class="fn-row-val"><span class="file-path">api/src/functions/listAssessments.js</span></span></div>
         <div class="fn-row"><span class="fn-row-label">Called by</span><span class="fn-row-val">LandingPage on every page load</span></div>
-        <div class="fn-row"><span class="fn-row-label">Returns</span><span class="fn-row-val">Lightweight array — metadata only, no form_data. Ordered by updated_at DESC.</span></div>
+        <div class="fn-row"><span class="fn-row-label">Returns</span><span class="fn-row-val">Lightweight array — metadata only, no full form_data. Ordered by updated_at DESC.</span></div>
         <div class="fn-row"><span class="fn-row-label">Query</span><span class="fn-row-val">UNION ALL — first SELECT fetches owned assessments, second fetches shared ones. <code>AND a.owner_id != $1</code> prevents duplicates if the owner was accidentally added to permissions.</span></div>
+        <div class="fn-row"><span class="fn-row-label">review_date</span><span class="fn-row-val">One exception to "no form_data": each SELECT also pulls <code>COALESCE(form_data->'form1'->>'reviewDate', form_data->'form2'->>'reviewDate') AS review_date</code> — reading an existing JSONB field, not a schema change. The workspace table needs this to know when the Review step becomes due without fetching the full assessment.</span></div>
       </div>
     </div>
 
@@ -518,9 +521,10 @@ await db.query(
         <span class="fn-desc">Permanently lock an assessment as read-only</span>
       </div>
       <div class="fn-body">
-        <div class="fn-row"><span class="fn-row-label">Called by</span><span class="fn-row-val">AssessmentDocument.jsx Sign Off button</span></div>
+        <div class="fn-row"><span class="fn-row-label">Called by</span><span class="fn-row-val">AssessmentDocument.jsx "Submit completed assessment" button</span></div>
         <div class="fn-row"><span class="fn-row-label">Sets</span><span class="fn-row-val"><code>status = 'signed_off'</code>, <code>signed_off_at = NOW()</code>, <code>signed_off_by = userId</code></span></div>
         <div class="fn-row"><span class="fn-row-label">Allowed</span><span class="fn-row-val">Owner only. Blocked for draft status (must be complete first). Idempotent — calling twice returns 200 both times.</span></div>
+        <div class="fn-row"><span class="fn-row-label">Naming note</span><span class="fn-row-val">The user-facing workflow was renamed "Submit" (an assessment is submitted once a colleague has confirmed sign-off from the project's Sponsor elsewhere — this app doesn't route a separate approval). The function name, <code>status</code> value (<code>signed_off</code>), and DB columns (<code>signed_off_at</code>, <code>signed_off_by</code>) were deliberately left unchanged so no database migration was needed — only frontend display text changed.</span></div>
       </div>
     </div>
 
@@ -587,11 +591,11 @@ await db.query(
   </div>
   <div class="block-body">
     <p>Every function enforces its own permissions independently. There is no central middleware — each function fetches the assessment, checks ownership or the permissions table, and returns 403 if the user is not allowed. This makes each function self-contained and easy to audit.</p>
-    <p>There are three roles: <strong>owner</strong> (created the assessment), <strong>edit</strong> (shared with edit access), <strong>view</strong> (shared with read-only access). A signed-off assessment blocks all writes regardless of role.</p>
+    <p>There are three roles: <strong>owner</strong> (created the assessment), <strong>edit</strong> (shared with edit access), <strong>view</strong> (shared with read-only access). A signed-off (submitted) assessment blocks all writes regardless of role, with one deliberate exception: <code>saveAssessment</code> still accepts a request that carries <code>reviewedAt</code>, since the Final Review step has to save after submission by design — see the Review Availability section below.</p>
 
     <table class="perm-table">
       <tr><th>Function</th><th>Owner</th><th>Editor</th><th>Viewer</th><th>Signed Off</th></tr>
-      <tr><td>saveAssessment</td><td class="tick">✓</td><td class="tick">✓</td><td class="cross">✗ 403</td><td class="cross">✗ 403</td></tr>
+      <tr><td>saveAssessment</td><td class="tick">✓</td><td class="tick">✓</td><td class="cross">✗ 403</td><td class="tick">✓ only if payload includes <code>reviewedAt</code>, else ✗ 403</td></tr>
       <tr><td>getAssessment</td><td class="tick">✓</td><td class="tick">✓</td><td class="tick">✓</td><td class="tick">✓ (read only)</td></tr>
       <tr><td>listAssessments</td><td class="tick">✓ owned</td><td class="tick">✓ shared</td><td class="tick">✓ shared</td><td class="tick">✓</td></tr>
       <tr><td>completeAssessment</td><td class="tick">✓</td><td class="tick">✓</td><td class="cross">✗ 403</td><td class="cross">✗ 403</td></tr>
@@ -621,6 +625,17 @@ if (!isOwner) {
     return { status: 403, jsonBody: { error: 'You do not have permission' } };
   }
 }</code></pre>
+    </div>
+
+    <div class="callout info">
+      <div class="callout-label">Review Availability — frontend-computed, not enforced server-side</div>
+      <p>The Final Review step (Form1 Step 10 / Form2 Step 4) is meant to happen once the work has actually taken place, not immediately after submission. It stays locked until <code>getReviewAvailability()</code> in <span class="file-path">app/src/utils/reviewGate.js</span> says it's due:</p>
+      <ul>
+        <li>Never available before <code>status = 'signed_off'</code></li>
+        <li>Otherwise available from whichever date the lead entered in the <code>reviewDate</code> field (Form1 Step 8 / Form2 Step 2) — <em>or</em> <code>signed_off_at</code> + 6 months if that field was left blank</li>
+        <li>Once due, it stays available indefinitely — there's no cutoff, so a late review can always still be added</li>
+      </ul>
+      <p>This is a UI gate, not a database constraint: the backend's only involvement is the <code>saveAssessment</code> exception above (any request carrying <code>reviewedAt</code> is accepted regardless of date) and the <code>review_date</code> column added to <code>listAssessments</code>. Nothing stops a hand-crafted API call from saving a review early — the app trusts the frontend here the same way it already trusts frontend-enforced read-only fields elsewhere.</p>
     </div>
   </div>
 </div>

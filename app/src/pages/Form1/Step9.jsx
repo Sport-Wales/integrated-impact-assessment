@@ -3,14 +3,12 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
-import { usePreserveId } from '../../hooks/usePreserveId';
 import ProgressBar from '../../components/ui/ProgressBar';
 import AssessmentDocument from '../AssessmentDocument';
 import { form1Steps } from './constants';
 
 const Form1Step9 = () => {
   const navigate = useNavigate();
-  const { navigateWithId } = usePreserveId();
   const { formData } = useFormContext();
 
   // Redirect if no form type is set (direct URL access without an active form)
@@ -27,21 +25,23 @@ const Form1Step9 = () => {
           currentStep={8}
           completedSteps={formData.completedSteps?.form1 || []}
           formType={formData.formType}
+          formData={formData}
         />
       </div>
 
       {/* The full assessment report + submit */}
       <AssessmentDocument embedded />
 
-      {/* Navigation to Review step — below the document */}
-      {formData.status !== 'draft' && (
+      {/* Once submitted, send the user back to the workspace — the Review step
+          isn't reachable from here, it only unlocks once actually due. */}
+      {formData.status === 'signed_off' && (
         <div className="max-w-4xl mx-auto px-4 pb-12 flex justify-end">
           <button
-            onClick={() => navigateWithId('/form1/step10')}
+            onClick={() => navigate('/')}
             className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium
               bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 transition-colors duration-200"
           >
-            Next: Review →
+            Go back to My Assessments
           </button>
         </div>
       )}

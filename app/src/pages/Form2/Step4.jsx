@@ -4,14 +4,26 @@ import { useFormContext } from '../../context/FormContext';
 import { usePreserveId } from '../../hooks/usePreserveId';
 import { apiService } from '../../services/api';
 import ProgressBar from '../../components/ui/ProgressBar';
-import { form2Steps } from './constants'; 
+import { form2Steps } from './constants';
+import { getReviewAvailability } from '../../utils/reviewGate';
 
 const Form2Step4 = () => {
   const navigate = useNavigate();
   const { navigateWithId } = usePreserveId();
   const { formData, updateFormData, commitStep, confirmDbSave } = useFormContext();
 
-  const isReadOnly = formData.userRole === 'view';
+  const isViewOnly = formData.userRole === 'view';
+  const alreadyReviewed = !!formData.reviewedAt;
+  const reviewGate = getReviewAvailability(formData);
+  const isReadOnly = isViewOnly || !reviewGate.isAvailable || alreadyReviewed;
+
+  const reviewLockedMessage = !reviewGate.isSubmitted
+    ? 'This assessment must be submitted before it can be reviewed.'
+    : !reviewGate.isAvailable
+      ? `Review will be available from ${reviewGate.availableFrom.toLocaleDateString('en-GB')}.`
+      : alreadyReviewed
+        ? 'This review has already been completed.'
+        : 'You have view-only access to this assessment.';
 
   const [formState, setFormState] = useState({
     review: formData.form2?.review || '',
@@ -85,6 +97,7 @@ const Form2Step4 = () => {
         currentStep={3} 
         completedSteps={formData.completedSteps?.form2 || []} 
         formType={formData.formType}
+        formData={formData}
       />
 
       <h2 className="text-3xl font-bold mb-8">
@@ -93,7 +106,7 @@ const Form2Step4 = () => {
 
       {isReadOnly && (
         <p className="mb-6 text-sm text-gray-500">
-           'You have view-only access to this assessment.'
+          {reviewLockedMessage}
         </p>
       )}
 
@@ -107,7 +120,7 @@ const Form2Step4 = () => {
             name="review"
             value={formState.review}
             onChange={handleChange}
-            // readOnly={isReadOnly}
+            readOnly={isReadOnly}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg"
             rows={6}
             placeholder="Describe the outcomes, impacts, and any actions taken"

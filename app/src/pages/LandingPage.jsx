@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useFormContext } from '../context/FormContext';
 import { apiService, ASSESSMENT_STATUS } from '../services/api';
+import { getReviewAvailability } from '../utils/reviewGate';
 import ShareModal from '../components/ui/ShareModal';
 
 const LandingPage = () => {
@@ -81,8 +82,9 @@ const LandingPage = () => {
         created_at:   local.createdAt   || null,   // set by resetFormData on creation
         updated_at:   local.lastSavedAt || null,   // updated by writeAssessmentToStore on every save
         completed_at:  (local.status === 'complete' || local.status === 'signed_off') ? (local.lastSavedAt || true) : null,
-        signed_off_at: local.status === 'signed_off' ? (local.lastSavedAt || true) : null,
+        signed_off_at: local.status === 'signed_off' ? (local.signedOffAt || local.lastSavedAt || true) : null,
         reviewed_at:   local.reviewedAt || null,
+        review_date:   local.form1?.reviewDate || null,
         _isLocalOnly:  true,
         _localId:      local.localId,
       }));
@@ -284,8 +286,9 @@ const LandingPage = () => {
                       : <span className="text-gray-300">—</span>}
                   </td>
 
-                  {/* Review column — blank until submitted, then clickable "Review" in SW Blue,
-                      then "Reviewed" in SW Green once the review step has been completed */}
+                  {/* Review column — blank until submitted, then either a due date (not yet
+                      due) or clickable "Review" in SW Blue, then "Reviewed" in SW Green once
+                      the review step has been completed */}
                   <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
                     {!assessment.signed_off_at ? (
                       <span className="text-gray-300">—</span>
@@ -293,18 +296,25 @@ const LandingPage = () => {
                       <span className="text-xs font-semibold" style={{ color: 'var(--color-sw-green)' }}>
                         Reviewed
                       </span>
-                    ) : (
-                      <button
-                        onClick={() => handleOpenAssessment(
-                          assessment,
-                          assessment.form_type === 'form1' ? '/form1/step10' : '/form2/step4'
-                        )}
-                        className="text-xs font-semibold hover:underline transition-colors"
-                        style={{ color: 'var(--color-sw-blue)' }}
-                      >
-                        Review
-                      </button>
-                    )}
+                    ) : (() => {
+                      const reviewGate = getReviewAvailability(assessment);
+                      return reviewGate.isAvailable ? (
+                        <button
+                          onClick={() => handleOpenAssessment(
+                            assessment,
+                            assessment.form_type === 'form1' ? '/form1/step10' : '/form2/step4'
+                          )}
+                          className="text-xs font-semibold hover:underline transition-colors"
+                          style={{ color: 'var(--color-sw-blue)' }}
+                        >
+                          Review
+                        </button>
+                      ) : (
+                        <span className="text-xs text-gray-400" title="Review not yet due">
+                          From {formatDate(reviewGate.availableFrom)}
+                        </span>
+                      );
+                    })()}
                   </td>
                   <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
                     {assessment.user_role === 'owner' && !assessment.signed_off_at ? (

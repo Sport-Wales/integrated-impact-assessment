@@ -73,6 +73,7 @@ const Form1Step2 = () => {
 				currentStep={1}
 				completedSteps={formData.completedSteps?.form1 || []}
 				formType={formData.formType}
+				formData={formData}
 			/>
 			<h2 className="text-3xl font-bold mb-8">
 				Known impacts and strategies

@@ -110,6 +110,7 @@ const Form1Step1 = () => {
 				currentStep={0}
 				completedSteps={formData.completedSteps?.form1 || []}
 				formType={formData.formType}
+				formData={formData}
 			/>
 			<h2 className="text-3xl font-bold mb-8">
 				Enter basic details

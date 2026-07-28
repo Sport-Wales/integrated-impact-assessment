@@ -174,6 +174,7 @@ const Form2Report = ({ formData }) => {
 
       <Section number={2} title="Your Assessment">
         <Field label="Impacts and actions" value={f.assessment} />
+        <Field label="Review date" value={f.reviewDate || null} />
       </Section>
     </>
   );
@@ -207,6 +208,7 @@ const AssessmentDocument = ({ embedded = false }) => {
       // in the same tick and unmounts the component before the effect can run.
       // Direct write guarantees the workspace sees the correct status immediately.
       const localId = formData.localId;
+      const signedOffAt = new Date().toISOString();
       if (localId) {
         try {
           const raw = localStorage.getItem('iia_assessments');
@@ -215,7 +217,8 @@ const AssessmentDocument = ({ embedded = false }) => {
             store[localId] = {
               ...store[localId],
               status: 'signed_off',
-              lastSavedAt: new Date().toISOString(),
+              signedOffAt,
+              lastSavedAt: signedOffAt,
             };
             localStorage.setItem('iia_assessments', JSON.stringify(store));
           }
@@ -223,7 +226,7 @@ const AssessmentDocument = ({ embedded = false }) => {
       }
 
       // 2. Also update FormContext in memory so any remaining renders are correct
-      updateFormData({ status: 'signed_off' });
+      updateFormData({ status: 'signed_off', signedOffAt });
 
       // 3. Sync to DB if we have a real assessment ID — silent fail if unavailable
       if (formData.assessmentId) {

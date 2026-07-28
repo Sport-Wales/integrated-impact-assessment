@@ -46,6 +46,7 @@ app.http('listAssessments', {
                a.id, a.title, a.lead_name, a.form_type, a.status,
                a.created_at, a.updated_at, a.completed_at,
                a.signed_off_at, a.reviewed_at,
+               COALESCE(a.form_data->'form1'->>'reviewDate', a.form_data->'form2'->>'reviewDate') AS review_date,
                CASE
                  WHEN a.owner_id = $1 THEN 'owner'
                  WHEN p.role IS NOT NULL THEN p.role
@@ -64,6 +65,7 @@ app.http('listAssessments', {
              id, title, lead_name, form_type, status,
              created_at, updated_at, completed_at,
              signed_off_at, reviewed_at,
+             COALESCE(form_data->'form1'->>'reviewDate', form_data->'form2'->>'reviewDate') AS review_date,
              'owner' AS user_role
            FROM assessments
            WHERE owner_id = $1
@@ -74,6 +76,7 @@ app.http('listAssessments', {
              a.id, a.title, a.lead_name, a.form_type, a.status,
              a.created_at, a.updated_at, a.completed_at,
              a.signed_off_at, a.reviewed_at,
+             COALESCE(a.form_data->'form1'->>'reviewDate', a.form_data->'form2'->>'reviewDate') AS review_date,
              p.role AS user_role
            FROM assessments a
            JOIN assessment_permissions p

@@ -246,8 +246,9 @@ export default defineConfig({
 
     <!-- A.2 -->
     <div class="step">
-      <div class="step-row"><span class="dot">A2</span><div class="step-head">Environment Variable Template<small>File: <code>/.env.example</code> — in project root, committed to Git</small></div></div>
+      <div class="step-row"><span class="dot">A2</span><div class="step-head">Environment Variable Template<small>File: <code>/app/.env.example</code> — inside the app folder, committed to Git</small></div></div>
       <p>A template showing what environment variables are needed. Never contains real values — safe to commit to Git.</p>
+      <div class="note warn"><div class="note-lbl">Must live inside /app/, not the repo root</div>Vite only loads <code>.env*</code> files from its own project root — the folder containing <code>vite.config.js</code>, i.e. <code>/app/</code>. A copy sitting at the repository root is silently ignored by <code>npm run dev</code>. (The repo currently still has a legacy copy at the root from before this was corrected — it does nothing and can be deleted.)</div>
 <pre># IIA Application Environment Configuration
 # Copy this file to .env.local and fill in actual values
 # NEVER commit .env.local to Git
@@ -266,9 +267,10 @@ VITE_API_BASE_URL=/api</pre>
 
     <!-- A.3 -->
     <div class="step">
-      <div class="step-row"><span class="dot req">A3</span><div class="step-head">Create Your Personal Environment File<small>File: <code>/.env.local</code> — in project root, NEVER committed to Git</small></div></div>
-      <div class="note warn"><div class="note-lbl">Action Required</div>This file must be created manually. It is listed in <code>.gitignore</code> so it is never shared on GitHub.</div>
-<pre># Create by copying the template:
+      <div class="step-row"><span class="dot req">A3</span><div class="step-head">Create Your Personal Environment File<small>File: <code>/app/.env.local</code> — inside the app folder, NEVER committed to Git</small></div></div>
+      <div class="note warn"><div class="note-lbl">Action Required</div>This file must be created manually, <strong>inside <code>/app/</code></strong>. It is listed in <code>app/.gitignore</code> so it is never shared on GitHub.</div>
+<pre># From the repo root:
+cd app
 cp .env.example .env.local</pre>
       <p>The default values are correct for local development. You do not need to change anything unless working with specific Azure credentials.</p>
       <div class="note warn"><div class="note-lbl">&#9888; Switching Between npm run dev and swa start</div>The <code>VITE_USE_MOCK_AUTH</code> value must change depending on how you start the app:
@@ -492,29 +494,31 @@ PERMISSION_ROLE.EDIT          // 'edit'</pre>
       <div class="step-row"><span class="dot">C4</span><div class="step-head">Assessment Lifecycle — When Each API Method Is Called</div></div>
       <p>The status constants above drive a specific lifecycle through the form. Understanding this flow explains when and why each API method gets called.</p>
 
-      <div class="flow">DRAFT ──────────────────────────────────────── COMPLETE ──── SIGNED OFF ──── REVIEWED
-  │                                                │              │               │
-  │  User fills in form steps                      │              │               │
-  │  saveAssessment() on every Next click          │              │               │
-  │                                                │              │               │
-  │  Step 8 (Form1) or Step 2 (Form2):             │              │               │
-  │  completeAssessment() ─────────────────────────┘              │               │
-  │                                                               │               │
-  │  Step 9 (Form1) or Step 3 (Form2) — Sign Off page:           │               │
-  │  signOffAssessment() ─────────────────────────────────────────┘               │
-  │                                                                               │
-  │  Step 10 (Form1) or Step 4 (Form2) — Review page:                            │
-  │  saveAssessment() with review answers ────────────────────────────────────────┘</div>
+      <div class="flow">DRAFT ──────────────────────────── COMPLETE ──── SUBMITTED ──(review due)──── REVIEWED
+  │                                        │              │                          │
+  │  User fills in form steps              │              │                          │
+  │  saveAssessment() on every Next click  │              │                          │
+  │                                        │              │                          │
+  │  Step 8 (Form1) or Step 2 (Form2):     │              │                          │
+  │  completeAssessment() ─────────────────┘              │                          │
+  │                                                       │                          │
+  │  Step 9 (Form1) or Step 3 (Form2) — Submit page:      │                          │
+  │  tick Sponsor sign-off checkbox, signOffAssessment() ─┘                          │
+  │                                                                                  │
+  │  Step 10 (Form1) or Step 4 (Form2) — Final Review, locked until due:             │
+  │  saveAssessment() with reviewedAt ────────────────────────────────────────────────┘</div>
 
       <table class="t">
         <tr><th>Status transition</th><th>API method called</th><th>Triggered by</th></tr>
         <tr><td class="plain">draft &#x2192; draft (save)</td><td>saveAssessment()</td><td>Every Next button, SaveButton, title blur</td></tr>
         <tr><td class="plain">draft &#x2192; complete</td><td>completeAssessment(id)</td><td>Form1/Step8 or Form2/Step2 "Mark as Complete"</td></tr>
-        <tr><td class="plain">complete &#x2192; signed_off</td><td>signOffAssessment(id)</td><td>Sign Off button on the Assessment Document page</td></tr>
-        <tr><td class="plain">signed_off &#x2192; reviewed</td><td>saveAssessment()</td><td>Review step (Step10/Step4) "Save &amp; Back to My Assessments"</td></tr>
+        <tr><td class="plain">complete &#x2192; signed_off (displayed as "Submitted")</td><td>signOffAssessment(id)</td><td>"Submit completed assessment" button on the Assessment Document page — only enabled once the "I have received sign off from the project's Sponsor" checkbox is ticked</td></tr>
+        <tr><td class="plain">signed_off &#x2192; reviewed</td><td>saveAssessment() with <code>reviewedAt</code></td><td>Review step (Step10/Step4) "Save &amp; Back to My Assessments" — only reachable once <code>getReviewAvailability()</code> says the review is due</td></tr>
       </table>
 
-      <div class="note info"><div class="note-lbl">Permanent lock</div>Once <code>signOffAssessment()</code> is called, the assessment is permanently locked. All form inputs become read-only via the <code>isReadOnly</code> check in every step. There is no "undo sign-off" — this is by design for audit compliance.</div>
+      <div class="note info"><div class="note-lbl">Permanent lock, with one exception</div>Once <code>signOffAssessment()</code> is called, the assessment's content is permanently locked — all form inputs become read-only via the <code>isReadOnly</code> check in every step, and there is no "undo submit" (by design, for audit compliance). The one thing that can still change afterwards is the Final Review step (Step10/Step4), and only once it's actually due — see <code>app/src/utils/reviewGate.js</code>. <code>saveAssessment.js</code> has a matching backend exception: it still accepts writes to a signed-off assessment if the payload carries <code>reviewedAt</code>, otherwise it 403s exactly as before.</div>
+
+      <div class="note info"><div class="note-lbl">When is the review due?</div>Not immediately after submission — it's meant to look back at what actually happened once the work has taken place. It unlocks on whichever date the lead entered in the <code>reviewDate</code> field (Form1 Step 8 / Form2 Step 2), or 6 months after <code>signed_off_at</code> if that was left blank. Once due, it stays available indefinitely (no expiry). Until then, the "Review" step is greyed out and unclickable in <code>ProgressBar.jsx</code>, and the workspace table's Review column shows "From DD/MM/YYYY" instead of a link.</div>
     </div>
 
   </div>
@@ -722,7 +726,8 @@ const isReadOnly = formData.status === 'signed_off'
   ? &lt;NextButton onClick={handleNext} /&gt;
   : &lt;button onClick={() =&gt; navigate('/')}&gt;Back to My Assessments&lt;/button&gt;
 }</pre>
-      <div class="note info"><div class="note-lbl">When read-only is applied</div><code>signed_off</code> — assessment permanently locked after sign-off. <code>view</code> — user was shared the assessment with view-only permission (userRole set by loadAssessment from the DB response).</div>
+      <div class="note info"><div class="note-lbl">When read-only is applied</div><code>signed_off</code> — assessment content permanently locked after submission. <code>view</code> — user was shared the assessment with view-only permission (userRole set by loadAssessment from the DB response).</div>
+      <div class="note info"><div class="note-lbl">Exception: the Final Review step</div>Step 10 (Form1) / Step 4 (Form2) don't use the pattern above — <code>signed_off</code> alone does <em>not</em> make them read-only, since that's the one step meant to be filled in <em>after</em> submission. Instead they compute <code>isReadOnly = isViewOnly || !reviewGate.isAvailable || alreadyReviewed</code> using <code>getReviewAvailability()</code> from <code>app/src/utils/reviewGate.js</code>. See Section C4 for the full lifecycle.</div>
     </div>
 
   </div>
@@ -919,7 +924,7 @@ const handleNext = async () => {
 }, []);</pre>
 
       <p><strong>Opening an existing assessment — two paths depending on source:</strong></p>
-      <p>The function accepts an assessment object and an optional <code>destination</code> parameter. By default, draft assessments open at Step 1, while completed or signed-off assessments open at the Sign Off step. The destination override lets the Review column navigate directly to the review step.</p>
+      <p>The function accepts an assessment object and an optional <code>destination</code> parameter. By default, draft assessments open at Step 1, while completed or submitted assessments open at the Submit step. The destination override lets the workspace table's Review column navigate directly to the review step — but only when it's clickable, since that column is itself gated by <code>getReviewAvailability()</code> and shows a "From DD/MM/YYYY" date instead of a link until the review is due.</p>
 <pre>const handleOpenAssessment = async (assessment, destination = null) => {
   const { id, form_type, status, _isLocalOnly, _localId } = assessment;
 
@@ -1067,12 +1072,13 @@ swa start</pre>
     </div>
 
     <div class="step">
-      <div class="step-row"><span class="dot">&#x21</span><div class="step-head">Auth endpoint not available / "user is undefined"</div></div>
+      <div class="step-row"><span class="dot">&#x21</span><div class="step-head">Auth endpoint not available / "user is undefined" / stuck redirecting to /.auth/login/aad</div></div>
       <ol class="list">
-        <li>Create <code>.env.local</code> from the template: <code>cp .env.example .env.local</code></li>
+        <li>Most common cause: <code>.env.local</code> exists but is in the <strong>wrong folder</strong> — it must be inside <code>/app/</code>, not the repository root. Vite only reads env files from the folder containing <code>vite.config.js</code>, so a root-level copy is silently ignored and the app falls through to the real <code>/.auth/me</code> check, which fails with no Azure SWA backend present, redirecting you in a loop to <code>/.auth/login/aad</code>.</li>
+        <li>Create it in the right place: <code>cd app &amp;&amp; cp .env.example .env.local</code></li>
         <li>Set <code>VITE_USE_MOCK_AUTH=true</code> for <code>npm run dev</code></li>
         <li>Set <code>VITE_USE_MOCK_AUTH=false</code> for <code>swa start</code></li>
-        <li>Restart the dev server after changing <code>.env.local</code></li>
+        <li>Restart the dev server after changing <code>.env.local</code> — Vite does not hot-reload it</li>
       </ol>
     </div>
 
@@ -1123,8 +1129,8 @@ lsof -ti:7071 | xargs kill</pre>
     <table class="t">
       <tr><th>File</th><th>Purpose</th><th>Location</th></tr>
       <tr><td>vite.config.js</td><td>Proxy /api/* to port 7071 during local dev</td><td>/app/</td></tr>
-      <tr><td>.env.example</td><td>Template showing required env vars — committed to Git</td><td>root /</td></tr>
-      <tr><td>.env.local</td><td>Your personal config — never committed to Git</td><td>root / (create it)</td></tr>
+      <tr><td>.env.example</td><td>Template showing required env vars — committed to Git</td><td>/app/</td></tr>
+      <tr><td>.env.local</td><td>Your personal config (e.g. <code>VITE_USE_MOCK_AUTH=true</code>) — never committed to Git</td><td>/app/ (create it — see Section A2/A3)</td></tr>
       <tr><td>AuthContext.jsx</td><td>Auth state, login/logout, mock vs real Azure AD</td><td>/app/src/context/</td></tr>
       <tr><td>LoginPage.jsx</td><td>Full-screen login — shown by AuthGate when not authenticated</td><td>/app/src/pages/</td></tr>
       <tr><td>FormContext.jsx</td><td>All form state, localStorage, multi-assessment store</td><td>/app/src/context/</td></tr>
