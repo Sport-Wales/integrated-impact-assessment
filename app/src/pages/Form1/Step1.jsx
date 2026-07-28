@@ -116,7 +116,7 @@ const Form1Step1 = () => {
 			</h2>
 			{isReadOnly && (
 				<p className="mb-6 text-sm text-gray-500">
-					{formData.status === 'signed_off' ? 'This assessment has been signed off and cannot be edited.' : 'You have view-only access to this assessment.'}
+					{formData.status === 'signed_off' ? 'This assessment has been submitted and cannot be edited.' : 'You have view-only access to this assessment.'}
 				</p>
 			)}
 			<div className="bg-white rounded-lg shadow p-6 space-y-6">

@@ -242,7 +242,7 @@ const LandingPage = () => {
                 <th className="text-left px-4 py-3 font-semibold text-gray-700">Last Edited</th>
                 <th className="text-center px-4 py-3 font-semibold text-gray-700">Role</th>
                 <th className="text-center px-4 py-3 font-semibold text-gray-700">Complete</th>
-                <th className="text-center px-4 py-3 font-semibold text-gray-700">Sign Off</th>
+                <th className="text-center px-4 py-3 font-semibold text-gray-700">Submitted</th>
                 <th className="text-center px-4 py-3 font-semibold text-gray-700">Review</th>
                 <th className="text-center px-4 py-3 font-semibold text-gray-700">Actions</th>
               </tr>
@@ -284,7 +284,7 @@ const LandingPage = () => {
                       : <span className="text-gray-300">—</span>}
                   </td>
 
-                  {/* Review column — blank until signed off, then clickable "Review" in SW Blue,
+                  {/* Review column — blank until submitted, then clickable "Review" in SW Blue,
                       then "Reviewed" in SW Green once the review step has been completed */}
                   <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
                     {!assessment.signed_off_at ? (

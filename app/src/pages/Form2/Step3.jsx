@@ -1,5 +1,5 @@
 // src/pages/Form2/Step3.jsx
-// Sign Off step — wraps AssessmentDocument with the ProgressBar and form navigation.
+// Submit step — wraps AssessmentDocument with the ProgressBar and form navigation.
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFormContext } from '../../context/FormContext';
@@ -30,7 +30,7 @@ const Form2Step3 = () => {
         />
       </div>
 
-      {/* The full assessment report + sign off */}
+      {/* The full assessment report + submit */}
       <AssessmentDocument embedded />
 
       {/* Navigation to Review step — below the document */}

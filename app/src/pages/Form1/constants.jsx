@@ -7,6 +7,6 @@ export const form1Steps = [
 	{ id: 'socioeconomic', title: 'Socio-Economic',  description: 'Explain the socio-economic impact of your work.' },
 	{ id: 'nature',        title: 'Nature',          description: 'Describe how your work impacts the environment and biodiversity.' },
 	{ id: 'actions',       title: 'Actions',         description: 'Set out the actions taken as a result of completing this IIA and set a review date.' },
-	{ id: 'document',      title: 'Sign Off',        description: 'Review your completed assessment and sign it off.' },
+	{ id: 'document',      title: 'Submit',          description: 'Review your completed assessment and submit it.' },
 	{ id: 'review',        title: 'Review',          description: 'Consider the actual impacts on your work compared to the potential impacts you expected.' },
 ];

@@ -189,6 +189,7 @@ const AssessmentDocument = ({ embedded = false }) => {
   const [signingOff, setSigningOff]     = useState(false);
   const [signOffError, setSignOffError] = useState(null);
   const [downloading, setDownloading]   = useState(false);
+  const [sponsorConfirmed, setSponsorConfirmed] = useState(false);
 
   const isForm1     = formData.formType === 'form1';
   const isDraft     = formData.status === 'draft';
@@ -233,7 +234,7 @@ const AssessmentDocument = ({ embedded = false }) => {
         }
       }
     } catch {
-      setSignOffError('Could not sign off. Please try again.');
+      setSignOffError('Could not submit. Please try again.');
     } finally {
       setSigningOff(false);
     }
@@ -295,11 +296,11 @@ const AssessmentDocument = ({ embedded = false }) => {
         </div>
       </div>
 
-      {/* Signed-off banner */}
+      {/* Submitted banner */}
       {isSignedOff && (
         <div className="mb-6 p-4 bg-green-50  rounded">
           <p className="text-black-800 font-medium">
-            This assessment has been signed off and is locked.
+            This assessment has been submitted and is locked.
           </p>
         </div>
       )}
@@ -321,25 +322,36 @@ const AssessmentDocument = ({ embedded = false }) => {
           </button>
         ) : <div />}
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col items-end gap-3">
           {signOffError && (
             <p className="text-sm text-red-600">{signOffError}</p>
           )}
 
           {isSignedOff ? (
             <span className="inline-flex items-center px-12 py-3 rounded-md text-sm font-medium bg-gray-100 text-gray-700 border border-gray-400">
-               Signed Off ✓
+               Submitted ✓
             </span>
           ) : canSignOff ? (
-            <button
-              onClick={handleSignOff}
-              disabled={signingOff}
-              className="inline-flex items-center px-12 py-3 rounded-md text-sm font-medium
-                bg-green-600 text-white hover:bg-green-700
-                disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-            >
-              {signingOff ? 'Submitting...' : 'Submit completed assessment'}
-            </button>
+            <>
+              <label className="flex items-start gap-2 text-sm text-gray-700 max-w-md text-left">
+                <input
+                  type="checkbox"
+                  checked={sponsorConfirmed}
+                  onChange={(e) => setSponsorConfirmed(e.target.checked)}
+                  className="mt-0.5"
+                />
+                I have received sign off from the project's Sponsor to submit this assessment
+              </label>
+              <button
+                onClick={handleSignOff}
+                disabled={signingOff || !sponsorConfirmed}
+                className="inline-flex items-center px-12 py-3 rounded-md text-sm font-medium
+                  bg-green-600 text-white hover:bg-green-700
+                  disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              >
+                {signingOff ? 'Submitting...' : 'Submit completed assessment'}
+              </button>
+            </>
           ) : null}
         </div>
       </div>
