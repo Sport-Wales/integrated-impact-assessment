@@ -198,6 +198,7 @@ const ShareModal = ({ assessmentId, onClose, shareUrl = null }) => {
             Add
           </button>
         </div>
+		<p className="text-sm text-gray-400 py-2">Note: you will need to manually share the link with anyone you want to give access to.</p>
 
         {/* People with access */}
         <div className="border-t border-gray-100 pt-4">

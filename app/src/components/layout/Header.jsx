@@ -68,12 +68,29 @@ const Header = () => {
 
           {/* Pre-form pages (selection/introduction) — show Share only, no Save */}
           {isPreForm && (
-            <ShareButton isOwner={isOwner} />
+			<>
+				<span className="text-sm text-gray-600">{user?.userDetails || 'User'}</span>
+				<button
+					onClick={logout}
+					className="inline-flex items-center px-3 py-2 rounded-md text-sm bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-colors duration-200"
+				>
+					Log out
+				</button>
+				<ShareButton isOwner={isOwner} />
+			</>
+			
           )}
 
           {/* Form pages — show Save and Share */}
           {isInForm && (
             <>
+				<span className="text-sm text-gray-600">{user?.userDetails || 'User'}</span>
+				<button
+					onClick={logout}
+					className="inline-flex items-center px-3 py-2 rounded-md text-sm bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-colors duration-200"
+				>
+					Log out
+				</button>
               {canSave && <SaveButton />}
               <ShareButton isOwner={isOwner} />
             </>

@@ -42,7 +42,7 @@ app.http('getAssessment', {
         'SELECT title FROM assessments WHERE id = $1',
         [assessmentId]
       );
-
+	  
       if (exists.length === 0) {
         return { status: 404, jsonBody: { error: 'Assessment not found' } };
       }

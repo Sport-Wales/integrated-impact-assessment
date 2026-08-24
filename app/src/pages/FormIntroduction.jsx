@@ -117,6 +117,7 @@ const FormIntroduction = () => {
 				</div>
 
 				{/* Guides and resources section */}
+				{/*
 				<div className="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500" id='guides-and-resources'>
 					<h3 className="text-xl font-bold mb-4">Guides and resources</h3>
 					
@@ -143,6 +144,7 @@ const FormIntroduction = () => {
 						</li>
 					</ul>
 				</div>
+				*/}
 
 				{/* Navigation buttons */}
 				<div className="mt-12 flex justify-between">
