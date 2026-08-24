@@ -103,6 +103,10 @@ const Form2Step4 = () => {
       <h2 className="text-3xl font-bold mb-8">
         Final Review
       </h2>
+	  <p className="mb-6 text-sm text-gray-500">
+        This is a review of the project after it has been completed.
+
+		</p>
 
       {isReadOnly && (
         <p className="mb-6 text-sm text-gray-500">
@@ -113,7 +117,7 @@ const Form2Step4 = () => {
       <div className="bg-white rounded-lg shadow p-6 space-y-6">
         <div>
           <label htmlFor="review" className="block text-lg font-semibold mb-2">
-            Use this space to detail the outcome of your work. What were the positive and negative impacts? Did you have to take any actions?
+				What were the outcomes and impacts of your project?
           </label>
           <textarea
             id="review"
@@ -123,7 +127,7 @@ const Form2Step4 = () => {
             readOnly={isReadOnly}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg"
             rows={6}
-            placeholder="Describe the outcomes, impacts, and any actions taken"
+            placeholder="Please describe the outcomes, impacts, and any actions taken as part of the project."
           />
         </div>
       </div>

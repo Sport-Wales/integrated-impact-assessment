@@ -75,7 +75,6 @@ const Header = () => {
 				>
 					Log out
 				</button>
-				<ShareButton isOwner={isOwner} />
 			</>
 			
           )}

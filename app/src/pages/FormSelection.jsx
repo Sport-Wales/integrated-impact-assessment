@@ -122,8 +122,8 @@ const FormSelection = () => {
 											Full integrated impact assessments are for when an impact assessment is required.  You might describe it as a piece of work, a policy or a project. These can be reviews or changes to current policies or significant changes in how we do our work. 
 										</p>
 										  <p className="text-gray-700">The integrated impact assessment helps you to predict and plan for your work’s impacts relating to each of our {' '}
-											<a href="#" className="text-sw-blue underline hover:text-sw-blue-dark">
-												Public Duties
+											<a href="https://sport.wales/about/duties" target="_blank" rel="noopener noreferrer" className="text-sw-blue underline hover:text-sw-blue-dark">
+												 Public Duties
 											</a>.
 										  </p>
 									</div>
@@ -155,7 +155,10 @@ const FormSelection = () => {
 
 										</p>
 										<p className="text-gray-700">
-											These assessments are helpful when you want to understand how your piece of work affects the community, but it doesn’t impact our Public Duties.
+											These assessments are helpful when you want to understand how your piece of work affects the community, but it doesn’t impact our {' '}
+											<a href="https://sport.wales/about/duties" target="_blank" rel="noopener noreferrer" className="text-sw-blue underline hover:text-sw-blue-dark">
+												Public Duties
+											</a>.
 										</p>
 									</div>
 								)}

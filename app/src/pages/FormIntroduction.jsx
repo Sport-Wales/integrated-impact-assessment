@@ -41,7 +41,7 @@ const FormIntroduction = () => {
 					<ul className="list-disc ml-6 space-y-2 mb-4">
 						<li className="text-lg">a title for your piece of work,</li>
 						<li className="text-lg">the names of the person leading this impact assessment and colleagues involved,</li>
-						<li className="text-lg">a description of your piece of work</li>
+						<li className="text-lg">a description of your piece of work,</li>
 						<li className="text-lg">a list of groups your piece of work could impact (for example: the public, athletes, staff, etc.).</li>
 					</ul>
 
@@ -54,12 +54,12 @@ const FormIntroduction = () => {
 						<li className="text-lg">surveys.</li>
 					</ul>
 
-					<p className="text-lg mt-3">
+					{/* <p className="text-lg mt-3">
 						You'll find links to help with this in {'   '}
 					  <a href="#guides-and-resources" className="text-sw-blue underline hover:text-sw-blue-dark">
 						  guides and resources.
 					  </a>
-					</p>
+					</p> */}
 				</div>
 
 				{/* Who to involve section */}
