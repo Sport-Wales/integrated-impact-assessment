@@ -17,6 +17,7 @@ const Header = () => {
 
   // These are pre-form pages — form type selected but no data entered yet, so Save is hidden.
   const isPreForm = location.pathname === '/form-selection' ||
+  					location.pathname === '/intro' ||
                     location.pathname === '/form-introduction';
 
   // userRole is set in FormContext: 'owner' for new/own assessments,
