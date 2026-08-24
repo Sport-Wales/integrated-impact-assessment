@@ -78,7 +78,7 @@ const IntroPage = () => {
 								At Sport Wales, we're committed to making a real difference to people in our communities.
 							</p>
 							<p className="text-lg">
-								<a href="#" className="text-sw-blue underline font-semibold hover:text-sw-blue-dark">
+								<a target="_blank" rel="noopener noreferrer" href="https://sport.wales/about/vision-strategy" className="text-sw-blue underline font-semibold hover:text-sw-blue-dark">
 									Our vision and strategy
 								</a> states Sport Wales' aim is to create an active nation where everyone can have a lifetime enjoyment of sport.
 							</p>

@@ -47,7 +47,6 @@ const Header = () => {
           {/* Landing page — show login/logout */}
           {isOnLandingPage && isAuthenticated && (
             <div className="flex items-center space-x-3">
-              <span className="text-sm text-gray-600">{user?.userDetails || 'User'}</span>
               <button
                 onClick={logout}
                 className="inline-flex items-center px-3 py-2 rounded-md text-sm bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-colors duration-200"
@@ -69,7 +68,6 @@ const Header = () => {
           {/* Pre-form pages (selection/introduction) — show Share only, no Save */}
           {isPreForm && (
 			<>
-				<span className="text-sm text-gray-600">{user?.userDetails || 'User'}</span>
 				<button
 					onClick={logout}
 					className="inline-flex items-center px-3 py-2 rounded-md text-sm bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-colors duration-200"
@@ -84,7 +82,6 @@ const Header = () => {
           {/* Form pages — show Save and Share */}
           {isInForm && (
             <>
-				<span className="text-sm text-gray-600">{user?.userDetails || 'User'}</span>
 				<button
 					onClick={logout}
 					className="inline-flex items-center px-3 py-2 rounded-md text-sm bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-colors duration-200"
