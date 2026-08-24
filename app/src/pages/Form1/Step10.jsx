@@ -100,6 +100,10 @@ const Form1Step10 = () => {
 			<h2 className="text-3xl font-bold mb-8">
 				Step 9: Final Review
 			</h2>
+			  <p className="mb-6 text-sm text-gray-500">
+				This is a review of the project after it has been completed.
+
+				</p>
 
 			{isReadOnly && (
 				<p className="mb-6 text-sm text-gray-500">
@@ -110,7 +114,7 @@ const Form1Step10 = () => {
 			<div className="bg-white rounded-lg shadow p-6 mb-8">
 				<div className="mb-6">
 					<label htmlFor="unexpectedHappened" className="block text-lg font-semibold mb-2">
-						Did anything unexpected happen?
+						Did anything unexpected happen during your project?
 					</label>
 					<p className="text-sm text-gray-600 mb-2">Good or bad</p>
 					<textarea
@@ -121,13 +125,13 @@ const Form1Step10 = () => {
 						readOnly={isReadOnly}
 						className="w-full px-4 py-2 border border-gray-300 rounded-lg"
 						rows={3}
-						placeholder="Describe any unexpected outcomes or impacts"
+						placeholder="Describe any unexpected outcomes or impacts as a result of your project"
 					/>
 				</div>
 
 				<div className="mb-6">
 					<label htmlFor="needToChangeAnything" className="block text-lg font-semibold mb-2">
-						Do we need to change anything because of this?
+						Should Sport Wales make any changes based on the outcomes?
 					</label>
 					<textarea
 						id="needToChangeAnything"
@@ -137,7 +141,7 @@ const Form1Step10 = () => {
 						readOnly={isReadOnly}
 						className="w-full px-4 py-2 border border-gray-300 rounded-lg"
 						rows={3}
-						placeholder="Describe any adjustments or changes needed"
+						placeholder="Describe any adjustments or changes needed within Sport Wales as a result of your project based on your project's outcomes"
 					/>
 				</div>
 			</div>
