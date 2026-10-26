@@ -45,6 +45,8 @@ psql iia_local -f src/db/schema.sql
 psql iia_local -c '\dt'     # should list both tables
 ```
 
+For existing databases (e.g. Azure dev/live), run any new files in `src/db/migrations/` in order instead of the full schema. Each file explains when and how to run it. Run migrations before deploying the matching function code.
+
 Then set `DB_CONNECTION_STRING` to `postgresql://<user>:<password>@localhost:5432/iia_local`.
 
 SSL is skipped automatically for `localhost` / `127.0.0.1` hosts (see `src/db/index.js`) and enabled for Azure. Keep the `user@` part of the string, as that is what the check matches on.
