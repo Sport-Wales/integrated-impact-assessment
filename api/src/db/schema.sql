@@ -89,9 +89,23 @@ CREATE TABLE IF NOT EXISTS assessments (
   -- Set when the owner completes the Final Review step (Step 10 / Form2 Step 4).
   -- Written by the backend when reviewedAt is present in the save payload.
   -- Used by the workspace table to show the Review column status.
-  reviewed_at      TIMESTAMPTZ
+  reviewed_at      TIMESTAMPTZ,
+
+  -- Frontend-generated key for the assessment's first save (the localId, e.g. 'local_...').
+  -- Makes the first INSERT idempotent: duplicate or retried first-saves from the same
+  -- owner (slow networks, double clicks, fetch retries) resolve to one row.
+  -- NULL for rows created before this column existed.
+  client_id        TEXT
 
 );
+
+-- For databases created before client_id existed (CREATE TABLE IF NOT EXISTS skips them).
+ALTER TABLE assessments ADD COLUMN IF NOT EXISTS client_id TEXT;
+
+-- Enforces one assessment per (owner, client_id). Partial so legacy NULL rows are unaffected.
+CREATE UNIQUE INDEX IF NOT EXISTS uq_assessments_owner_client_id
+  ON assessments(owner_id, client_id)
+  WHERE client_id IS NOT NULL;
 
 
 -- =============================================================

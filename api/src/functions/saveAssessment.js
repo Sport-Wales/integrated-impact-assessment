@@ -51,7 +51,7 @@ app.http('saveAssessment', {
     //    cleanFormData contains only the actual form answers.
     const {
       assessmentId,
-      localId:      _l,   // frontend localStorage key — not stored in DB
+      localId,            // frontend localStorage key — stored as client_id (idempotency key), not in form_data
       userRole:     _ur,  // computed by DB query — not stored in DB
       createdAt:    _ca,  // DB manages created_at column — not stored in form_data
       lastSavedAt:  _ls,  // frontend-only timestamp — not stored in DB
@@ -88,10 +88,26 @@ app.http('saveAssessment', {
       // INSERT — new assessment (no assessmentId yet)
       // ============================================================
       if (!assessmentId) {
+        // client_id makes this idempotent: if the same owner sends the first save twice
+        // (slow network, double click, fetch retry) the second hits the unique index and
+        // updates the existing draft instead of inserting a duplicate row.
+        // Required: without it the unique index can't protect against duplicates.
+        const clientId = typeof localId === 'string' ? localId.trim() : '';
+        if (!clientId) {
+          return { status: 400, jsonBody: { error: 'localId is required for a new assessment' } };
+        }
+
         const rows = await db.query(
           `INSERT INTO assessments
-             (owner_id, owner_email, form_type, title, lead_name, status, form_data, completed_steps)
-           VALUES ($1, $2, $3, $4, $5, 'draft', $6, $7)
+             (owner_id, owner_email, form_type, title, lead_name, status, form_data, completed_steps, client_id)
+           VALUES ($1, $2, $3, $4, $5, 'draft', $6, $7, $8)
+           ON CONFLICT (owner_id, client_id) WHERE client_id IS NOT NULL
+           DO UPDATE SET
+             title           = EXCLUDED.title,
+             lead_name       = EXCLUDED.lead_name,
+             form_data       = EXCLUDED.form_data,
+             completed_steps = EXCLUDED.completed_steps
+           WHERE assessments.status = 'draft'
            RETURNING id`,
           [
             user.userId,
@@ -101,10 +117,23 @@ app.http('saveAssessment', {
             leadName.trim(),
             JSON.stringify(cleanFormData),
             JSON.stringify(completedSteps || {}),
+            clientId,
           ]
         );
-        logger.info(`Assessment created: ${rows[0].id} by ${user.userEmail}`);
-        return { status: 200, jsonBody: { id: rows[0].id } };
+
+        // No row returned: conflict on a row that is no longer a draft, so the update was skipped.
+        // Return the existing id rather than failing.
+        let id = rows[0]?.id;
+        if (!id) {
+          const existingRow = await db.query(
+            `SELECT id FROM assessments WHERE owner_id = $1 AND client_id = $2`,
+            [user.userId, clientId]
+          );
+          id = existingRow[0].id;
+        }
+
+        logger.info(`Assessment created: ${id} by ${user.userEmail}`);
+        return { status: 200, jsonBody: { id } };
       }
 
       // ============================================================

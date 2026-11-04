@@ -91,6 +91,21 @@ const fetchWithRetry = async (url, options = {}, maxRetries = 3) => {
 };
 
 // =============================================
+// INTERNAL: Save requests
+// =============================================
+// In-flight first saves, keyed by localId. See saveAssessment.
+const firstSaves = new Map();
+
+const postSave = async (payload) => {
+  const response = await fetchWithRetry(`${API_BASE}/saveAssessment`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  return await handleResponse(response);
+};
+
+// =============================================
 // API SERVICE
 // =============================================
 // Two error-handling patterns are used deliberately:
@@ -132,13 +147,32 @@ export const apiService = {
   // NOTE: This method deliberately does NOT call handleError — it throws the raw error.
   // All callers (step files, SaveButton) silently swallow the error because localStorage
   // is always the primary store. The DB save is a best-effort background sync.
+  //
+  // Single-flight for first saves: while a first save (no assessmentId) is in flight for a
+  // localId, any further save for that localId waits for it, then goes out as an UPDATE using
+  // the returned id. This stops the title-blur / Next / Save / Share saves racing each other
+  // on slow networks, and means the latest data is always sent last. The server is also
+  // idempotent on localId, so this is an optimisation rather than the only safeguard.
   saveAssessment: async (formData) => {
-    const response = await fetchWithRetry(`${API_BASE}/saveAssessment`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    });
-    return await handleResponse(response);
+    const localId = formData.localId;
+
+    if (formData.assessmentId || !localId) return postSave(formData);
+
+    const pending = firstSaves.get(localId);
+    if (pending) {
+      const first = await pending.catch(() => null);
+      // First save succeeded: send this (newer) data as an update to the same row.
+      if (first?.id) return postSave({ ...formData, assessmentId: first.id });
+      // First save failed: fall through and try again as the first save.
+    }
+
+    const request = postSave(formData);
+    firstSaves.set(localId, request);
+    try {
+      return await request;
+    } finally {
+      if (firstSaves.get(localId) === request) firstSaves.delete(localId);
+    }
   },
 
   // Get a single assessment by ID.

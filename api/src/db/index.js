@@ -64,9 +64,12 @@ async function getConnection() {
       // - max: 10 connections maximum (prevents overwhelming database)
       // - idleTimeoutMillis: Close unused connections after 30 seconds
       // - connectionTimeoutMillis: Give up if connection takes > 10 seconds
+      // Local Postgres doesn't support SSL, so skip it for localhost connections
+      const isLocal = /@(localhost|127\.0\.0\.1)(:|\/|$)/.test(connectionString);
+
       pool = new dbClient({
         connectionString,
-        ssl: { rejectUnauthorized: false }, // Required for Azure PostgreSQL Flexible Server
+        ssl: isLocal ? false : { rejectUnauthorized: false }, // Required for Azure PostgreSQL Flexible Server
         max: 10,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 10000,
